@@ -1,103 +1,115 @@
-import Image from "next/image";
+import Link from "next/link";
+import WaitlistForm from "../components/WaitlistForm"; // 👈 Client Component import
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main className='min-h-screen bg-[#17424D] text-white'>
+      {/* Navbar */}
+      <header className='flex justify-between items-center px-6 py-4 max-w-7xl mx-auto'>
+        <h1 className='text-xl font-bold'>FraiJob</h1>
+        <nav className='space-x-6 hidden md:flex text-sm'>
+          <Link href='#'>How It Works</Link>
+          <Link href='#'>Features</Link>
+          <Link href='#'>Projects</Link>
+          <Link href='#'>Community</Link>
+          <Link href='#'>Jobs</Link>
+          <Link href='#'>Pricing</Link>
+          <Link href='#'>Testimonials</Link>
+        </nav>
+        <Link
+          href='/signup'
+          className='bg-white text-[#17424D] px-4 py-2 rounded-full text-sm font-semibold'>
+          Get started
+        </Link>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Hero */}
+      <section className='text-center py-20 px-4 max-w-3xl mx-auto'>
+        <h2 className='text-4xl md:text-5xl font-bold mb-6 leading-tight'>
+          Your AI Partner — FraiJob: <br />
+          Become a Job-Ready Talent
+        </h2>
+        <p className='text-lg mb-8 text-gray-200'>
+          Practice, prove, and unlock your next opportunity with FraiJob
+        </p>
+        <div className='flex flex-col sm:flex-row justify-center gap-4'>
+          <Link
+            href='#'
+            className='bg-white text-[#17424D] px-6 py-3 rounded-full font-semibold text-sm'>
+            Join FraiJob Waitlist
+          </Link>
+          <Link
+            href='#'
+            className='border border-white px-6 py-3 rounded-full font-semibold text-sm'>
+            Start your journey
+          </Link>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className='bg-white text-[#17424D] py-16 px-6'>
+        <div className='max-w-3xl mx-auto bg-[#F3F7FA] rounded-2xl p-6 md:p-10 text-center shadow-lg'>
+          <h3 className='text-2xl md:text-3xl font-bold leading-snug mb-6'>
+            Be the first to try FraiJob’s smart career tools.
+          </h3>
+          <WaitlistForm /> {/* 👈 Client component */}
+          <p className='mt-6 text-sm md:text-base text-gray-600 leading-relaxed'>
+            Spots are filling up fast — be among the first to shape FraiJob and
+            unlock exclusive early-access benefits. Once we’re live, this early
+            opportunity closes forever.
+          </p>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className='bg-[#F3F7FA] text-[#17424D] py-16 px-6'>
+        <div className='max-w-6xl mx-auto text-center'>
+          <h2 className='text-3xl md:text-4xl font-bold mb-10'>
+            See how FraiJob helps you build real skills and get hired - in 3 simple steps.
+          </h2>
+
+          <div className='grid md:grid-cols-3 gap-8 text-left'>
+            {/* Step 1 */}
+            <div className='bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition'>
+              <div className='w-12 h-12 rounded-full bg-[#17424D] text-white flex items-center justify-center text-xl font-bold mb-4'>
+                1
+              </div>
+              <h3 className='text-xl font-semibold mb-2'>
+                Create Your Smart Profile
+              </h3>
+              <p className='text-gray-700 text-sm'>
+                Build your AI-powered resume. Get personalized skill assessments and a roadmap for your growth.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className='bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition'>
+              <div className='w-12 h-12 rounded-full bg-[#17424D] text-white flex items-center justify-center text-xl font-bold mb-4'>
+                2
+              </div>
+              <h3 className='text-xl font-semibold mb-2'>
+                Practice & Prove Your Skills
+              </h3>
+              <p className='text-gray-700 text-sm'>
+                Join real projects, collaborate with teams, and use the AI Interview Simulator to get job-ready faster.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className='bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition'>
+              <div className='w-12 h-12 rounded-full bg-[#17424D] text-white flex items-center justify-center text-xl font-bold mb-4'>
+                3
+              </div>
+              <h3 className='text-xl font-semibold mb-2'>
+                Apply & Get Hired Instantly
+              </h3>
+              <p className='text-gray-700 text-sm'>
+                One-click apply for freelance or full-time roles. Stand out with verified skills, real experience, and AI-ranked profile.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }

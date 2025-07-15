@@ -1,0 +1,214 @@
+/* ========================= */
+/* Ubuntu shrifti            */
+/* ========================= */
+
+@font-face {
+  font-family: "Ubuntu-Bold";
+  src: url(./Ubuntu/Ubuntu-Bold.ttf);
+}
+
+@font-face {
+  font-family: "Ubuntu-BoldItalic";
+  src: url(./Ubuntu/Ubuntu-BoldItalic.ttf);
+}
+
+@font-face {
+  font-family: "Ubuntu-Italic";
+  src: url(./Ubuntu/Ubuntu-Italic.ttf);
+}
+
+@font-face {
+  font-family: "Ubuntu-Light";
+  src: url(./Ubuntu/Ubuntu-Light.ttf);
+}
+
+@font-face {
+  font-family: "Ubuntu-LightItalic";
+  src: url(./Ubuntu/Ubuntu-LightItalic.ttf);
+}
+
+@font-face {
+  font-family: "Ubuntu-Medium";
+  src: url(./Ubuntu/Ubuntu-Medium.ttf);
+}
+
+@font-face {
+  font-family: "Ubuntu-MediumItalic";
+  src: url(./Ubuntu/Ubuntu-MediumItalic.ttf);
+}
+
+@font-face {
+  font-family: "Ubuntu-Regular";
+  src: url(./Ubuntu/Ubuntu-Regular.ttf);
+}
+
+/* ========================= */
+/* Merienda shrifti          */
+/* ========================= */
+
+@font-face {
+  font-family: "Merienda-Light";
+  src: url(./Meriende/static/Merienda-Light.ttf);
+}
+
+@font-face {
+  font-family: "Merienda-Regular";
+  src: url(./Meriende/static/Merienda-Regular.ttf);
+}
+
+@font-face {
+  font-family: "Merienda-Medium";
+  src: url(./Meriende/static/Merienda-Medium.ttf);
+}
+
+@font-face {
+  font-family: "Merienda-SemiBold";
+  src: url(./Meriende/static/Merienda-SemiBold.ttf);
+}
+
+@font-face {
+  font-family: "Merienda-Bold";
+  src: url(./Meriende/static/Merienda-Bold.ttf);
+}
+
+@font-face {
+  font-family: "Merienda-ExtraBold";
+  src: url(./Meriende/static/Merienda-ExtraBold.ttf);
+}
+
+@font-face {
+  font-family: "Merienda-Black";
+  src: url(./Meriende/static/Merienda-Black.ttf);
+}
+
+/* ========================= */
+/* Roboto Mono shrifti       */
+/* ========================= */
+
+@font-face {
+  font-family: "RobotoMono-Thin";
+  src: url(./Roboto-Mono/static/RobotoMono-Thin.ttf);
+}
+
+@font-face {
+  font-family: "RobotoMono-ExtraLight";
+  src: url(./Roboto-Mono/static/RobotoMono-ExtraLight.ttf);
+}
+
+@font-face {
+  font-family: "RobotoMono-Light";
+  src: url(./Roboto-Mono/static/RobotoMono-Light.ttf);
+}
+
+@font-face {
+  font-family: "RobotoMono-Regular";
+  src: url(./Roboto-Mono/static/RobotoMono-Regular.ttf);
+}
+
+@font-face {
+  font-family: "RobotoMono-Medium";
+  src: url(./Roboto-Mono/static/RobotoMono-Medium.ttf);
+}
+
+@font-face {
+  font-family: "RobotoMono-SemiBold";
+  src: url(./Roboto-Mono/static/RobotoMono-SemiBold.ttf);
+}
+
+@font-face {
+  font-family: "RobotoMono-Bold";
+  src: url(./Roboto-Mono/static/RobotoMono-Bold.ttf);
+}
+
+@font-face {
+  font-family: "RobotoMono-ThinItalic";
+  src: url(./Roboto-Mono/static/RobotoMono-ThinItalic.ttf);
+}
+
+@font-face {
+  font-family: "RobotoMono-ExtraLightItalic";
+  src: url(./Roboto-Mono/static/RobotoMono-ExtraLightItalic.ttf);
+}
+
+@font-face {
+  font-family: "RobotoMono-LightItalic";
+  src: url(./Roboto-Mono/static/RobotoMono-LightItalic.ttf);
+}
+
+@font-face {
+  font-family: "RobotoMono-Italic";
+  src: url(./Roboto-Mono/static/RobotoMono-Italic.ttf);
+}
+
+@font-face {
+  font-family: "RobotoMono-MediumItalic";
+  src: url(./Roboto-Mono/static/RobotoMono-MediumItalic.ttf);
+}
+
+@font-face {
+  font-family: "RobotoMono-SemiBoldItalic";
+  src: url(./Roboto-Mono/static/RobotoMono-SemiBoldItalic.ttf);
+}
+
+@font-face {
+  font-family: "RobotoMono-BoldItalic";
+  src: url(./Roboto-Mono/static/RobotoMono-BoldItalic.ttf);
+}
+
+/* ========================= */
+/* Inter shrifti             */
+/* ========================= */
+
+@font-face {
+  font-family: "Inter-Thin";
+  src: url(./Inter/static/Inter_18pt-Thin.ttf);
+}
+
+@font-face {
+  font-family: "Inter-ExtraLight";
+  src: url(./Inter/static/Inter_18pt-ExtraLight.ttf);
+}
+
+@font-face {
+  font-family: "Inter-Light";
+  src: url(./Inter/static/Inter_18pt-Light.ttf);
+}
+
+@font-face {
+  font-family: "Inter-Regular";
+  src: url(./Inter/static/Inter_18pt-Regular.ttf);
+}
+
+@font-face {
+  font-family: "Inter-Medium";
+  src: url(./Inter/static/Inter_18pt-Medium.ttf);
+}
+
+@font-face {
+  font-family: "Inter-SemiBold";
+  src: url(./Inter/static/Inter_18pt-SemiBold.ttf);
+}
+
+@font-face {
+  font-family: "Inter-Bold";
+  src: url(./Inter/static/Inter_18pt-Bold.ttf);
+}
+
+@font-face {
+  font-family: "Inter-ExtraBold";
+  src: url(./Inter/static/Inter_18pt-ExtraBold.ttf);
+}
+
+@font-face {
+  font-family: "Inter-Black";
+  src: url(./Inter/static/Inter_18pt-Black.ttf);
+}
+
+/* Inter */
+
+/* Roboto */
+
+@font-face {
+  font-family: "Roboto-Medium";
+  src: url(./Roboto/static/Roboto-Medium.ttf);
+}
