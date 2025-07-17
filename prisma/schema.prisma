@@ -12,6 +12,6 @@ model User {
   name      String
   email     String   @unique
   password  String
-  role      String   @default("user") // ← BU YER BO‘LSIN
   createdAt DateTime @default(now())
+  role      String   @default("user")
 }
