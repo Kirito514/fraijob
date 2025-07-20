@@ -1,35 +1,32 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") // .env fayldan olinadi
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String   @id @default(uuid())
-  name          String?
-  email         String   @unique
-  password      String?  // faqat email/password login bo‘lsa
-  firebaseUid   String?  @unique // Firebase orqali kirgan user uchun
-  image         String?
-  role          Role     @default(USER)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  waitlist      Waitlist[] // 1 userda ko‘p waitlist entries bo‘lishi mumkin
+  id          String     @id @default(uuid())
+  name        String?
+  email       String     @unique
+  password    String?
+  firebaseUid String?    @unique
+  image       String?
+  role        Role       @default(USER)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  waitlist    Waitlist[]
 }
 
 model Waitlist {
   id        String   @id @default(uuid())
   email     String   @unique
   name      String?
-  userId    String? // optional, agar user tizimga kirgan bo‘lsa
-  user      User?   @relation(fields: [userId], references: [id])
+  userId    String?
   createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
 enum Role {

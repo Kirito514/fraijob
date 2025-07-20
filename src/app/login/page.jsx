@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle, AlertCircle, X } from "lucide-react";
-import { signIn } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { auth, provider } from "@/lib/firebase";
@@ -46,6 +45,7 @@ export default function LoginPage() {
       setNotification({ type: "error", message: "⚠️ Server xatosi" });
     }
   };
+
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
@@ -165,7 +165,7 @@ export default function LoginPage() {
         {/* Google login */}
         <button
           type='button'
-          onClick={handleGoogleLogin} // 👈 yangilandi
+          onClick={handleGoogleLogin}
           className='w-full border border-[#10B981] text-[#10B981] py-3 rounded-lg font-semibold hover:bg-[#e6f9f3] transition flex items-center justify-center gap-2'>
           <FcGoogle className='w-5 h-5' />
           Google bilan kirish
