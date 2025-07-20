@@ -18,33 +18,39 @@ export default function LoginPage() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+  e.preventDefault();
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+    const data = await res.json();
+
+    if (res.status === 200) {
+      setNotification({
+        type: "success",
+        message: "✅ Kirish muvaffaqiyatli!",
       });
+      setFormData({ email: "", password: "" });
 
-      const data = await res.json();
-
-      if (res.status === 200) {
-        setNotification({
-          type: "success",
-          message: "✅ Kirish muvaffaqiyatli!",
-        });
-        setFormData({ email: "", password: "" });
+      setTimeout(() => {
+        // 1-variant (Next.js router)
         router.push("/dashboard");
-      } else {
-        setNotification({
-          type: "error",
-          message: data.error || "❌ Login xatoligi",
-        });
-      }
-    } catch {
-      setNotification({ type: "error", message: "⚠️ Server xatosi" });
+
+        // 2-variant (ishlamasa, pastdagini oching)
+        // window.location.href = "/dashboard";
+      }, 500);
+    } else {
+      setNotification({
+        type: "error",
+        message: data.error || "❌ Login xatoligi",
+      });
     }
-  };
+  } catch {
+    setNotification({ type: "error", message: "⚠️ Server xatosi" });
+  }
+};
 
   const handleGoogleLogin = async () => {
     try {
@@ -56,7 +62,9 @@ export default function LoginPage() {
         message: `✅ Xush kelibsiz, ${user.displayName}!`,
       });
 
-      router.push("/dashboard");
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 500);
     } catch (error) {
       console.error("Google login error:", error);
       setNotification({

@@ -37,7 +37,9 @@ export async function POST(request) {
     response.cookies.set("token", token, {
       httpOnly: true,
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 kun
+      maxAge: 60 * 60 * 24 * 7,
+      sameSite: "lax", // yoki "strict"
+      // secure: process.env.NODE_ENV === "production" // localda false bo‘lishi mumkin
     });
 
     return response;
