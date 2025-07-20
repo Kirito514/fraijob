@@ -10,10 +10,12 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.10.0",
     "@prisma/client": "^6.12.0",
     "@supabase/supabase-js": "^2.52.0",
     "bcryptjs": "^3.0.2",
     "cookies": "^0.9.1",
+    "firebase": "^12.0.0",
     "framer-motion": "^12.23.6",
     "jose": "^6.0.11",
     "jsonwebtoken": "^9.0.2",
@@ -22,11 +24,13 @@
     "next-auth": "^4.24.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/react": "19.1.8",
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",

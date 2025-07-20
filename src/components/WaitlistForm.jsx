@@ -63,22 +63,30 @@ export default function WaitlistForm() {
             initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -50, opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3 max-w-md w-full
-              ${notification.type === "success" ? "bg-green-500/70" : "bg-red-500/70"}
-              backdrop-blur-md text-white border border-white/20`}
+            transition={{ duration: 0.3 }}
+            className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-fit px-6 py-4 flex items-start gap-4 rounded-2xl shadow-xl border border-white/20 backdrop-blur-md bg-white/70"
           >
-            {notification.type === "success" ? (
-              <CheckCircle size={20} className="text-white" />
-            ) : (
-              <AlertCircle size={20} className="text-white" />
-            )}
-            <p className="text-sm font-semibold flex-1">{notification.message}</p>
+            <div
+              className={`p-2 rounded-full ${
+                notification.type === "success"
+                  ? "bg-green-100 text-green-600"
+                  : "bg-red-100 text-red-600"
+              }`}
+            >
+              {notification.type === "success" ? (
+                <CheckCircle size={20} />
+              ) : (
+                <AlertCircle size={20} />
+              )}
+            </div>
+            <p className="text-sm text-gray-800 font-medium leading-snug max-w-xs">
+              {notification.message}
+            </p>
             <button
               onClick={() => setNotification(null)}
-              className="hover:text-white/80 transition"
+              className="text-gray-400 hover:text-gray-600 transition"
             >
-              <X size={18} className="text-white" />
+              <X size={18} />
             </button>
           </motion.div>
         )}
@@ -89,7 +97,7 @@ export default function WaitlistForm() {
         className="flex flex-col sm:flex-row items-center justify-center gap-4"
       >
         <input
-          type="text" // << changed from "email" to "text"
+          type="text"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email"
