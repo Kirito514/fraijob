@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, AlertCircle, X } from "lucide-react";
+import { CheckCircle, AlertCircle, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function WaitlistForm() {
   const [email, setEmail] = useState("");
   const [notification, setNotification] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,29 +23,38 @@ export default function WaitlistForm() {
       return;
     }
 
-    const response = await fetch("/api/addEmail", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      setNotification({
-        type: "success",
-        message: "Email muvaffaqiyatli yuborildi!",
+    setLoading(true);
+    try {
+      const response = await fetch("/api/addEmail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
       });
-    } else {
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setNotification({
+          type: "success",
+          message: "Email muvaffaqiyatli yuborildi!",
+        });
+      } else {
+        setNotification({
+          type: "error",
+          message: data.error || "Xatolik yuz berdi, qayta urinib ko'ring!",
+        });
+      }
+      setEmail("");
+    } catch (error) {
       setNotification({
         type: "error",
-        message: data.error || "Xatolik yuz berdi, qayta urinib ko'ring!",
+        message: "Server bilan aloqa qilishda xatolik yuz berdi.",
       });
+    } finally {
+      setLoading(false);
     }
-
-    setEmail("");
   };
 
   useEffect(() => {
@@ -102,12 +112,23 @@ export default function WaitlistForm() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email"
           className="w-full sm:w-80 px-4 py-3 rounded-full border border-gray-300 text-sm outline-none text-gray-800 bg-white shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-[#10B981] transition duration-200"
+          disabled={loading}
         />
         <button
           type="submit"
-          className="bg-[#10B981] text-white px-6 py-3 rounded-full font-semibold text-sm shadow hover:bg-[#0ea672] active:bg-[#0c8f60] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#10B981] transition duration-200"
+          disabled={loading}
+          className={`flex items-center justify-center gap-2 bg-[#10B981] text-white px-6 py-3 rounded-full font-semibold text-sm shadow hover:bg-[#0ea672] active:bg-[#0c8f60] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#10B981] transition duration-200 ${
+            loading ? "opacity-70 cursor-not-allowed" : ""
+          }`}
         >
-          🚀 Join Waitlist
+          {loading ? (
+            <>
+              <Loader2 className="animate-spin" size={18} />
+              Submitting...
+            </>
+          ) : (
+            "🚀 Join Waitlist"
+          )}
         </button>
       </form>
     </>
