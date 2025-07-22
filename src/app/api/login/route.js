@@ -11,8 +11,17 @@ export async function POST(request) {
     const { email, password } = body;
 
     const user = await prisma.user.findUnique({ where: { email } });
+
     if (!user) {
       return NextResponse.json({ error: "Email topilmadi" }, { status: 401 });
+    }
+
+    // ✅ Email tasdiqlanganmi?
+    if (!user.verified) {
+      return NextResponse.json(
+        { error: "Email hali tasdiqlanmagan. Kodni tasdiqlang." },
+        { status: 403 }
+      );
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
@@ -31,15 +40,14 @@ export async function POST(request) {
       { expiresIn: "7d" }
     );
 
-    // ✅ Tokenni cookie sifatida qaytarish
     const response = NextResponse.json({ message: "Login ok" });
 
     response.cookies.set("token", token, {
       httpOnly: true,
       path: "/",
       maxAge: 60 * 60 * 24 * 7,
-      sameSite: "lax", // yoki "strict"
-      // secure: process.env.NODE_ENV === "production" // localda false bo‘lishi mumkin
+      sameSite: "lax",
+      // secure: process.env.NODE_ENV === "production"
     });
 
     return response;

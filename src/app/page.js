@@ -17,8 +17,14 @@ import {
   ShieldCheck,
   Lightbulb,
   FileSearch,
+  Github,
+  Twitter,
+  MessageCircle,
+  Slack,
 } from "lucide-react";
 import WaitlistForm from "../components/WaitlistForm";
+import JobsSection from "@/components/JobsSection";
+import Footer from "@/components/Footer";
 
 const features = [
   {
@@ -145,7 +151,6 @@ export default function LandingPage() {
           Get started
         </Link>
       </header>
-
       {/* Hero Section */}
       <section className='relative bg-gradient-to-tr from-[#ecfdf5] via-white to-[#f0fdfa] py-24 px-4 text-center overflow-hidden'>
         <div className='absolute inset-0 z-0 overflow-hidden pointer-events-none'>
@@ -189,10 +194,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
       {/* Waitlist Form */}
       <section
-        className='bg-[#F9FAFB] text-gray-800 py-16 px-6'
+        className='bg-white text-gray-800 py-16 px-6'
         id='waitlist-form'>
         <div className='max-w-3xl mx-auto bg-white rounded-2xl p-6 md:p-10 text-center shadow-lg hover:shadow-xl'>
           <h3 className='text-2xl md:text-3xl font-bold leading-snug mb-6'>
@@ -205,7 +209,6 @@ export default function LandingPage() {
           </p>
         </div>
       </section>
-
       {/* How It Works */}
       <section className='bg-white text-gray-800 py-16 px-6' id='how-it-works'>
         <div className='max-w-6xl mx-auto text-center'>
@@ -229,9 +232,8 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
       {/* Features */}
-      <section className='bg-[#F9FAFB] text-gray-800 py-20 px-6' id='features'>
+      <section className='bg-white text-gray-800 py-20 px-6' id='features'>
         <div className='max-w-6xl mx-auto text-center'>
           <div className='inline-block bg-[#DCFCE7] text-[#10B981] px-4 py-1 rounded-full text-sm font-medium mb-4'>
             Features
@@ -252,11 +254,10 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/*  */}
+      {/* Project's  */}
       <section
         id='projects'
-        className='relative z-10 py-24 px-6 bg-[#ecfdf5] overflow-hidden'>
+        className='relative z-10 py-24 px-6 bg-white overflow-hidden'>
         {/* Gradient spotlight background */}
         <div
           className='absolute inset-0 pointer-events-none z-0'
@@ -340,6 +341,61 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      {/* community */}
+      <section
+        id='community'
+        className='relative py-36 bg-white text-gray-800 overflow-hidden flex flex-col items-center'>
+        {/* RINGS */}
+        <div className='absolute inset-0 z-0 flex justify-center items-center pointer-events-none'>
+          <div className='relative w-[700px] h-[700px]'>
+            {/* OUTER RING - almost invisible */}
+            <div className='absolute inset-0 rounded-full border-2 border-[#D1FAE5]/30 blur-sm' />
+            {/* MIDDLE RING */}
+            <div className='absolute inset-12 rounded-full border border-[#BBF7D0]/50 blur-[1px]' />
+            {/* INNER RING */}
+            <div className='absolute inset-24 rounded-full border border-[#6EE7B7]' />
+
+            {/* Floating icons using lucide-react */}
+            <Github className='absolute w-6 h-6 top-6 left-[45%] text-[#374151] animate-float' />
+            <Twitter className='absolute w-6 h-6 bottom-6 right-[45%] text-[#1DA1F2] animate-float-slow' />
+            <MessageCircle className='absolute w-6 h-6 top-[25%] right-0 text-[#6366F1] animate-pulse-slow' />
+            <Slack className='absolute w-6 h-6 bottom-[25%] left-0 text-[#0ea5e9] animate-float-slow' />
+            <Users className='absolute w-8 h-8 top-[5%] left-[15%] text-[#10B981] animate-float' />
+          </div>
+        </div>
+
+        {/* Top label and headline (outside ring) */}
+        <div className='relative z-10 mb-16 text-center'>
+          <div className='inline-block bg-[#DCFCE7] text-[#10B981] px-4 py-1 rounded-full text-sm font-medium mb-4'>
+            Community
+          </div>
+          <h2 className='text-3xl md:text-4xl font-bold max-w-xl mx-auto'>
+            The place where tech minds connect.
+          </h2>
+        </div>
+
+        {/* Inner ring content */}
+        <div className='relative z-10 text-center max-w-md mx-auto px-6'>
+          <p className='text-gray-600 text-base mb-4'>
+            Connect, share, and grow with your community.
+          </p>
+          <p className='text-gray-600 text-base mb-4'>
+            Join discussions, find teammates, and get help.
+          </p>
+          <p className='text-gray-600 text-base mb-8'>
+            Be part of a movement that empowers practical collaboration and
+            real-world experience.
+          </p>
+          <button className='bg-[#10B981] text-white px-6 py-3 rounded-full font-semibold text-sm hover:bg-[#0ea672]'>
+            Join the community
+          </button>
+        </div>
+      </section>
+      {/* jobs */}
+      <JobsSection />
+
+      {/* footer*/}
+      <Footer />
     </main>
   );
 }

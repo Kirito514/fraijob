@@ -1,7 +1,12 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { sendEmailWithCode } from '@/lib/email'
 
 const prisma = new PrismaClient()
+
+function generateCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
 
 export async function POST(request) {
   console.log('✅ STEP 1: POST function chaqirildi')
@@ -33,12 +38,28 @@ export async function POST(request) {
         name,
         email,
         password: hashedPassword,
+        verified: false, // ❗️ Aytmasangiz ham bo'ladi, default: false
       },
     })
 
-    console.log('✅ STEP 5: Bazaga yozildi:', user)
+    console.log('✅ STEP 5: Foydalanuvchi yaratildi:', user)
 
-    return new Response(JSON.stringify({ message: 'Foydalanuvchi yaratildi' }), {
+    // 🔐 STEP 6: Email verification code
+    const code = generateCode()
+    await prisma.emailVerificationCode.create({
+      data: {
+        email,
+        code,
+      },
+    })
+
+    console.log('✅ STEP 6: Verification code yaratildi:', code)
+
+    // 📧 STEP 7: Email yuborish
+    await sendEmailWithCode(email, code)
+    console.log('✅ STEP 7: Email yuborildi')
+
+    return new Response(JSON.stringify({ message: 'Kod emailga yuborildi', email }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     })

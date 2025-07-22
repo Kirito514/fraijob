@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle, AlertCircle, X } from "lucide-react";
+import { CheckCircle, AlertCircle, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { auth, provider } from "@/lib/firebase";
@@ -11,6 +11,8 @@ import { signInWithPopup } from "firebase/auth";
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [notification, setNotification] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -18,41 +20,42 @@ export default function LoginPage() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    const data = await res.json();
+    e.preventDefault();
+    setIsLoading(true);
 
-    if (res.status === 200) {
-      setNotification({
-        type: "success",
-        message: "✅ Kirish muvaffaqiyatli!",
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
-      setFormData({ email: "", password: "" });
+      const data = await res.json();
 
-      setTimeout(() => {
-        // 1-variant (Next.js router)
-        router.push("/dashboard");
+      if (res.status === 200) {
+        setNotification({
+          type: "success",
+          message: "✅ Kirish muvaffaqiyatli!",
+        });
+        setFormData({ email: "", password: "" });
 
-        // 2-variant (ishlamasa, pastdagini oching)
-        // window.location.href = "/dashboard";
-      }, 500);
-    } else {
-      setNotification({
-        type: "error",
-        message: data.error || "❌ Login xatoligi",
-      });
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 500);
+      } else {
+        setNotification({
+          type: "error",
+          message: data.error || "❌ Login xatoligi",
+        });
+      }
+    } catch {
+      setNotification({ type: "error", message: "⚠️ Server xatosi" });
+    } finally {
+      setIsLoading(false);
     }
-  } catch {
-    setNotification({ type: "error", message: "⚠️ Server xatosi" });
-  }
-};
+  };
 
   const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
@@ -71,6 +74,8 @@ export default function LoginPage() {
         type: "error",
         message: "❌ Google orqali kirishda xatolik yuz berdi",
       });
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
@@ -166,17 +171,35 @@ export default function LoginPage() {
 
         <button
           type='submit'
-          className='w-full bg-[#10B981] text-white py-3 rounded-lg font-semibold hover:bg-[#0ea672] transition'>
-          🚀 Kirish
+          disabled={isLoading}
+          className='w-full bg-[#10B981] text-white py-3 rounded-lg font-semibold hover:bg-[#0ea672] transition flex items-center justify-center gap-2'>
+          {isLoading ? (
+            <>
+              <Loader2 className='animate-spin w-5 h-5' />
+              Yuklanyapti...
+            </>
+          ) : (
+            <>🚀 Kirish</>
+          )}
         </button>
 
         {/* Google login */}
         <button
           type='button'
           onClick={handleGoogleLogin}
+          disabled={isGoogleLoading}
           className='w-full border border-[#10B981] text-[#10B981] py-3 rounded-lg font-semibold hover:bg-[#e6f9f3] transition flex items-center justify-center gap-2'>
-          <FcGoogle className='w-5 h-5' />
-          Google bilan kirish
+          {isGoogleLoading ? (
+            <>
+              <Loader2 className='animate-spin w-5 h-5' />
+              Google orqali...
+            </>
+          ) : (
+            <>
+              <FcGoogle className='w-5 h-5' />
+              Google bilan kirish
+            </>
+          )}
         </button>
 
         <p className='text-center text-sm text-gray-600'>
