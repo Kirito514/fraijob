@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma';
 
 // Foydalanuvchi o‘chirish (DELETE)
 export async function DELETE(request, { params }) {
