@@ -49,14 +49,15 @@ export default function DashboardPage() {
   const [error, setError] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Foydalanuvchi va profilni Supabase'dan olish
+  // Foydalanuvchi va profilni JWT cookie orqali olish
   useEffect(() => {
     const fetchProfile = async () => {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (!user || userError) {
+      const res = await fetch("/api/me");
+      if (!res.ok) {
         window.location.href = "/login";
         return;
       }
+      const { user } = await res.json();
       setUser(user);
       // Profil ma'lumotlari (users jadvali)
       const { data } = await supabase
@@ -110,7 +111,7 @@ export default function DashboardPage() {
 
   // Logout
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await fetch("/api/logout");
     window.location.href = "/login";
   };
 
