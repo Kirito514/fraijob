@@ -174,7 +174,7 @@ export default function DashboardPage() {
               <div className="text-gray-500">{profile.email}</div>
             </div>
           )}
-          <button
+            <button
             onClick={handleLogout}
             className="mt-2 flex items-center gap-2 text-xs text-red-600 hover:bg-white/40 px-3 py-1 rounded-md"
           >
@@ -348,13 +348,13 @@ export default function DashboardPage() {
                   className="w-full border border-gray-300 px-4 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#10B981]"
                 />
               </div>
-              <button
+                  <button
                 type="submit"
                 disabled={loading}
                 className="w-full bg-[#10B981] text-white py-3 rounded-lg font-semibold hover:bg-[#0ea672] transition flex items-center justify-center gap-2"
-              >
+                  >
                 {loading ? "Saving..." : "Save changes"}
-              </button>
+                  </button>
               {success && <div className="text-green-600 text-sm">{success}</div>}
               {error && <div className="text-red-600 text-sm">{error}</div>}
             </form>

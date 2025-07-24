@@ -72,7 +72,7 @@ const TEXT = {
     }
   },
   howItWorks: [
-    {
+  {
       title: { uz: "Profil yarating", en: "Create Your Smart Profile" },
       desc: {
         uz: "AI yordamida rezyume tuzing. Shaxsiy baholash va o‘sish yo‘nalishini oling.",
@@ -105,7 +105,7 @@ const TEXT = {
     en: "Unlock your potential with these smart features"
   },
   features: [
-    {
+  {
       title: { uz: "AI rezyume yaratuvchi", en: "Smart Resume Builder" },
       desc: {
         uz: "AI yordamida professional rezyume tuzing, ko‘nikmalaringiz va tajribangizga mos.",
@@ -118,7 +118,7 @@ const TEXT = {
       desc: {
         uz: "AI yordamida haqiqiy intervyu savollarini mashq qiling va zaif joylaringizni yaxshilang.",
         en: "Practice real interview questions with AI, get instant feedback and improve weak areas."
-      },
+  },
       icon: <BrainCircuit size={36} className='text-[#10B981] mb-4' />
     },
     {
@@ -126,7 +126,7 @@ const TEXT = {
       desc: {
         uz: "Shaxsiy baholash va kasb maqsadingizga mos o‘sish va o‘zlashtirish yo‘nalishini oling.",
         en: "Get a personalized learning and growth plan based on your current skills and career goals."
-      },
+  },
       icon: <BarChart2 size={36} className='text-[#10B981] mb-4' />
     },
     {
@@ -134,7 +134,7 @@ const TEXT = {
       desc: {
         uz: "Haqiqiy loyihalarda qatnashing, portfolio yarating va tajribangizni oling.",
         en: "Join or launch real-world projects, build your portfolio, and gain hands-on experience."
-      },
+  },
       icon: <Briefcase size={36} className='text-[#10B981] mb-4' />
     },
     {
@@ -142,7 +142,7 @@ const TEXT = {
       desc: {
         uz: "AI yordamida bir klikda ishga murojaat qiling. Sizning profilingizga mos keladigan eng yaxshi imkoniyatlarni AI taklif qiladi.",
         en: "Apply for jobs with one click — AI recommends the best opportunities for your profile."
-      },
+  },
       icon: <Rocket size={36} className='text-[#10B981] mb-4' />
     },
     {
@@ -150,7 +150,7 @@ const TEXT = {
       desc: {
         uz: "Ish beruvchilar AI asosida eng yaxshi kandidatlar ro‘yxatini olishadi, portfoliyalar va faoliyat tahlili bilan.",
         en: "Employers get top candidate shortlists with AI-based ranking, portfolios, and activity analysis."
-      },
+  },
       icon: <UserCheck size={36} className='text-[#10B981] mb-4' />
     },
     {
@@ -158,7 +158,7 @@ const TEXT = {
       desc: {
         uz: "Bilish, bilish va o‘z bilimingizni rivojlantiring. Jamoada va sirtqi ilmiy mentorlar bilan bog‘laning.",
         en: "Connect, share knowledge, ask questions, and learn from peers and industry mentors."
-      },
+  },
       icon: <Users size={36} className='text-[#10B981] mb-4' />
     },
     {
@@ -166,7 +166,7 @@ const TEXT = {
       desc: {
         uz: "Yolg‘on foydalanuvchilar uchun kutuvlar asosida ishlar olib borish imkoniyati. Yolg‘on foydalanuvchilar uchun ish tajribasi olish.",
         en: "Eligible users get invited to internships as they progress on their roadmap — gain real work experience."
-      },
+  },
       icon: <BadgeCheck size={36} className='text-[#10B981] mb-4' />
     },
     {
@@ -174,7 +174,7 @@ const TEXT = {
       desc: {
         uz: "Shaxsiy takliflar va mentorlik takliflarini oling. Sizning kasb yo‘nalishingizni yaxshilang.",
         en: "Personalized tips and mentorship recommendations to boost your career journey."
-      },
+  },
       icon: <Sparkles size={36} className='text-[#10B981] mb-4' />
     },
     {
@@ -182,7 +182,7 @@ const TEXT = {
       desc: {
         uz: "Barcha sizning afzalliklar va ko‘nikmalaringiz haqida ma'lumotlar va tasdiqlanadi. Haqiqiy vaqtda.",
         en: "All your achievements and skills are tracked and verified in real-time."
-      },
+  },
       icon: <ShieldCheck size={36} className='text-[#10B981] mb-4' />
     },
     {
@@ -192,8 +192,8 @@ const TEXT = {
         en: "Discover trending skills and the most in-demand job categories in your field."
       },
       icon: <FileSearch size={36} className='text-[#10B981] mb-4' />
-    },
-    {
+  },
+  {
       title: { uz: "AI Learning Assistant", en: "AI Learning Assistant" },
       desc: {
         uz: "Savollar berish, tushuntirishlar olish va o‘rganishda qolib qolmasangiz, AI yordamchisi sizni yordam beradi.",
@@ -391,16 +391,16 @@ export default function LandingPage() {
       <header className='sticky top-0 z-50 w-full bg-white/60 backdrop-blur-lg px-6 py-6 dark:bg-white/30'>
         <div className='max-w-7xl mx-auto flex justify-between items-center gap-20'>
           <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">FraiJob</h1>
-          <nav className='space-x-6 hidden md:flex text-sm text-gray-700'>
+        <nav className='space-x-6 hidden md:flex text-sm text-gray-700'>
             {TEXT.header[lang].map((label, i) => (
-              <Link
-                key={i}
-                href={`#${label.toLowerCase().replace(/\s+/g, "-")}`}
-                className='transition hover:text-[#10B981]'>
-                {label}
-              </Link>
-            ))}
-          </nav>
+            <Link
+              key={i}
+              href={`#${label.toLowerCase().replace(/\s+/g, "-")}`}
+              className='transition hover:text-[#10B981]'>
+              {label}
+            </Link>
+          ))}
+        </nav>
           <div className="flex items-center gap-3">
             {/* Language Switcher */}
             <div className="flex border border-gray-200 rounded-full overflow-hidden text-xs font-semibold">
@@ -431,11 +431,11 @@ export default function LandingPage() {
                 title="System mode"
               ><Monitor size={16} /></button>
             </div>
-            <Link
-              href='/signup'
+        <Link
+          href='/signup'
               className='bg-[#10B981] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#0ea672] shadow-md ml-2'>
-              Get started
-            </Link>
+          Get started
+        </Link>
           </div>
         </div>
       </header>
