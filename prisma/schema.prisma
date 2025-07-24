@@ -11,16 +11,15 @@ model User {
   id          String     @id @default(uuid())
   name        String?
   email       String     @unique
-  password    String?
-  firebaseUid String?    @unique
+  password    String?    // Google orqali kirganda bo‘sh bo'lishi mumkin
+  firebaseUid String?    @unique // Google foydalanuvchisi uchun kerakli
   image       String?
   role        Role       @default(USER)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  verified    Boolean    @default(false) // ✅ YANGI MAYDON
+  verified    Boolean    @default(false) // Email tekshiruvi yo‘q bo‘lsa true qilinadi
   waitlist    Waitlist[]
 }
-
 
 model Waitlist {
   id        String   @id @default(uuid())

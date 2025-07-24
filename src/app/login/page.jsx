@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { CheckCircle, AlertCircle, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
-import { auth, provider } from "@/lib/firebase";
-import { signInWithPopup } from "firebase/auth";
+import { supabase } from "@/utils/supabase/client";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -29,15 +28,15 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+
       const data = await res.json();
 
-      if (res.status === 200) {
+      if (res.ok) {
         setNotification({
           type: "success",
           message: "✅ Kirish muvaffaqiyatli!",
         });
         setFormData({ email: "", password: "" });
-
         setTimeout(() => {
           router.push("/dashboard");
         }, 500);
@@ -48,7 +47,10 @@ export default function LoginPage() {
         });
       }
     } catch {
-      setNotification({ type: "error", message: "⚠️ Server xatosi" });
+      setNotification({
+        type: "error",
+        message: "⚠️ Tizim xatosi",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -56,27 +58,21 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
 
-      setNotification({
-        type: "success",
-        message: `✅ Xush kelibsiz, ${user.displayName}!`,
-      });
-
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 500);
-    } catch (error) {
-      console.error("Google login error:", error);
+    if (error) {
       setNotification({
         type: "error",
         message: "❌ Google orqali kirishda xatolik yuz berdi",
       });
-    } finally {
-      setIsGoogleLoading(false);
     }
+
+    setIsGoogleLoading(false);
   };
 
   useEffect(() => {
@@ -88,7 +84,7 @@ export default function LoginPage() {
 
   return (
     <main className='min-h-screen flex items-center justify-center bg-[#ECFDF5] relative overflow-hidden px-4'>
-      {/* 🔔 Toast */}
+      {/* Toast */}
       <AnimatePresence>
         {notification && (
           <motion.div
@@ -122,7 +118,6 @@ export default function LoginPage() {
         )}
       </AnimatePresence>
 
-      {/* Bosh sahifaga qaytish */}
       <a
         href='/'
         className='absolute top-6 left-6 flex items-center gap-2 bg-white/70 text-[#10B981] border border-[#10B981] px-4 py-2 rounded-full font-medium text-sm shadow-md backdrop-blur-md hover:bg-[#e6f9f3] transition z-20'>
@@ -183,7 +178,6 @@ export default function LoginPage() {
           )}
         </button>
 
-        {/* Google login */}
         <button
           type='button'
           onClick={handleGoogleLogin}
