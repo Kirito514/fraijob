@@ -41,3 +41,12 @@ model EmailVerificationCode {
   code      String
   createdAt DateTime @default(now())
 }
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  userId    String
+  userName  String
+  message   String
+  createdAt DateTime @default(now())
+  replyTo   String?  // Reply parent xabar id-si
+}
