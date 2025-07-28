@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   GraduationCap,
   BrainCircuit,
@@ -1074,7 +1075,7 @@ export default function LandingPage() {
                         <p className='text-gray-600 leading-relaxed'>{item.desc[lang]}</p>
                       </div>
                       <div className="ml-6 bg-gradient-to-br from-emerald-100 to-blue-100 rounded-3xl flex items-center justify-center p-4">
-                        <img src={item.icon} alt={item.title[lang]} />
+                        <Image src={item.icon} alt={item.title[lang]} width={48} height={48} />
                       </div>
                     </div>
                   </div>
@@ -1100,9 +1101,11 @@ export default function LandingPage() {
                         <p className='text-gray-600 leading-relaxed'>{item.desc[lang]}</p>
                       </div>
                       <div className="mt-6 bg-gradient-to-br from-emerald-100 to-blue-100 rounded-3xl flex items-center justify-center p-3">
-                        <img
+                        <Image
                           src={item.icon}
                           alt={item.title[lang]}
+                          width={48}
+                          height={48}
                         />
                       </div>
                     </div>
@@ -1679,7 +1682,7 @@ export default function LandingPage() {
 
                         {/* Review Text */}
                         <blockquote className="text-gray-700 mb-6 leading-relaxed italic">
-                          "{review.text[lang]}"
+                          &ldquo;{review.text[lang]}&rdquo;
                         </blockquote>
 
                         {/* Highlight */}
