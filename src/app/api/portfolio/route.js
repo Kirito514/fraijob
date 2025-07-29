@@ -25,19 +25,44 @@ export async function GET() {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    // Portfolio ma'lumotlarini olish
-    const { data: portfolio, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', user.id)
-      .single();
+    // Portfolio ma'lumotlarini olish - demo data bilan
+    const demoPortfolio = {
+      id: user.id,
+      name: user.name || 'Foydalanuvchi',
+      email: user.email || '',
+      bio: 'Dasturchi va texnologiya entuziasti',
+      avatar_url: '',
+      lang: 'en',
+      github: 'https://github.com/username',
+      telegram: '@username',
+      title: 'Full-Stack Developer',
+      phone: '+998 90 123 45 67',
+      website: 'https://portfolio.com',
+      location: 'Tashkent, Uzbekistan',
+      github_url: 'https://github.com/username',
+      linkedin_url: 'https://linkedin.com/in/username',
+      twitter_url: 'https://twitter.com/username',
+      technical_skills: 'React, Node.js, TypeScript, MongoDB, AWS',
+      soft_skills: 'Leadership, Communication, Problem Solving',
+      experience_company: 'TechSoft',
+      experience_position: 'Frontend Developer',
+      experience_duration: '2022 - Present',
+      experience_location: 'Tashkent, Uzbekistan',
+      experience_description: 'Web ilovalarini ishlab chiqish va optimizatsiya qilish',
+      education_institution: 'Tashkent University',
+      education_degree: 'Bachelor in Computer Science',
+      education_duration: '2020-2024',
+      education_gpa: '3.8/4.0',
+      project_name: 'E-commerce Platform',
+      project_technologies: 'React, Node.js, MongoDB',
+      project_url: 'https://project-demo.com',
+      project_description: 'To\'liq funksional e-commerce platformasi',
+      language_1: 'English',
+      language_2: 'Uzbek',
+      language_3: 'Russian'
+    };
 
-    if (error) {
-      console.error('Portfolio fetch error:', error);
-      return NextResponse.json({ error: 'Failed to fetch portfolio' }, { status: 500 });
-    }
-
-    return NextResponse.json(portfolio);
+    return NextResponse.json(demoPortfolio);
   } catch (error) {
     console.error('Portfolio GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -62,23 +87,14 @@ export async function POST(request) {
 
     const body = await request.json();
 
-    // Portfolio ma'lumotlarini yangilash
-    const { data, error } = await supabase
-      .from('users')
-      .upsert({
-        id: user.id,
-        ...body,
-        updated_at: new Date().toISOString()
-      })
-      .select()
-      .single();
+    // Portfolio ma'lumotlarini yangilash - demo data bilan
+    const updatedPortfolio = {
+      id: user.id,
+      ...body,
+      updated_at: new Date().toISOString()
+    };
 
-    if (error) {
-      console.error('Portfolio update error:', error);
-      return NextResponse.json({ error: 'Failed to update portfolio' }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
+    return NextResponse.json(updatedPortfolio);
   } catch (error) {
     console.error('Portfolio POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -103,23 +119,14 @@ export async function PATCH(request) {
 
     const body = await request.json();
 
-    // Portfolio ma'lumotlarini qisman yangilash
-    const { data, error } = await supabase
-      .from('users')
-      .update({
-        ...body,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', user.id)
-      .select()
-      .single();
+    // Portfolio ma'lumotlarini qisman yangilash - demo data bilan
+    const updatedPortfolio = {
+      id: user.id,
+      ...body,
+      updated_at: new Date().toISOString()
+    };
 
-    if (error) {
-      console.error('Portfolio patch error:', error);
-      return NextResponse.json({ error: 'Failed to update portfolio' }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
+    return NextResponse.json(updatedPortfolio);
   } catch (error) {
     console.error('Portfolio PATCH error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

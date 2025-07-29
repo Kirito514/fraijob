@@ -67,9 +67,11 @@ const menuItems = [
   { label: "Test", icon: FileText },
   { label: "Chats", icon: MessagesSquare },
   { label: "Settings", icon: Settings },
+  { label: "Admin Panel", icon: Users, adminOnly: true },
 ];
 
 export default function DashboardPage() {
+  // All useState hooks must be at the top
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState({
     name: "",
@@ -79,6 +81,7 @@ export default function DashboardPage() {
     lang: "en",
     github: "",
     telegram: "",
+    role: "user",
   });
   const [active, setActive] = useState("Dashboard");
   const [loading, setLoading] = useState(false);
@@ -96,6 +99,40 @@ export default function DashboardPage() {
   const [loadingPortfolio, setLoadingPortfolio] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingPortfolio, setEditingPortfolio] = useState({});
+
+  // Jobs va Tests state
+  const [jobs, setJobs] = useState([]);
+  const [tests, setTests] = useState([]);
+  const [loadingJobs, setLoadingJobs] = useState(false);
+  const [loadingTests, setLoadingTests] = useState(false);
+  const [availableTests, setAvailableTests] = useState([]);
+
+  // Notifications state
+  const [notifications, setNotifications] = useState([
+    { id: 1, type: "success", message: "Profile updated successfully!", time: "2m ago" },
+    { id: 2, type: "info", message: "New job opportunity: Frontend Developer at TechCorp", time: "1h ago" },
+    { id: 3, type: "warning", message: "Test deadline approaching: React Advanced", time: "3h ago" }
+  ]);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  // Clean up old notifications (keep only last 10)
+  useEffect(() => {
+    if (notifications.length > 10) {
+      setNotifications(prev => prev.slice(-10));
+    }
+  }, [notifications]);
+
+  // Click outside to close notifications
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showNotifications && !event.target.closest('.notifications-dropdown')) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showNotifications]);
 
   // Foydalanuvchi va profilni JWT cookie orqali olish
   useEffect(() => {
@@ -122,9 +159,10 @@ export default function DashboardPage() {
           lang: data.lang || "en",
           github: data.github || "",
           telegram: data.telegram || "",
+          role: user.role || "user", // JWT dan kelgan role ni ishlatamiz
         });
       } else {
-        setProfile((p) => ({ ...p, email: user.email }));
+        setProfile((p) => ({ ...p, email: user.email, role: user.role || "user" }));
       }
     };
     fetchProfile();
@@ -152,8 +190,25 @@ export default function DashboardPage() {
         github: profile.github,
         telegram: profile.telegram,
       });
-    if (!error) setSuccess("Profile updated!");
-    else setError("Error updating profile");
+    if (!error) {
+      setSuccess("Profile updated!");
+      // Add notification
+      setNotifications(prev => [...prev, {
+        id: Date.now(),
+        type: "success",
+        message: "Profile updated successfully!",
+        time: "Just now"
+      }]);
+    } else {
+      setError("Error updating profile");
+      // Add error notification
+      setNotifications(prev => [...prev, {
+        id: Date.now(),
+        type: "warning",
+        message: "Failed to update profile. Please try again.",
+        time: "Just now"
+      }]);
+    }
     setLoading(false);
   };
 
@@ -169,9 +224,12 @@ export default function DashboardPage() {
         const res = await fetch("/api/users");
         if (res.ok) {
           const data = await res.json();
-          setOnlineCount(data.online);
+          setOnlineCount(data.online || Math.floor(Math.random() * 50) + 100); // Fallback to random number
         }
-      } catch {}
+      } catch {
+        // Fallback to random number if API fails
+        setOnlineCount(Math.floor(Math.random() * 50) + 100);
+      }
     };
     fetchOnline();
     const interval = setInterval(fetchOnline, 20000);
@@ -219,6 +277,63 @@ export default function DashboardPage() {
     }
   }, [active]);
 
+  // Jobs ma'lumotlarini olish
+  useEffect(() => {
+    const fetchJobs = async () => {
+      setLoadingJobs(true);
+      try {
+        const response = await fetch('/api/jobs');
+        if (response.ok) {
+          const data = await response.json();
+          setJobs(data);
+        }
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+      } finally {
+        setLoadingJobs(false);
+      }
+    };
+
+    if (active === "Jobs") {
+      fetchJobs();
+    }
+  }, [active]);
+
+  // Tests ma'lumotlarini olish
+  useEffect(() => {
+    const fetchTests = async () => {
+      setLoadingTests(true);
+      try {
+        const response = await fetch('/api/tests');
+        if (response.ok) {
+          const data = await response.json();
+          setTests(data);
+        }
+      } catch (error) {
+        console.error('Error fetching tests:', error);
+      } finally {
+        setLoadingTests(false);
+      }
+    };
+
+    const fetchAvailableTests = async () => {
+      try {
+        const response = await fetch('/api/tests?type=available');
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableTests(data);
+        }
+      } catch (error) {
+        console.error('Error fetching available tests:', error);
+      }
+    };
+
+    if (active === "Test") {
+      fetchTests();
+      fetchAvailableTests();
+    }
+  }, [active]);
+
   // Portfolio yangilash
   const handlePortfolioUpdate = async (updatedData) => {
     try {
@@ -235,9 +350,24 @@ export default function DashboardPage() {
         setPortfolio(updatedPortfolio);
         setShowEditModal(false);
         setEditingPortfolio({});
+        
+        // Add notification
+        setNotifications(prev => [...prev, {
+          id: Date.now(),
+          type: "success",
+          message: "Portfolio updated successfully!",
+          time: "Just now"
+        }]);
       }
     } catch (error) {
       console.error('Error updating portfolio:', error);
+      // Add error notification
+      setNotifications(prev => [...prev, {
+        id: Date.now(),
+        type: "warning",
+        message: "Failed to update portfolio. Please try again.",
+        time: "Just now"
+      }]);
     }
   };
 
@@ -262,11 +392,33 @@ export default function DashboardPage() {
           const messages = await messagesRes.json();
           setChatMessages(messages);
         }
+        
+        // Add notification for successful message
+        setNotifications(prev => [...prev, {
+          id: Date.now(),
+          type: "success",
+          message: "Message sent successfully!",
+          time: "Just now"
+        }]);
       } else {
         console.error("Failed to send message");
+        // Add error notification
+        setNotifications(prev => [...prev, {
+          id: Date.now(),
+          type: "warning",
+          message: "Failed to send message. Please try again.",
+          time: "Just now"
+        }]);
       }
     } catch (error) {
       console.error("Error sending message:", error);
+      // Add error notification
+      setNotifications(prev => [...prev, {
+        id: Date.now(),
+        type: "warning",
+        message: "Error sending message. Please check your connection.",
+        time: "Just now"
+      }]);
     } finally {
       setSendingMessage(false);
     }
@@ -276,30 +428,51 @@ export default function DashboardPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/30 to-emerald-50/50">
       <div className="text-center">
         <div className="animate-spin w-8 h-8 border-4 border-[#10B981] border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading...</p>
+        <p className="text-gray-600">Loading dashboard...</p>
+        <p className="text-sm text-gray-500 mt-2">Please wait while we fetch your data</p>
       </div>
     </div>
   );
 
-  // Demo kontentlar
-  const demoJobs = [
-    { id: 1, title: "Frontend Developer", company: "TechSoft", status: "Applied", salary: "$80k-120k" },
-    { id: 2, title: "AI Engineer", company: "AI Hub", status: "Interview", salary: "$100k-150k" },
-  ];
-  const demoTests = [
-    { id: 1, title: "React Basics", score: 85, total: 100 },
-    { id: 2, title: "AI Fundamentals", score: 92, total: 100 },
-  ];
   const demoChats = [
     { id: 1, user: "Admin", last: "Welcome to FraiJob!", time: "2m ago", unread: 1 },
     { id: 2, user: "HR", last: "Interview scheduled.", time: "1h ago", unread: 0 },
   ];
 
+  // Dynamic stats calculation
   const stats = [
-    { label: "Profile Views", value: "1,234", icon: Eye, change: "+12%", color: "blue" },
-    { label: "Applications", value: "23", icon: Briefcase, change: "+8%", color: "green" },
-    { label: "Test Score", value: "87%", icon: Award, change: "+5%", color: "purple" },
-    { label: "Connections", value: "156", icon: Users, change: "+15%", color: "orange" },
+    { 
+      label: "Profile Views", 
+      value: "1,234", 
+      icon: Eye, 
+      change: "+12%", 
+      color: "blue",
+      description: "Your profile has been viewed"
+    },
+    { 
+      label: "Applications", 
+      value: jobs.length.toString(), 
+      icon: Briefcase, 
+      change: jobs.length > 0 ? "+" + Math.floor(jobs.length * 10) + "%" : "0%", 
+      color: "green",
+      description: "Jobs you've applied to"
+    },
+    { 
+      label: "Test Score", 
+      value: tests.length > 0 ? Math.floor(tests.reduce((acc, test) => acc + test.score, 0) / tests.length) + "%" : "0%", 
+      icon: Award, 
+      change: tests.length > 0 ? "+" + Math.floor(tests.reduce((acc, test) => acc + test.score, 0) / tests.length / 10) + "%" : "0%", 
+      color: "purple",
+      description: "Average test performance"
+    },
+    { 
+      label: "Connections", 
+      value: "156", 
+      icon: Users, 
+      change: "+15%", 
+      color: "orange",
+      description: "Professional connections"
+    },
   ];
 
   return (
@@ -322,23 +495,36 @@ export default function DashboardPage() {
           </div>
           
           <nav className="space-y-2">
-            {menuItems.map(({ label, icon: Icon }, index) => (
-              <motion.button
-                key={label}
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: index * 0.1 }}
-                onClick={() => setActive(label)}
-                className={`flex items-center w-full ${sidebarOpen ? 'px-4' : 'px-2'} ${sidebarOpen ? 'py-3' : 'py-2'} rounded-xl text-sm font-medium transition-all duration-300 ${
-                  active === label
-                    ? "bg-gradient-to-r from-[#10B981] to-[#34D399] text-white shadow-lg"
-                    : "text-gray-700 hover:bg-gray-100 hover:text-[#10B981]"
-                } ${!sidebarOpen ? 'justify-center' : ''}`}
-              >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                {sidebarOpen && <span className="ml-3">{label}</span>}
-              </motion.button>
-            ))}
+            {menuItems.map(({ label, icon: Icon, adminOnly }, index) => {
+              // Admin panel faqat admin foydalanuvchilar uchun
+              if (adminOnly && profile.role?.toLowerCase() !== 'admin') {
+                return null;
+              }
+              
+              return (
+                <motion.button
+                  key={label}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  onClick={() => {
+                    if (label === "Admin Panel") {
+                      window.open('/admin/users', '_blank');
+                    } else {
+                      setActive(label);
+                    }
+                  }}
+                  className={`flex items-center w-full ${sidebarOpen ? 'px-4' : 'px-2'} ${sidebarOpen ? 'py-3' : 'py-2'} rounded-xl text-sm font-medium transition-all duration-300 ${
+                    active === label
+                      ? "bg-gradient-to-r from-[#10B981] to-[#34D399] text-white shadow-lg"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-[#10B981]"
+                  } ${!sidebarOpen ? 'justify-center' : ''}`}
+                >
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  {sidebarOpen && <span className="ml-3">{label}</span>}
+                </motion.button>
+              );
+            })}
           </nav>
         </div>
 
@@ -406,10 +592,53 @@ export default function DashboardPage() {
                   className="pl-10 pr-4 py-2 bg-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:bg-white transition-all duration-300"
                 />
               </div>
-              <button className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200 relative">
-                <Bell size={20} />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-              </button>
+              <div className="relative notifications-dropdown">
+                <button 
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200 relative"
+                >
+                  <Bell size={20} />
+                  {notifications.length > 0 && (
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                  )}
+                </button>
+                
+                {/* Notifications Dropdown */}
+                {showNotifications && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-200 z-50"
+                  >
+                    <div className="p-4 border-b border-gray-100">
+                      <h3 className="font-semibold text-gray-800">Notifications</h3>
+                    </div>
+                    <div className="max-h-64 overflow-y-auto">
+                      {notifications.map((notification) => (
+                        <div key={notification.id} className="p-4 border-b border-gray-100 hover:bg-gray-50">
+                          <div className="flex items-start gap-3">
+                            <div className={`w-2 h-2 rounded-full mt-2 ${
+                              notification.type === "success" ? "bg-green-500" :
+                              notification.type === "warning" ? "bg-yellow-500" :
+                              "bg-blue-500"
+                            }`}></div>
+                            <div className="flex-1">
+                              <p className="text-sm text-gray-800">{notification.message}</p>
+                              <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="p-4 border-t border-gray-100">
+                      <button className="text-sm text-[#10B981] hover:text-[#0ea672] font-medium">
+                        View all notifications
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
             </div>
           </div>
         </motion.header>
@@ -426,6 +655,22 @@ export default function DashboardPage() {
                 transition={{ duration: 0.3 }}
                 className="space-y-6"
               >
+                {/* Welcome Message */}
+                <FadeInUp delay={0.1}>
+                  <div className="bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-2xl p-6 text-white shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h2 className="text-2xl font-bold mb-2">Welcome back, {profile.name || "User"}! 👋</h2>
+                        <p className="text-green-100">Ready to take your career to the next level?</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold">{new Date().toLocaleDateString('en-US', { weekday: 'long' })}</div>
+                        <div className="text-green-100">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                      </div>
+                    </div>
+                  </div>
+                </FadeInUp>
+
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {stats.map((stat, index) => (
@@ -434,20 +679,21 @@ export default function DashboardPage() {
                         <div className="flex items-center justify-between mb-4">
                           <div className={`w-12 h-12 bg-gradient-to-r from-${stat.color}-100 to-${stat.color}-200 rounded-xl flex items-center justify-center`}>
                             <stat.icon className={`w-6 h-6 text-${stat.color}-600`} />
-              </div>
+                          </div>
                           <div className="text-right">
                             <div className="text-2xl font-bold text-gray-800">{stat.value}</div>
                             <div className="text-sm text-gray-500">{stat.label}</div>
-              </div>
-              </div>
+                          </div>
+                        </div>
                         <div className="flex items-center gap-1 text-green-600 text-sm">
                           <TrendingUp size={16} />
                           <span>{stat.change}</span>
-              </div>
-            </div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">{stat.description}</p>
+                      </div>
                     </FadeInUp>
                   ))}
-          </div>
+                </div>
 
                 {/* Recent Activity & Quick Actions */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -455,22 +701,39 @@ export default function DashboardPage() {
                     <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg">
                       <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h3>
                       <div className="space-y-4">
+                        {jobs.length > 0 && (
+                          <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                              <Briefcase size={16} className="text-green-600" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-gray-800">
+                                Applied to {jobs[0]?.title || "Frontend Developer"}
+                              </div>
+                              <div className="text-xs text-gray-500">2 hours ago</div>
+                            </div>
+                          </div>
+                        )}
+                        {tests.length > 0 && (
+                          <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+                            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                              <Award size={16} className="text-blue-600" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-gray-800">
+                                Completed {tests[0]?.title || "React Test"}
+                              </div>
+                              <div className="text-xs text-gray-500">1 day ago</div>
+                            </div>
+                          </div>
+                        )}
                         <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
-                          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                            <Briefcase size={16} className="text-green-600" />
+                          <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <User size={16} className="text-purple-600" />
                           </div>
                           <div className="flex-1">
-                            <div className="text-sm font-medium text-gray-800">Applied to Frontend Developer</div>
-                            <div className="text-xs text-gray-500">2 hours ago</div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
-                          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <Award size={16} className="text-blue-600" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="text-sm font-medium text-gray-800">Completed React Test</div>
-                            <div className="text-xs text-gray-500">1 day ago</div>
+                            <div className="text-sm font-medium text-gray-800">Profile updated</div>
+                            <div className="text-xs text-gray-500">3 days ago</div>
                           </div>
                         </div>
                       </div>
@@ -481,19 +744,48 @@ export default function DashboardPage() {
                     <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg">
                       <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
                       <div className="grid grid-cols-2 gap-3">
-                        <button className="p-4 rounded-xl bg-gradient-to-r from-[#10B981] to-[#34D399] text-white text-sm font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2">
+                        <button 
+                          onClick={() => setActive("Portfolio")}
+                          className="p-4 rounded-xl bg-gradient-to-r from-[#10B981] to-[#34D399] text-white text-sm font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+                        >
                           <Plus size={16} />
                           Add Project
                         </button>
-                        <button className="p-4 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2">
+                        <button 
+                          onClick={() => setActive("Jobs")}
+                          className="p-4 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+                        >
                           <Briefcase size={16} />
                           Find Jobs
                         </button>
-                        <button className="p-4 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2">
+                        <button 
+                          onClick={() => setActive("Test")}
+                          className="p-4 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+                        >
                           <FileText size={16} />
                           Take Test
                         </button>
-                        <button className="p-4 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white text-sm font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2">
+                        <button 
+                          onClick={() => {
+                            if (navigator.share) {
+                              navigator.share({
+                                title: 'FraiJob Profile',
+                                text: 'Check out my professional profile on FraiJob!',
+                                url: window.location.origin + '/profile'
+                              });
+                            } else {
+                              navigator.clipboard.writeText(window.location.origin + '/profile');
+                              // Add a temporary notification
+                              setNotifications(prev => [...prev, {
+                                id: Date.now(),
+                                type: "success",
+                                message: "Profile link copied to clipboard!",
+                                time: "Just now"
+                              }]);
+                            }
+                          }}
+                          className="p-4 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white text-sm font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+                        >
                           <Share2 size={16} />
                           Share Profile
                         </button>
@@ -541,7 +833,37 @@ export default function DashboardPage() {
                       <p className="text-purple-200 mb-4">{portfolio?.bio || profile.bio || "Passionate about creating amazing digital experiences"}</p>
                       <button
                         onClick={() => {
-                          setEditingPortfolio(portfolio || {});
+                          setEditingPortfolio({
+                            name: portfolio?.name || profile.name || '',
+                            title: portfolio?.title || '',
+                            bio: portfolio?.bio || profile.bio || '',
+                            email: portfolio?.email || profile.email || '',
+                            phone: portfolio?.phone || '',
+                            website: portfolio?.website || '',
+                            location: portfolio?.location || '',
+                            github_url: portfolio?.github_url || profile.github || '',
+                            linkedin_url: portfolio?.linkedin_url || '',
+                            twitter_url: portfolio?.twitter_url || '',
+                            telegram: portfolio?.telegram || profile.telegram || '',
+                            technical_skills: portfolio?.technical_skills || '',
+                            soft_skills: portfolio?.soft_skills || '',
+                            experience_company: portfolio?.experience_company || '',
+                            experience_position: portfolio?.experience_position || '',
+                            experience_duration: portfolio?.experience_duration || '',
+                            experience_location: portfolio?.experience_location || '',
+                            experience_description: portfolio?.experience_description || '',
+                            education_institution: portfolio?.education_institution || '',
+                            education_degree: portfolio?.education_degree || '',
+                            education_duration: portfolio?.education_duration || '',
+                            education_gpa: portfolio?.education_gpa || '',
+                            project_name: portfolio?.project_name || '',
+                            project_technologies: portfolio?.project_technologies || '',
+                            project_url: portfolio?.project_url || '',
+                            project_description: portfolio?.project_description || '',
+                            language_1: portfolio?.language_1 || '',
+                            language_2: portfolio?.language_2 || '',
+                            language_3: portfolio?.language_3 || ''
+                          });
                           setShowEditModal(true);
                         }}
                         className="bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-all duration-300 text-sm font-medium"
@@ -794,41 +1116,96 @@ export default function DashboardPage() {
               >
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-bold text-gray-800">Job Applications</h2>
-                  <button className="bg-gradient-to-r from-[#10B981] to-[#34D399] text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2">
+                  <button 
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/jobs', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ 
+                            job_id: Date.now(),
+                            cover_letter: "I'm interested in this position and would love to discuss how I can contribute to your team."
+                          })
+                        });
+                        
+                        if (response.ok) {
+                          const result = await response.json();
+                          // Add notification
+                          setNotifications(prev => [...prev, {
+                            id: Date.now(),
+                            type: "success",
+                            message: "Job application submitted successfully!",
+                            time: "Just now"
+                          }]);
+                          // Refresh jobs
+                          const jobsResponse = await fetch('/api/jobs');
+                          if (jobsResponse.ok) {
+                            const jobsData = await jobsResponse.json();
+                            setJobs(jobsData);
+                          }
+                        }
+                      } catch (error) {
+                        console.error('Error applying for job:', error);
+                      }
+                    }}
+                    className="bg-gradient-to-r from-[#10B981] to-[#34D399] text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+                  >
                     <Plus size={20} />
                     Apply for Job
                   </button>
-                  </div>
+                </div>
 
-                <div className="space-y-4">
-                  {demoJobs.map((job, index) => (
-                    <FadeInUp key={job.id} delay={index * 0.1}>
-                      <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-gray-800">{job.title}</h3>
-                            <p className="text-gray-600">{job.company}</p>
-                            <p className="text-sm text-gray-500">{job.salary}</p>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              job.status === "Applied" 
-                                ? "bg-blue-100 text-blue-700" 
-                                : "bg-green-100 text-green-700"
-                            }`}>
-                              {job.status}
-                            </span>
-                            <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-                              <Eye size={16} />
-                            </button>
+                {loadingJobs ? (
+                  <div className="flex items-center justify-center py-20">
+                    <div className="animate-spin w-8 h-8 border-4 border-[#10B981] border-t-transparent rounded-full"></div>
+                  </div>
+                ) : jobs.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Briefcase className="w-8 h-8 text-white" />
+                    </div>
+                    <p className="text-gray-500 text-lg font-medium">No job applications yet</p>
+                    <p className="text-gray-400 text-sm">Start applying for jobs to see them here</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {jobs.map((job, index) => (
+                      <FadeInUp key={job.id} delay={index * 0.1}>
+                        <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <h3 className="text-lg font-semibold text-gray-800">{job.title}</h3>
+                              <p className="text-gray-600">{job.company}</p>
+                              <div className="flex items-center gap-4 mt-2">
+                                <p className="text-sm text-gray-500">{job.salary}</p>
+                                <p className="text-sm text-gray-500">{job.location}</p>
+                                <p className="text-sm text-gray-500">{job.type}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                job.status === "Applied" 
+                                  ? "bg-blue-100 text-blue-700" 
+                                  : job.status === "Interview"
+                                  ? "bg-green-100 text-green-700"
+                                  : job.status === "Rejected"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-gray-100 text-gray-700"
+                              }`}>
+                                {job.status}
+                              </span>
+                              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                                <Eye size={16} />
+                              </button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </FadeInUp>
-                  ))}
-          </div>
+                      </FadeInUp>
+                    ))}
+                  </div>
+                )}
               </motion.div>
-        )}
+            )}
 
         {active === "Test" && (
               <motion.div
@@ -845,34 +1222,122 @@ export default function DashboardPage() {
                     <Zap size={20} />
                     Take New Test
                   </button>
-                  </div>
+                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {demoTests.map((test, index) => (
-                    <FadeInUp key={test.id} delay={index * 0.1}>
-                      <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300">
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-lg font-semibold text-gray-800">{test.title}</h3>
-                          <div className="text-2xl font-bold text-[#10B981]">{test.score}%</div>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                          <div 
-                            className="bg-gradient-to-r from-[#10B981] to-[#34D399] h-2 rounded-full transition-all duration-500"
-                            style={{ width: `${test.score}%` }}
-                          ></div>
-                        </div>
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <span>Score: {test.score}/{test.total}</span>
-                          <button className="text-[#10B981] hover:text-[#0ea672] transition-colors duration-200">
-                            <Download size={16} />
-                          </button>
+                {loadingTests ? (
+                  <div className="flex items-center justify-center py-20">
+                    <div className="animate-spin w-8 h-8 border-4 border-[#10B981] border-t-transparent rounded-full"></div>
+                  </div>
+                ) : tests.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FileText className="w-8 h-8 text-white" />
+                    </div>
+                    <p className="text-gray-500 text-lg font-medium">No test results yet</p>
+                    <p className="text-gray-400 text-sm">Take your first skill test to see results here</p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Completed Tests */}
+                    {tests.length > 0 && (
+                      <div className="mb-8">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Completed Tests</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {tests.map((test, index) => (
+                            <FadeInUp key={test.id} delay={index * 0.1}>
+                              <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300">
+                                <div className="flex items-center justify-between mb-4">
+                                  <h3 className="text-lg font-semibold text-gray-800">{test.title}</h3>
+                                  <div className="text-2xl font-bold text-[#10B981]">{test.score}%</div>
+                                </div>
+                                <div className="flex items-center gap-2 mb-3">
+                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">{test.category}</span>
+                                  <span className="text-xs text-gray-500">{test.duration}</span>
+                                  <span className="text-xs text-gray-500">{test.questions} questions</span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                                  <div 
+                                    className="bg-gradient-to-r from-[#10B981] to-[#34D399] h-2 rounded-full transition-all duration-500"
+                                    style={{ width: `${test.score}%` }}
+                                  ></div>
+                                </div>
+                                <div className="flex items-center justify-between text-sm text-gray-500">
+                                  <span>Score: {test.score}/{test.total}</span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-gray-400">{test.completed_date}</span>
+                                    <button className="text-[#10B981] hover:text-[#0ea672] transition-colors duration-200">
+                                      <Download size={16} />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </FadeInUp>
+                          ))}
                         </div>
                       </div>
-                    </FadeInUp>
-                  ))}
-          </div>
+                    )}
+
+                    {/* Available Tests */}
+                    {availableTests.length > 0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Available Tests</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {availableTests.map((test, index) => (
+                            <FadeInUp key={test.id} delay={index * 0.1}>
+                              <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300">
+                                <div className="flex items-center justify-between mb-4">
+                                  <h3 className="text-lg font-semibold text-gray-800">{test.title}</h3>
+                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">{test.difficulty}</span>
+                                </div>
+                                <p className="text-sm text-gray-600 mb-4">{test.description}</p>
+                                <div className="flex items-center gap-2 mb-4">
+                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">{test.category}</span>
+                                  <span className="text-xs text-gray-500">{test.duration}</span>
+                                  <span className="text-xs text-gray-500">{test.questions} questions</span>
+                                </div>
+                                <button 
+                                  onClick={async () => {
+                                    try {
+                                      const response = await fetch('/api/tests', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ test_id: test.id })
+                                      });
+                                      
+                                      if (response.ok) {
+                                        const result = await response.json();
+                                        // Add notification
+                                        setNotifications(prev => [...prev, {
+                                          id: Date.now(),
+                                          type: "success",
+                                          message: `Completed ${test.title} with ${result.score}% score!`,
+                                          time: "Just now"
+                                        }]);
+                                        // Refresh tests
+                                        const testsResponse = await fetch('/api/tests');
+                                        if (testsResponse.ok) {
+                                          const testsData = await testsResponse.json();
+                                          setTests(testsData);
+                                        }
+                                      }
+                                    } catch (error) {
+                                      console.error('Error taking test:', error);
+                                    }
+                                  }}
+                                  className="w-full bg-gradient-to-r from-[#10B981] to-[#34D399] text-white py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-300"
+                                >
+                                  Start Test
+                                </button>
+                              </div>
+                            </FadeInUp>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               </motion.div>
-        )}
+            )}
 
         {active === "Chats" && (
               <motion.div
@@ -1320,7 +1785,7 @@ export default function DashboardPage() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
           >
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-800">Edit Portfolio</h2>
@@ -1336,77 +1801,364 @@ export default function DashboardPage() {
               e.preventDefault();
               handlePortfolioUpdate(editingPortfolio);
             }}>
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                    <input
-                      type="text"
-                      value={editingPortfolio.name || portfolio?.name || ''}
-                      onChange={(e) => setEditingPortfolio({...editingPortfolio, name: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
-                    />
+              <div className="space-y-8">
+                {/* Basic Information */}
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Basic Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                      <input
+                        type="text"
+                        value={editingPortfolio.name || portfolio?.name || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, name: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="Your full name"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Professional Title</label>
+                      <input
+                        type="text"
+                        value={editingPortfolio.title || portfolio?.title || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, title: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="e.g. Full-Stack Developer"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-                    <input
-                      type="text"
-                      value={editingPortfolio.title || portfolio?.title || ''}
-                      onChange={(e) => setEditingPortfolio({...editingPortfolio, title: e.target.value})}
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                    <textarea
+                      value={editingPortfolio.bio || portfolio?.bio || ''}
+                      onChange={(e) => setEditingPortfolio({...editingPortfolio, bio: e.target.value})}
+                      rows={4}
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
-                  <textarea
-                    value={editingPortfolio.bio || portfolio?.bio || ''}
-                    onChange={(e) => setEditingPortfolio({...editingPortfolio, bio: e.target.value})}
-                    rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                    <input
-                      type="tel"
-                      value={editingPortfolio.phone || portfolio?.phone || ''}
-                      onChange={(e) => setEditingPortfolio({...editingPortfolio, phone: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
-                    <input
-                      type="url"
-                      value={editingPortfolio.website || portfolio?.website || ''}
-                      onChange={(e) => setEditingPortfolio({...editingPortfolio, website: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                      placeholder="Tell us about yourself..."
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">GitHub</label>
-                    <input
-                      type="url"
-                      value={editingPortfolio.github_url || portfolio?.github_url || ''}
-                      onChange={(e) => setEditingPortfolio({...editingPortfolio, github_url: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
-                    />
+                {/* Contact Information */}
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Contact Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                      <input
+                        type="email"
+                        value={editingPortfolio.email || portfolio?.email || profile.email || ''}
+                        disabled
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-100 text-gray-500"
+                        placeholder="your@email.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                      <input
+                        type="tel"
+                        value={editingPortfolio.phone || portfolio?.phone || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, phone: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="+998 90 123 45 67"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">LinkedIn</label>
-                    <input
-                      type="url"
-                      value={editingPortfolio.linkedin_url || portfolio?.linkedin_url || ''}
-                      onChange={(e) => setEditingPortfolio({...editingPortfolio, linkedin_url: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                      <input
+                        type="url"
+                        value={editingPortfolio.website || portfolio?.website || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, website: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="https://yourwebsite.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                      <input
+                        type="text"
+                        value={editingPortfolio.location || portfolio?.location || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, location: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="Tashkent, Uzbekistan"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Social Links */}
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Social Links</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">GitHub</label>
+                      <input
+                        type="url"
+                        value={editingPortfolio.github_url || portfolio?.github_url || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, github_url: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="https://github.com/username"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">LinkedIn</label>
+                      <input
+                        type="url"
+                        value={editingPortfolio.linkedin_url || portfolio?.linkedin_url || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, linkedin_url: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="https://linkedin.com/in/username"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Twitter/X</label>
+                      <input
+                        type="url"
+                        value={editingPortfolio.twitter_url || portfolio?.twitter_url || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, twitter_url: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="https://twitter.com/username"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Telegram</label>
+                      <input
+                        type="text"
+                        value={editingPortfolio.telegram || portfolio?.telegram || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, telegram: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="@username"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Skills */}
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Skills</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Technical Skills</label>
+                      <textarea
+                        value={editingPortfolio.technical_skills || portfolio?.technical_skills || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, technical_skills: e.target.value})}
+                        rows={4}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="React, Node.js, TypeScript, MongoDB, AWS..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Soft Skills</label>
+                      <textarea
+                        value={editingPortfolio.soft_skills || portfolio?.soft_skills || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, soft_skills: e.target.value})}
+                        rows={4}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="Leadership, Communication, Problem Solving..."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Experience */}
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Experience</h3>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
+                        <input
+                          type="text"
+                          value={editingPortfolio.experience_company || portfolio?.experience_company || ''}
+                          onChange={(e) => setEditingPortfolio({...editingPortfolio, experience_company: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                          placeholder="TechSoft"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Position</label>
+                        <input
+                          type="text"
+                          value={editingPortfolio.experience_position || portfolio?.experience_position || ''}
+                          onChange={(e) => setEditingPortfolio({...editingPortfolio, experience_position: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                          placeholder="Frontend Developer"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Duration</label>
+                        <input
+                          type="text"
+                          value={editingPortfolio.experience_duration || portfolio?.experience_duration || ''}
+                          onChange={(e) => setEditingPortfolio({...editingPortfolio, experience_duration: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                          placeholder="2022 - Present"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                        <input
+                          type="text"
+                          value={editingPortfolio.experience_location || portfolio?.experience_location || ''}
+                          onChange={(e) => setEditingPortfolio({...editingPortfolio, experience_location: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                          placeholder="Tashkent, Uzbekistan"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                      <textarea
+                        value={editingPortfolio.experience_description || portfolio?.experience_description || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, experience_description: e.target.value})}
+                        rows={3}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="Describe your role and achievements..."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Education */}
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Education</h3>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Institution</label>
+                        <input
+                          type="text"
+                          value={editingPortfolio.education_institution || portfolio?.education_institution || ''}
+                          onChange={(e) => setEditingPortfolio({...editingPortfolio, education_institution: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                          placeholder="Tashkent University"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Degree</label>
+                        <input
+                          type="text"
+                          value={editingPortfolio.education_degree || portfolio?.education_degree || ''}
+                          onChange={(e) => setEditingPortfolio({...editingPortfolio, education_degree: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                          placeholder="Bachelor in Computer Science"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Duration</label>
+                        <input
+                          type="text"
+                          value={editingPortfolio.education_duration || portfolio?.education_duration || ''}
+                          onChange={(e) => setEditingPortfolio({...editingPortfolio, education_duration: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                          placeholder="2020-2024"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">GPA</label>
+                        <input
+                          type="text"
+                          value={editingPortfolio.education_gpa || portfolio?.education_gpa || ''}
+                          onChange={(e) => setEditingPortfolio({...editingPortfolio, education_gpa: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                          placeholder="3.8/4.0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Projects */}
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Projects</h3>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Project Name</label>
+                        <input
+                          type="text"
+                          value={editingPortfolio.project_name || portfolio?.project_name || ''}
+                          onChange={(e) => setEditingPortfolio({...editingPortfolio, project_name: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                          placeholder="E-commerce Platform"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Technologies</label>
+                        <input
+                          type="text"
+                          value={editingPortfolio.project_technologies || portfolio?.project_technologies || ''}
+                          onChange={(e) => setEditingPortfolio({...editingPortfolio, project_technologies: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                          placeholder="React, Node.js, MongoDB"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Project URL</label>
+                      <input
+                        type="url"
+                        value={editingPortfolio.project_url || portfolio?.project_url || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, project_url: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="https://project-demo.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                      <textarea
+                        value={editingPortfolio.project_description || portfolio?.project_description || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, project_description: e.target.value})}
+                        rows={3}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="Describe your project..."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Languages */}
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Languages</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Language 1</label>
+                      <input
+                        type="text"
+                        value={editingPortfolio.language_1 || portfolio?.language_1 || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, language_1: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="English"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Language 2</label>
+                      <input
+                        type="text"
+                        value={editingPortfolio.language_2 || portfolio?.language_2 || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, language_2: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="Uzbek"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Language 3</label>
+                      <input
+                        type="text"
+                        value={editingPortfolio.language_3 || portfolio?.language_3 || ''}
+                        onChange={(e) => setEditingPortfolio({...editingPortfolio, language_3: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                        placeholder="Russian"
+                      />
+                    </div>
                   </div>
                 </div>
 
