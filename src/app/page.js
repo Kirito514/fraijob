@@ -47,10 +47,10 @@ import { motion, useInView, useScroll, useTransform } from "framer-motion";
 const TEXT = {
   header: {
     uz: [
-      "Qanday ishlaydi", "Xususiyatlar", "Loyihalar", "Jamiyat", "Ishlar", "Narxlar", "Fikrlar"
+      "Qanday ishlaydi", "Xususiyatlar", "Loyihalar", "Jamiyat", "Narxlar", "Ishlar", "Fikrlar"
     ],
     en: [
-      "How It Works", "Features", "Projects", "Community", "Jobs", "Pricing", "Testimonials"
+      "How It Works", "Features", "Projects", "Community", "Pricing", "Jobs", "Testimonials"
     ]
   },
   hero: {
@@ -453,42 +453,6 @@ const TEXT = {
           en: "The projects and AI interview simulator helped me get job-ready. Highly recommend!"
         },
         highlight: { uz: "2 oyda ishga joylashdi", en: "Hired in 2 months" }
-      },
-      {
-        name: "Dilfuza Rahimova",
-        role: { uz: "Mobile Dasturchi", en: "Mobile Developer" },
-        company: "AppWorks",
-        avatar: "👩‍💻",
-        rating: 5,
-        text: {
-          uz: "FraiJob'ning AI rezyume yaratish xususiyati meni boshqalardan ajratib turdi. Natijalar ajoyib!",
-          en: "FraiJob's AI resume builder helped me stand out from others. The results are amazing!"
-        },
-        highlight: { uz: "4 ta taklif oldi", en: "Received 4 offers" }
-      },
-      {
-        name: "Bekzod Mirzaev",
-        role: { uz: "DevOps Muhandisi", en: "DevOps Engineer" },
-        company: "CloudTech",
-        avatar: "👨‍💻",
-        rating: 5,
-        text: {
-          uz: "Jamoaviy loyihalar va mentorlik orqali men o'z ko'nikmalarimni kengaytirdim. FraiJob - eng yaxshi platforma!",
-          en: "Through team projects and mentorship, I expanded my skills. FraiJob is the best platform!"
-        },
-        highlight: { uz: "Senior darajaga ko'tarildi", en: "Promoted to Senior" }
-      },
-      {
-        name: "Zarina Karimova",
-        role: { uz: "UI/UX Dizayner", en: "UI/UX Designer" },
-        company: "DesignLab",
-        avatar: "👩‍🎨",
-        rating: 5,
-        text: {
-          uz: "FraiJob'ning jamiyati va loyihalari meni professional darajaga olib chiqdi. Rahmat!",
-          en: "FraiJob's community and projects brought me to a professional level. Thank you!"
-        },
-        highlight: { uz: "Freelance martaba", en: "Freelance career" }
       }
     ],
     stats: {
@@ -651,6 +615,13 @@ export default function LandingPage() {
   const [lang, setLang] = useState("en");
   const [mode, setMode] = useState("system");
   const [openIndex, setOpenIndex] = useState(null);
+  const [stats, setStats] = useState({
+    users: 0,
+    jobs: 0,
+    companies: 0,
+    successRate: 0,
+    countries: 0
+  });
 
   // Scroll animations
   const { scrollYProgress } = useScroll();
@@ -679,6 +650,23 @@ export default function LandingPage() {
     // Bu yerda i18n yoki boshqa tilni almashtirish logikasini qo'shish mumkin
   };
 
+  // Fetch stats from API
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('/api/stats');
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data);
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   return (
     <main className='min-h-screen bg-white text-gray-800 scroll-smooth'>
       {/* Header */}
@@ -702,8 +690,8 @@ export default function LandingPage() {
                   'Xususiyatlar': '#features',
                   'Loyihalar': '#projects',
                   'Jamiyat': '#community',
-                  'Ishlar': '#jobs',
                   'Narxlar': '#pricing',
+                  'Ishlar': '#jobs',
                   'Fikrlar': '#testimonials'
                 },
                 'en': {
@@ -711,8 +699,8 @@ export default function LandingPage() {
                   'Features': '#features',
                   'Projects': '#projects',
                   'Community': '#community',
-                  'Jobs': '#jobs',
                   'Pricing': '#pricing',
+                  'Jobs': '#jobs',
                   'Testimonials': '#testimonials'
                 }
               };
@@ -856,7 +844,7 @@ export default function LandingPage() {
             <div className="flex items-center justify-center gap-8 text-sm text-gray-500">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-[#10B981] rounded-full"></div>
-                <span>{lang === 'uz' ? '10,000+ foydalanuvchi' : '10,000+ users'}</span>
+                <span>{lang === 'uz' ? `${stats.users.toLocaleString()}+ foydalanuvchi` : `${stats.users.toLocaleString()}+ users`}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-[#34D399] rounded-full"></div>
@@ -1118,597 +1106,523 @@ export default function LandingPage() {
       </section>
       {/* community */}
       <section id="community" className="relative py-32 bg-gradient-to-br from-emerald-50/30 via-white to-blue-50/30 text-gray-800 overflow-hidden">
-        {/* Enhanced background decorations */}
+        {/* Simple background decorations */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-10 left-1/4 w-96 h-96 bg-gradient-to-br from-emerald-200/10 to-blue-200/10 rounded-full blur-3xl animate-float-slow" />
-          <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-gradient-to-br from-purple-200/10 to-pink-200/10 rounded-full blur-3xl animate-pulse-slow" />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-blue-200/5 to-emerald-200/5 rounded-full blur-2xl animate-float-slow" />
+          <div className="absolute top-10 left-1/4 w-96 h-96 bg-gradient-to-br from-emerald-200/10 to-blue-200/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-gradient-to-br from-purple-200/10 to-pink-200/10 rounded-full blur-3xl" />
         </div>
 
         {/* Main content */}
         <div className="relative z-10 max-w-7xl mx-auto px-6">
           {/* Header */}
           <div className="text-center mb-16">
-            <FadeInUp delay={0.2}>
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-100 to-blue-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-emerald-200/50">
-                <Users size={16} className="text-emerald-600" />
-                <span>{TEXT.community.label[lang]}</span>
-              </div>
-            </FadeInUp>
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-100 to-blue-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-emerald-200/50">
+              <Users size={16} className="text-emerald-600" />
+              <span>{TEXT.community.label[lang]}</span>
+            </div>
 
-            <FadeInUp delay={0.1}>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                {TEXT.community.title[lang]}
-              </h2>
-            </FadeInUp>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              {TEXT.community.title[lang]}
+            </h2>
 
-            <FadeInUp delay={0.15}>
-              <p className="text-lg text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
-                {TEXT.community.desc[lang]}
-              </p>
-            </FadeInUp>
+            <p className="text-lg text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
+              {TEXT.community.desc[lang]}
+            </p>
           </div>
 
           {/* Community Stats */}
-          <FadeInUp delay={0.2}>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-              <motion.div
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="group bg-white/80 backdrop-blur-xl rounded-2xl p-8 text-center border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden h-full"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative z-10">
-                  <div className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent mb-2">{TEXT.community.stats.members[lang]}</div>
-                  <div className="text-sm text-gray-600">{lang === "uz" ? "A'zolar" : "Members"}</div>
-                </div>
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="group bg-white/80 backdrop-blur-xl rounded-2xl p-8 text-center border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden h-full"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative z-10">
-                  <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent mb-2">{TEXT.community.stats.discussions[lang]}</div>
-                  <div className="text-sm text-gray-600">{lang === "uz" ? "Munozaralar" : "Discussions"}</div>
-                </div>
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="group bg-white/80 backdrop-blur-xl rounded-2xl p-8 text-center border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden h-full"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative z-10">
-                  <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-500 bg-clip-text text-transparent mb-2">{TEXT.community.stats.projects[lang]}</div>
-                  <div className="text-sm text-gray-600">{lang === "uz" ? "Loyihalar" : "Projects"}</div>
-                </div>
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="group bg-white/80 backdrop-blur-xl rounded-2xl p-8 text-center border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden h-full"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative z-10">
-                  <div className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-pink-500 bg-clip-text text-transparent mb-2">{TEXT.community.stats.mentors[lang]}</div>
-                  <div className="text-sm text-gray-600">{lang === "uz" ? "Mentorlar" : "Mentors"}</div>
-                </div>
-              </motion.div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+            <div className="group bg-white/80 backdrop-blur-xl rounded-2xl p-8 text-center border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden h-full">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative z-10">
+                <div className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent mb-2">{stats.users.toLocaleString()}+</div>
+                <div className="text-sm text-gray-600">{lang === "uz" ? "A'zolar" : "Members"}</div>
+              </div>
             </div>
-          </FadeInUp>
+            <div className="group bg-white/80 backdrop-blur-xl rounded-2xl p-8 text-center border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden h-full">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative z-10">
+                <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent mb-2">{stats.jobs.toLocaleString()}+</div>
+                <div className="text-sm text-gray-600">{lang === "uz" ? "Ishlar" : "Jobs"}</div>
+              </div>
+            </div>
+            <div className="group bg-white/80 backdrop-blur-xl rounded-2xl p-8 text-center border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden h-full">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative z-10">
+                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-500 bg-clip-text text-transparent mb-2">{stats.companies.toLocaleString()}+</div>
+                <div className="text-sm text-gray-600">{lang === "uz" ? "Kompaniyalar" : "Companies"}</div>
+              </div>
+            </div>
+            <div className="group bg-white/80 backdrop-blur-xl rounded-2xl p-8 text-center border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden h-full">
+              <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative z-10">
+                <div className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-pink-500 bg-clip-text text-transparent mb-2">{stats.countries.toLocaleString()}+</div>
+                <div className="text-sm text-gray-600">{lang === "uz" ? "Mamlakatlar" : "Countries"}</div>
+              </div>
+            </div>
+          </div>
 
           {/* Community Features */}
           <div className="grid md:grid-cols-2 gap-8 mb-16">
-            <FadeInLeft delay={0.3}>
-              <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-lg relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-emerald-100/50 to-blue-100/50 rounded-full blur-2xl"></div>
-                <div className="relative z-10">
-                  <h3 className="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
-                    <Sparkles size={20} className="text-emerald-600" />
-                    {lang === "uz" ? "Jamiyat Xususiyatlari" : "Community Features"}
-                  </h3>
-                  <div className="space-y-6">
-                    {TEXT.community.features.map((feature, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        whileHover={{ scale: 1.02, x: 5 }}
-                        className="group flex items-start gap-4 p-3 rounded-xl hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-blue-50/50 transition-all duration-300"
-                      >
-                        <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-100 to-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                          <feature.icon size={24} className="text-emerald-600" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-emerald-600 transition-colors">{feature.title[lang]}</h4>
-                          <p className="text-sm text-gray-600">{feature.desc[lang]}</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </FadeInLeft>
-
-            <FadeInRight delay={0.4}>
-              <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-lg relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-100/50 to-pink-100/50 rounded-full blur-2xl"></div>
-                <div className="relative z-10">
-                  <h3 className="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
-                    <MessageCircle size={20} className="text-emerald-600" />
-                    {lang === "uz" ? "So'nggi Munozaralar" : "Recent Discussions"}
-                  </h3>
-                  <div className="space-y-4">
-                    {TEXT.community.recentDiscussions.map((discussion, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        whileHover={{ scale: 1.02, y: -2 }}
-                        className="group p-4 bg-gray-50/50 rounded-xl hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-blue-50/50 transition-all duration-300 cursor-pointer relative overflow-hidden"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <div className="relative z-10">
-                          <div className="flex items-start justify-between mb-2">
-                            <h4 className="font-medium text-gray-900 text-sm group-hover:text-emerald-600 transition-colors">{discussion.title[lang]}</h4>
-                            <span className="text-xs bg-gradient-to-r from-emerald-100 to-blue-100 text-emerald-700 px-2 py-1 rounded-full border border-emerald-200/50">{discussion.category}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-xs text-gray-500">
-                            <span className="font-medium">{discussion.author}</span>
-                            <div className="flex items-center gap-4">
-                              <span className="flex items-center gap-1">
-                                <MessageCircle size={12} />
-                                {discussion.replies}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Eye size={12} />
-                                {discussion.views}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Link
-                      href="/community"
-                      className="group w-full mt-6 bg-gradient-to-r from-[#10B981] to-[#34D399] text-white py-3 rounded-xl font-medium overflow-hidden transition-all duration-300 hover:shadow-[0_8px_20px_rgba(16,185,129,0.2)] inline-flex items-center justify-center"
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-emerald-100/50 to-blue-100/50 rounded-full blur-2xl"></div>
+              <div className="relative z-10">
+                <h3 className="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
+                  <Sparkles size={20} className="text-emerald-600" />
+                  {lang === "uz" ? "Jamiyat Xususiyatlari" : "Community Features"}
+                </h3>
+                <div className="space-y-6">
+                  {TEXT.community.features.map((feature, index) => (
+                    <div
+                      key={index}
+                      className="group flex items-start gap-4 p-3 rounded-xl hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-blue-50/50 transition-all duration-300"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#34D399] to-[#10B981] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      <span className="relative z-10">{lang === "uz" ? "Barcha munozaralarni ko'rish" : "View All Discussions"}</span>
-                    </Link>
-                  </motion.div>
+                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-100 to-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <feature.icon size={24} className="text-emerald-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-emerald-600 transition-colors">{feature.title[lang]}</h4>
+                        <p className="text-sm text-gray-600">{feature.desc[lang]}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </FadeInRight>
+            </div>
+
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-100/50 to-pink-100/50 rounded-full blur-2xl"></div>
+              <div className="relative z-10">
+                <h3 className="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
+                  <MessageCircle size={20} className="text-emerald-600" />
+                  {lang === "uz" ? "So'nggi Munozaralar" : "Recent Discussions"}
+                </h3>
+                <div className="space-y-4">
+                  {TEXT.community.recentDiscussions.map((discussion, index) => (
+                    <div
+                      key={index}
+                      className="group p-4 bg-gray-50/50 rounded-xl hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-blue-50/50 transition-all duration-300 cursor-pointer relative overflow-hidden"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="relative z-10">
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-medium text-gray-900 text-sm group-hover:text-emerald-600 transition-colors">{discussion.title[lang]}</h4>
+                          <span className="text-xs bg-gradient-to-r from-emerald-100 to-blue-100 text-emerald-700 px-2 py-1 rounded-full border border-emerald-200/50">{discussion.category}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span className="font-medium">{discussion.author}</span>
+                          <div className="flex items-center gap-4">
+                            <span className="flex items-center gap-1">
+                              <MessageCircle size={12} />
+                              {discussion.replies}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Eye size={12} />
+                              {discussion.views}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Link
+                  href="/community"
+                  className="group w-full mt-6 bg-gradient-to-r from-[#10B981] to-[#34D399] text-white py-3 rounded-xl font-medium transition-all duration-300 hover:shadow-[0_8px_20px_rgba(16,185,129,0.2)] inline-flex items-center justify-center hover:from-[#34D399] hover:to-[#10B981]"
+                >
+                  <span>{lang === "uz" ? "Barcha munozaralarni ko'rish" : "View All Discussions"}</span>
+                </Link>
+              </div>
+            </div>
           </div>
 
           {/* Call to Action */}
-          <FadeInUp delay={0.5}>
-            <div className="bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-3xl p-8 text-center text-white relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#34D399] to-[#10B981] opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-              <div className="absolute bottom-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
-              <div className="relative z-10">
-                <motion.h3
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  className="text-2xl font-bold mb-4"
+          <div className="bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-3xl p-8 text-center text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#34D399] to-[#10B981] opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+            <div className="absolute bottom-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+            <div className="relative z-10">
+              <h3 className="text-2xl font-bold mb-4">
+                {lang === "uz" ? "Jamiyatga qo'shiling" : "Join Our Community"}
+              </h3>
+              <p className="text-emerald-100 mb-6 max-w-2xl mx-auto">
+                {lang === "uz"
+                  ? "Boshqa dasturchilar bilan bog'laning, bilim almashing va martabangizni rivojlantiring"
+                  : "Connect with other developers, share knowledge, and grow your career"
+                }
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="/community"
+                  className="group bg-white text-emerald-600 px-8 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 flex items-center gap-2 hover:shadow-lg inline-flex"
                 >
-                  {lang === "uz" ? "Jamiyatga qo'shiling" : "Join Our Community"}
-                </motion.h3>
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="text-emerald-100 mb-6 max-w-2xl mx-auto"
+                  <span>{TEXT.community.button[lang]}</span>
+                  <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform duration-300" />
+                </Link>
+                <Link
+                  href="/community"
+                  className="border-2 border-white/30 text-white px-8 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all duration-300 hover:shadow-lg inline-flex"
                 >
-                  {lang === "uz"
-                    ? "Boshqa dasturchilar bilan bog'laning, bilim almashing va martabangizni rivojlantiring"
-                    : "Connect with other developers, share knowledge, and grow your career"
-                  }
-                </motion.p>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="flex flex-col sm:flex-row gap-4 justify-center"
-                >
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Link
-                      href="/community"
-                      className="group bg-white text-emerald-600 px-8 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 flex items-center gap-2 hover:shadow-lg inline-flex"
-                    >
-                      <span>{TEXT.community.button[lang]}</span>
-                      <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform duration-300" />
-                    </Link>
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Link
-                      href="/community"
-                      className="border-2 border-white/30 text-white px-8 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all duration-300 hover:shadow-lg inline-flex"
-                    >
-                      {lang === "uz" ? "Forumga kirish" : "Enter Forum"}
-                    </Link>
-                  </motion.div>
-                </motion.div>
+                  {lang === "uz" ? "Forumga kirish" : "Enter Forum"}
+                </Link>
               </div>
             </div>
-          </FadeInUp>
+          </div>
 
           {/* Social Links */}
-          <FadeInUp delay={0.6}>
-            <div className="flex gap-6 mt-12 justify-center">
-              <motion.a
-                whileHover={{ scale: 1.1, y: -5 }}
-                whileTap={{ scale: 0.95 }}
-                href="https://github.com/fraijob"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 hover:from-[#10B981] hover:to-[#34D399] rounded-2xl flex items-center justify-center transition-all duration-300 hover:shadow-[0_8px_20px_rgba(16,185,129,0.2)]"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#10B981] to-[#34D399] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-                <Github size={28} className="relative z-10 text-gray-600 group-hover:text-white transition-colors group-hover:scale-110 transition-transform" />
-              </motion.a>
-              <motion.a
-                whileHover={{ scale: 1.1, y: -5 }}
-                whileTap={{ scale: 0.95 }}
-                href="https://twitter.com/fraijob"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 hover:from-[#10B981] hover:to-[#34D399] rounded-2xl flex items-center justify-center transition-all duration-300 hover:shadow-[0_8px_20px_rgba(16,185,129,0.2)]"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#10B981] to-[#34D399] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-                <Twitter size={28} className="relative z-10 text-gray-600 group-hover:text-white transition-colors group-hover:scale-110 transition-transform" />
-              </motion.a>
-              <motion.a
-                whileHover={{ scale: 1.1, y: -5 }}
-                whileTap={{ scale: 0.95 }}
-                href="mailto:hello@fraijob.com"
-                className="group relative w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 hover:from-[#10B981] hover:to-[#34D399] rounded-2xl flex items-center justify-center transition-all duration-300 hover:shadow-[0_8px_20px_rgba(16,185,129,0.2)]"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#10B981] to-[#34D399] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-                <Mail size={28} className="relative z-10 text-gray-600 group-hover:text-white transition-colors group-hover:scale-110 transition-transform" />
-              </motion.a>
-            </div>
-          </FadeInUp>
+          <div className="flex gap-6 mt-12 justify-center">
+            <a
+              href="https://github.com/fraijob"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 hover:from-[#10B981] hover:to-[#34D399] rounded-2xl flex items-center justify-center transition-all duration-300 hover:shadow-[0_8px_20px_rgba(16,185,129,0.2)]"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-[#10B981] to-[#34D399] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+              <Github size={28} className="relative z-10 text-gray-600 group-hover:text-white transition-colors group-hover:scale-110 transition-transform" />
+            </a>
+            <a
+              href="https://twitter.com/fraijob"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 hover:from-[#10B981] hover:to-[#34D399] rounded-2xl flex items-center justify-center transition-all duration-300 hover:shadow-[0_8px_20px_rgba(16,185,129,0.2)]"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-[#10B981] to-[#34D399] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+              <Twitter size={28} className="relative z-10 text-gray-600 group-hover:text-white transition-colors group-hover:scale-110 transition-transform" />
+            </a>
+            <a
+              href="mailto:hello@fraijob.com"
+              className="group relative w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 hover:from-[#10B981] hover:to-[#34D399] rounded-2xl flex items-center justify-center transition-all duration-300 hover:shadow-[0_8px_20px_rgba(16,185,129,0.2)]"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-[#10B981] to-[#34D399] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+              <Mail size={28} className="relative z-10 text-gray-600 group-hover:text-white transition-colors group-hover:scale-110 transition-transform" />
+            </a>
+          </div>
         </div>
       </section>
 
       {/* pricing */}
       <section id="pricing" className="relative w-full py-32 px-6 bg-gradient-to-br from-white via-emerald-50/30 to-blue-50/30 text-gray-800 overflow-hidden">
-        {/* Enhanced background decorations */}
+        {/* Simple background decorations */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-10 left-1/4 w-80 h-80 bg-gradient-to-br from-emerald-200/10 to-blue-200/10 rounded-full blur-3xl animate-float-slow"></div>
-          <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-gradient-to-br from-purple-200/10 to-pink-200/10 rounded-full blur-3xl animate-pulse-slow"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-blue-200/5 to-emerald-200/5 rounded-full blur-2xl animate-float-slow"></div>
-          <div className="absolute top-20 left-10 w-16 h-16 bg-gradient-to-br from-yellow-300/20 to-orange-300/20 rounded-full blur-xl animate-pulse-slow"></div>
-          <div className="absolute bottom-20 right-10 w-12 h-12 bg-gradient-to-br from-pink-300/20 to-red-300/20 rounded-full blur-lg animate-float-slow"></div>
+          <div className="absolute top-10 left-1/4 w-80 h-80 bg-gradient-to-br from-emerald-200/10 to-blue-200/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-gradient-to-br from-purple-200/10 to-pink-200/10 rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <FadeInUp>
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-100 to-blue-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-emerald-200/50">
-                <DollarSign size={16} className="text-emerald-600" />
-                <span>{TEXT.pricing.label[lang]}</span>
-              </div>
-            </FadeInUp>
-            <FadeInUp delay={0.1}>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
-                {TEXT.pricing.title[lang]}
-              </h2>
-            </FadeInUp>
-            <FadeInUp delay={0.15}>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                {TEXT.pricing.desc[lang]}
-              </p>
-            </FadeInUp>
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-100 to-blue-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-emerald-200/50">
+              <DollarSign size={16} className="text-emerald-600" />
+              <span>{TEXT.pricing.label[lang]}</span>
+            </div>
+            
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+              {TEXT.pricing.title[lang]}
+            </h2>
+            
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              {TEXT.pricing.desc[lang]}
+            </p>
           </div>
 
           {/* Pricing Cards */}
-          <StaggerContainer staggerDelay={0.1}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {TEXT.pricing.plans.map((plan, index) => (
-                <StaggerItem key={index}>
-                  <motion.div
-                    whileHover={{ y: -10, scale: 1.02 }}
-                    className={`relative group ${plan.popular
-                      ? 'lg:scale-105 lg:-mt-4 lg:mb-4'
-                      : ''
-                      }`}
-                  >
-                    {/* Popular Badge */}
-                    {plan.popular && (
-                      <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
-                        <div className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
-                          {lang === 'uz' ? 'Eng mashhur' : 'Most Popular'}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {TEXT.pricing.plans.map((plan, index) => (
+              <div key={index} className={`relative group ${plan.popular ? 'lg:scale-105 lg:-mt-4 lg:mb-4' : ''}`}>
+                {/* Popular Badge */}
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
+                    <div className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
+                      {lang === 'uz' ? 'Eng mashhur' : 'Most Popular'}
+                    </div>
+                  </div>
+                )}
+
+                {/* Card */}
+                <div className={`relative h-full bg-white/80 backdrop-blur-xl rounded-3xl border-2 transition-all duration-300 overflow-hidden shadow-lg hover:shadow-2xl ${
+                  plan.popular
+                    ? 'border-emerald-200 shadow-emerald-100/50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}>
+                  {/* Background decoration */}
+                  <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${plan.color} opacity-5 rounded-full blur-2xl`}></div>
+
+                  <div className="relative z-10 p-8">
+                    {/* Plan Header */}
+                    <div className="text-center mb-8">
+                      <h3 className={`text-2xl font-bold mb-2 ${plan.popular ? 'text-emerald-600' : 'text-gray-900'}`}>
+                        {plan.name[lang]}
+                      </h3>
+                      <p className="text-gray-600 mb-6">{plan.desc[lang]}</p>
+
+                      {/* Price */}
+                      <div className="mb-6">
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className="text-4xl font-bold text-gray-900">
+                            {plan.price[lang]}
+                          </span>
+                          <span className="text-lg text-gray-600">
+                            {plan.currency[lang]}
+                          </span>
                         </div>
-                      </div>
-                    )}
-
-                    {/* Card */}
-                    <div className={`relative h-full bg-white/80 backdrop-blur-xl rounded-3xl border-2 transition-all duration-300 overflow-hidden shadow-lg hover:shadow-2xl ${plan.popular
-                      ? 'border-emerald-200 shadow-emerald-100/50'
-                      : 'border-gray-200 hover:border-gray-300'
-                      }`}>
-                      {/* Background decoration */}
-                      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${plan.color} opacity-5 rounded-full blur-2xl`}></div>
-
-                      <div className="relative z-10 p-8">
-                        {/* Plan Header */}
-                        <div className="text-center mb-8">
-                          <h3 className={`text-2xl font-bold mb-2 ${plan.popular ? 'text-emerald-600' : 'text-gray-900'
-                            }`}>
-                            {plan.name[lang]}
-                          </h3>
-                          <p className="text-gray-600 mb-6">{plan.desc[lang]}</p>
-
-                          {/* Price */}
-                          <div className="mb-6">
-                            <div className="flex items-baseline justify-center gap-1">
-                              <span className="text-4xl font-bold text-gray-900">
-                                {plan.price[lang]}
-                              </span>
-                              <span className="text-lg text-gray-600">
-                                {plan.currency[lang]}
-                              </span>
-                            </div>
-                            <p className="text-gray-500 text-sm">
-                              {plan.period[lang]}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Features */}
-                        <ul className="space-y-4 mb-8">
-                          {plan.features.map((feature, featureIndex) => (
-                            <motion.li
-                              key={featureIndex}
-                              initial={{ opacity: 0, x: -20 }}
-                              whileInView={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.2 + featureIndex * 0.05 }}
-                              className="flex items-center gap-3 text-gray-700"
-                            >
-                              <div className={`w-5 h-5 rounded-full flex items-center justify-center ${plan.popular
-                                ? 'bg-emerald-100 text-emerald-600'
-                                : 'bg-gray-100 text-gray-600'
-                                }`}>
-                                <Check size={12} className="font-bold" />
-                              </div>
-                              <span className="text-sm">{feature[lang]}</span>
-                            </motion.li>
-                          ))}
-                        </ul>
-
-                        {/* CTA Button */}
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className={`w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 ${plan.popular
-                            ? 'bg-gradient-to-r from-emerald-500 to-blue-500 text-white hover:shadow-[0_8px_25px_rgba(16,185,129,0.3)]'
-                            : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:from-gray-200 hover:to-gray-300'
-                            }`}
-                          onClick={() => alert(lang === 'uz' ? 'Tez orada qo\'shiladi!' : 'Coming soon!')}
-                        >
-                          {TEXT.pricing.button[lang]}
-                        </motion.button>
+                        <p className="text-gray-500 text-sm">
+                          {plan.period[lang]}
+                        </p>
                       </div>
                     </div>
-                  </motion.div>
-                </StaggerItem>
-              ))}
-            </div>
-          </StaggerContainer>
+
+                    {/* Features */}
+                    <ul className="space-y-4 mb-8">
+                      {plan.features.map((feature, featureIndex) => (
+                        <li key={featureIndex} className="flex items-center gap-3 text-gray-700">
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                            plan.popular
+                              ? 'bg-emerald-100 text-emerald-600'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            <Check size={12} className="font-bold" />
+                          </div>
+                          <span className="text-sm">{feature[lang]}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* CTA Button */}
+                    <button
+                      className={`w-full py-4 px-6 rounded-2xl font-semibold transition-all duration-300 ${
+                        plan.popular
+                          ? 'bg-gradient-to-r from-emerald-500 to-blue-500 text-white hover:shadow-[0_8px_25px_rgba(16,185,129,0.3)]'
+                          : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:from-gray-200 hover:to-gray-300'
+                      }`}
+                      onClick={() => alert(lang === 'uz' ? 'Tez orada qo\'shiladi!' : 'Coming soon!')}
+                    >
+                      {TEXT.pricing.button[lang]}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
 
           {/* Note */}
-          <FadeInUp delay={0.8}>
-            <div className="text-center">
-              <p className="text-gray-500 text-sm max-w-2xl mx-auto">
-                {TEXT.pricing.note[lang]}
-              </p>
-            </div>
-          </FadeInUp>
+          <div className="text-center">
+            <p className="text-gray-500 text-sm max-w-2xl mx-auto">
+              {TEXT.pricing.note[lang]}
+            </p>
+          </div>
         </div>
       </section>
 
       {/* jobs */}
       <section id="jobs" className="relative w-full py-24 px-6 bg-gradient-to-br from-white via-gray-50/50 to-emerald-50/30 text-gray-800 overflow-hidden">
-        {/* Enhanced background decorations */}
+        {/* Simple background decorations */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-10 left-1/4 w-80 h-80 bg-gradient-to-br from-emerald-200/10 to-blue-200/10 rounded-full blur-3xl"></div>
           <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-gradient-to-br from-purple-200/10 to-pink-200/10 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-blue-200/5 to-emerald-200/5 rounded-full blur-2xl"></div>
-          <div className="absolute top-20 left-10 w-16 h-16 bg-gradient-to-br from-yellow-300/20 to-orange-300/20 rounded-full blur-xl animate-float-slow"></div>
-          <div className="absolute bottom-20 right-10 w-12 h-12 bg-gradient-to-br from-pink-300/20 to-red-300/20 rounded-full blur-lg animate-pulse-slow"></div>
         </div>
+        
         <div className="relative z-10 max-w-5xl mx-auto text-center mb-16">
-          <FadeInUp>
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-100 to-blue-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-emerald-200/50">
-              <Briefcase size={16} className="text-emerald-600" />
-              <span>{TEXT.jobs.title[lang]}</span>
-            </div>
-          </FadeInUp>
-          <FadeInUp delay={0.1}>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
-              {lang === "uz" ? "Ishingizni ishonch bilan toping." : "Land your next job with confidence."}
-            </h2>
-          </FadeInUp>
-          <FadeInUp delay={0.15}>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              {lang === "uz"
-                ? "Freelance, stajirovka va to'liq stavkali ishlarni o'rganing — barchasi sizning ko'nikma va maqsadlaringizga mos."
-                : "Explore freelance gigs, internships, and full-time roles from verified companies — all tailored to your skills and goals."}
-            </p>
-          </FadeInUp>
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-100 to-blue-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-emerald-200/50">
+            <Briefcase size={16} className="text-emerald-600" />
+            <span>{TEXT.jobs.title[lang]}</span>
+          </div>
+          
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+            {lang === "uz" ? "Ishingizni ishonch bilan toping." : "Land your next job with confidence."}
+          </h2>
+          
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            {lang === "uz"
+              ? "Freelance, stajirovka va to'liq stavkali ishlarni o'rganing — barchasi sizning ko'nikma va maqsadlaringizga mos."
+              : "Explore freelance gigs, internships, and full-time roles from verified companies — all tailored to your skills and goals."}
+          </p>
         </div>
-        <StaggerContainer staggerDelay={0.05}>
-          <div className="max-w-3xl mx-auto space-y-4">
-            {jobsData.map((job, index) => {
-              const Icon = job.icon;
-              const isOpen = openIndex === index;
-              return (
-                <StaggerItem key={index}>
-                  <div
-                    className={`group rounded-2xl border transition-all duration-300 overflow-hidden shadow-sm ${isOpen ? "bg-white/90 backdrop-blur-xl border-[#10B981] shadow-md" : "bg-white/80 backdrop-blur-xl border-gray-200 hover:border-[#10B981]/50"
-                      }`}
+        
+        <div className="max-w-3xl mx-auto space-y-4">
+          {jobsData.map((job, index) => {
+            const Icon = job.icon;
+            const isOpen = openIndex === index;
+            return (
+              <div key={index} className="group">
+                <div
+                  className={`rounded-2xl border transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md ${
+                    isOpen 
+                      ? "bg-white/90 backdrop-blur-xl border-[#10B981] shadow-lg" 
+                      : "bg-white/80 backdrop-blur-xl border-gray-200 hover:border-[#10B981]/50"
+                  }`}
+                >
+                  <button
+                    onClick={() => setOpenIndex(isOpen ? null : index)}
+                    className="w-full flex justify-between items-center p-6 text-left focus:outline-none group-hover:bg-gradient-to-r group-hover:from-emerald-50/50 group-hover:to-blue-50/50 transition-all duration-300"
                   >
-                    <button
-                      onClick={() => setOpenIndex(isOpen ? null : index)}
-                      className="w-full flex justify-between items-center p-6 text-left focus:outline-none group-hover:bg-gradient-to-r group-hover:from-emerald-50/50 group-hover:to-blue-50/50 transition-all duration-300"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${isOpen ? "bg-gradient-to-br from-[#10B981] to-[#34D399] text-white" : "bg-gray-100 text-gray-500 group-hover:bg-gradient-to-br group-hover:from-[#10B981]/20 group-hover:to-[#34D399]/20 group-hover:text-[#10B981]"
-                          }`}>
-                          <Icon className="w-5 h-5" />
-                        </div>
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                        isOpen 
+                          ? "bg-gradient-to-br from-[#10B981] to-[#34D399] text-white shadow-lg" 
+                          : "bg-gray-100 text-gray-500 group-hover:bg-gradient-to-br group-hover:from-[#10B981]/20 group-hover:to-[#34D399]/20 group-hover:text-[#10B981]"
+                      }`}>
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <div className="text-left">
                         <span className="text-lg font-semibold text-gray-900 group-hover:text-[#10B981] transition-colors">
                           {job.title[lang]}
                         </span>
                       </div>
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isOpen ? "bg-[#10B981] text-white" : "bg-gray-100 text-gray-400 group-hover:bg-[#10B981] group-hover:text-white"
-                        }`}>
-                        {isOpen ? (
-                          <ChevronUp className="w-4 h-4" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4" />
-                        )}
+                    </div>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      isOpen 
+                        ? "bg-[#10B981] text-white shadow-lg" 
+                        : "bg-gray-100 text-gray-400 group-hover:bg-[#10B981] group-hover:text-white"
+                    }`}>
+                      {isOpen ? (
+                        <ChevronUp className="w-5 h-5" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5" />
+                      )}
+                    </div>
+                  </button>
+                  
+                  <motion.div
+                    initial={false}
+                    animate={{ 
+                      height: isOpen ? "auto" : 0,
+                      opacity: isOpen ? 1 : 0
+                    }}
+                    transition={{ 
+                      duration: 0.3,
+                      ease: "easeInOut"
+                    }}
+                    className="overflow-hidden"
+                  >
+                    <div className="px-6 pb-6 text-sm text-gray-700 leading-relaxed bg-gradient-to-br from-emerald-50/30 to-blue-50/30 border-t border-emerald-100/50">
+                      <div className="pt-4">
+                        <div className="flex items-start gap-3">
+                          <div className="w-2 h-2 bg-[#10B981] rounded-full mt-2 flex-shrink-0"></div>
+                          <p>{job.description[lang]}</p>
+                        </div>
                       </div>
-                    </button>
-                    {isOpen && (
-                      <div className="px-6 pb-6 text-sm text-gray-700 leading-relaxed bg-gradient-to-br from-emerald-50/30 to-blue-50/30">
-                        {job.description[lang]}
-                      </div>
-                    )}
-                  </div>
-                </StaggerItem>
-              );
-            })}
-          </div>
-        </StaggerContainer>
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </section>
 
       {/* testimonials */}
       <section id="testimonials" className="relative w-full py-32 px-6 bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 text-gray-800 overflow-hidden">
-        {/* Enhanced background decorations */}
+        {/* Simple background decorations */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-10 left-1/4 w-80 h-80 bg-gradient-to-br from-purple-200/10 to-pink-200/10 rounded-full blur-3xl animate-float-slow"></div>
-          <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-gradient-to-br from-emerald-200/10 to-blue-200/10 rounded-full blur-3xl animate-pulse-slow"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-pink-200/5 to-purple-200/5 rounded-full blur-2xl animate-float-slow"></div>
-          <div className="absolute top-20 left-10 w-16 h-16 bg-gradient-to-br from-yellow-300/20 to-orange-300/20 rounded-full blur-xl animate-pulse-slow"></div>
-          <div className="absolute bottom-20 right-10 w-12 h-12 bg-gradient-to-br from-blue-300/20 to-emerald-300/20 rounded-full blur-lg animate-float-slow"></div>
+          <div className="absolute top-10 left-1/4 w-80 h-80 bg-gradient-to-br from-purple-200/10 to-pink-200/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-gradient-to-br from-emerald-200/10 to-blue-200/10 rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <FadeInUp>
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-purple-200/50">
-                <Star size={16} className="text-purple-600" />
-                <span>{TEXT.testimonials.label[lang]}</span>
-              </div>
-            </FadeInUp>
-            <FadeInUp delay={0.1}>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
-                {TEXT.testimonials.title[lang]}
-              </h2>
-            </FadeInUp>
-            <FadeInUp delay={0.15}>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                {TEXT.testimonials.desc[lang]}
-              </p>
-            </FadeInUp>
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-purple-200/50">
+              <Star size={16} className="text-purple-600" />
+              <span>{TEXT.testimonials.label[lang]}</span>
+            </div>
+            
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+              {TEXT.testimonials.title[lang]}
+            </h2>
+            
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              {TEXT.testimonials.desc[lang]}
+            </p>
           </div>
 
           {/* Stats */}
-          <FadeInUp delay={0.2}>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-              {Object.entries(TEXT.testimonials.stats).map(([key, value], index) => (
-                <motion.div
-                  key={key}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + index * 0.1 }}
-                  className="text-center"
-                >
-                  <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-8 border border-white/20 shadow-lg h-full">
-                    <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                      {value[lang]}
-                    </div>
-                    <div className="text-sm text-gray-600 font-medium">
-                      {key === 'users' && (lang === 'uz' ? 'Foydalanuvchi' : 'Users')}
-                      {key === 'success' && (lang === 'uz' ? 'Muvaffaqiyat' : 'Success Rate')}
-                      {key === 'companies' && (lang === 'uz' ? 'Kompaniya' : 'Companies')}
-                      {key === 'countries' && (lang === 'uz' ? 'Mamlakat' : 'Countries')}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+            <div className="text-center">
+              <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-8 border border-white/20 shadow-lg h-full">
+                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                  {stats.users.toLocaleString()}+
+                </div>
+                <div className="text-sm text-gray-600 font-medium">
+                  {lang === 'uz' ? 'Foydalanuvchi' : 'Users'}
+                </div>
+              </div>
             </div>
-          </FadeInUp>
+            <div className="text-center">
+              <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-8 border border-white/20 shadow-lg h-full">
+                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                  {stats.successRate}%
+                </div>
+                <div className="text-sm text-gray-600 font-medium">
+                  {lang === 'uz' ? 'Muvaffaqiyat' : 'Success Rate'}
+                </div>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-8 border border-white/20 shadow-lg h-full">
+                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                  {stats.companies.toLocaleString()}+
+                </div>
+                <div className="text-sm text-gray-600 font-medium">
+                  {lang === 'uz' ? 'Kompaniya' : 'Companies'}
+                </div>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-8 border border-white/20 shadow-lg h-full">
+                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                  {stats.countries.toLocaleString()}+
+                </div>
+                <div className="text-sm text-gray-600 font-medium">
+                  {lang === 'uz' ? 'Mamlakat' : 'Countries'}
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Testimonials Grid */}
-          <StaggerContainer staggerDelay={0.1}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {TEXT.testimonials.reviews.map((review, index) => (
-                <StaggerItem key={index}>
-                  <motion.div
-                    whileHover={{ y: -10, scale: 1.02 }}
-                    className="group relative"
-                  >
-                    {/* Card */}
-                    <div className="relative h-full bg-white/80 backdrop-blur-xl rounded-3xl border border-white/20 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
-                      {/* Background decoration */}
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-200/10 to-pink-200/10 rounded-full blur-2xl"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {TEXT.testimonials.reviews.map((review, index) => (
+              <div key={index} className="group relative">
+                {/* Card */}
+                <div className="relative h-full bg-white/80 backdrop-blur-xl rounded-3xl border border-white/20 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                  {/* Background decoration */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-200/10 to-pink-200/10 rounded-full blur-2xl"></div>
 
-                      <div className="relative z-10 p-8">
-                        {/* Rating */}
-                        <div className="flex gap-1 mb-4">
-                          {[...Array(review.rating)].map((_, i) => (
-                            <Star key={i} size={16} className="text-yellow-400 fill-current" />
-                          ))}
-                        </div>
+                  <div className="relative z-10 p-8">
+                    {/* Rating */}
+                    <div className="flex gap-1 mb-4">
+                      {[...Array(review.rating)].map((_, i) => (
+                        <Star key={i} size={16} className="text-yellow-400 fill-current" />
+                      ))}
+                    </div>
 
-                        {/* Review Text */}
-                        <blockquote className="text-gray-700 mb-6 leading-relaxed italic">
-                          &ldquo;{review.text[lang]}&rdquo;
-                        </blockquote>
+                    {/* Review Text */}
+                    <blockquote className="text-gray-700 mb-6 leading-relaxed italic">
+                      &ldquo;{review.text[lang]}&rdquo;
+                    </blockquote>
 
-                        {/* Highlight */}
-                        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-100 to-blue-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium mb-6">
-                          <TrendingUp size={12} className="text-emerald-600" />
-                          {review.highlight[lang]}
-                        </div>
+                    {/* Highlight */}
+                    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-100 to-blue-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium mb-6">
+                      <TrendingUp size={12} className="text-emerald-600" />
+                      {review.highlight[lang]}
+                    </div>
 
-                        {/* Author */}
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center text-2xl">
-                            {review.avatar}
-                          </div>
-                          <div>
-                            <div className="font-semibold text-gray-900">{review.name}</div>
-                            <div className="text-sm text-gray-600">{review.role[lang]}</div>
-                            <div className="text-xs text-gray-500">{review.company}</div>
-                          </div>
-                        </div>
+                    {/* Author */}
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center text-2xl">
+                        {review.avatar}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-900">{review.name}</div>
+                        <div className="text-sm text-gray-600">{review.role[lang]}</div>
+                        <div className="text-xs text-gray-500">{review.company}</div>
                       </div>
                     </div>
-                  </motion.div>
-                </StaggerItem>
-              ))}
-            </div>
-          </StaggerContainer>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

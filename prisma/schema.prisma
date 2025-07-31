@@ -11,13 +11,14 @@ model User {
   id          String     @id @default(uuid())
   name        String?
   email       String     @unique
-  password    String?    // Google orqali kirganda bo‘sh bo'lishi mumkin
+  password    String?    // Google orqali kirganda bo'lishi mumkin
   firebaseUid String?    @unique // Google foydalanuvchisi uchun kerakli
   image       String?
   role        Role       @default(USER)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  verified    Boolean    @default(false) // Email tekshiruvi yo‘q bo‘lsa true qilinadi
+  verified    Boolean    @default(false) // Email tekshiruvi yo'q bo'lsa true qilinadi
+  hasJob      Boolean    @default(false) // User ishga joylashganmi
   waitlist    Waitlist[]
 }
 
@@ -49,4 +50,16 @@ model ChatMessage {
   message   String
   createdAt DateTime @default(now())
   replyTo   String?  // Reply parent xabar id-si
+}
+
+model Job {
+  id          String   @id @default(uuid())
+  title       String
+  company     String
+  description String?
+  location    String?
+  salary      String?
+  type        String?  // full-time, part-time, freelance
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
