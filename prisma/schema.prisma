@@ -11,14 +11,14 @@ model User {
   id          String     @id @default(uuid())
   name        String?
   email       String     @unique
-  password    String?    // Google orqali kirganda bo'lishi mumkin
-  firebaseUid String?    @unique // Google foydalanuvchisi uchun kerakli
+  password    String?
+  firebaseUid String?    @unique
   image       String?
   role        Role       @default(USER)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  verified    Boolean    @default(false) // Email tekshiruvi yo'q bo'lsa true qilinadi
-  hasJob      Boolean    @default(false) // User ishga joylashganmi
+  verified    Boolean    @default(false)
+  hasJob      Boolean    @default(false)
   waitlist    Waitlist[]
 }
 
@@ -43,15 +43,6 @@ model EmailVerificationCode {
   createdAt DateTime @default(now())
 }
 
-model ChatMessage {
-  id        String   @id @default(uuid())
-  userId    String
-  userName  String
-  message   String
-  createdAt DateTime @default(now())
-  replyTo   String?  // Reply parent xabar id-si
-}
-
 model Job {
   id          String   @id @default(uuid())
   title       String
@@ -59,7 +50,7 @@ model Job {
   description String?
   location    String?
   salary      String?
-  type        String?  // full-time, part-time, freelance
+  type        String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

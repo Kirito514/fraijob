@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // For now, return mock data until database is properly set up
-    // In the future, this will fetch real data from the database
+    // Mock data for now - will be replaced with real database queries
+    // when database schema issues are resolved
     const mockStats = {
       users: 1247,
       jobs: 892,
