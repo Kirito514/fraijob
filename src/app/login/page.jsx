@@ -81,23 +81,18 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: typeof window !== "undefined"
-          ? `${window.location.origin}/auth/callback`
-          : undefined,
-      },
-    });
-
-    if (error) {
-      setNotification({
-        type: "error",
-        message: "❌ Google orqali kirishda xatolik yuz berdi",
-      });
-    }
-
-    setIsGoogleLoading(false);
+    
+    // Google OAuth URL yaratish
+    const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    googleAuthUrl.searchParams.append('client_id', process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
+    googleAuthUrl.searchParams.append('redirect_uri', `${window.location.origin}/auth/google/callback`);
+    googleAuthUrl.searchParams.append('response_type', 'code');
+    googleAuthUrl.searchParams.append('scope', 'email profile');
+    googleAuthUrl.searchParams.append('access_type', 'offline');
+    googleAuthUrl.searchParams.append('prompt', 'consent');
+    
+    // Google OAuth sahifasiga yo'naltirish
+    window.location.href = googleAuthUrl.toString();
   };
 
   useEffect(() => {
