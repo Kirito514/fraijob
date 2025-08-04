@@ -1,11 +1,10 @@
 'use client'
 
 import { useEffect, useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 function GoogleAuthCallbackContent() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -13,7 +12,8 @@ function GoogleAuthCallbackContent() {
     const handleGoogleCallback = async () => {
       try {
         // URL'dan code parametrini olamiz
-        const code = searchParams.get('code')
+        const urlParams = new URLSearchParams(window.location.search)
+        const code = urlParams.get('code')
         
         if (!code) {
           setError('Authorization code topilmadi')
@@ -80,7 +80,7 @@ function GoogleAuthCallbackContent() {
     }
 
     handleGoogleCallback()
-  }, [searchParams, router])
+  }, [router])
 
   if (error) {
     return (
