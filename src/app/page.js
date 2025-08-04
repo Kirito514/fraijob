@@ -22,9 +22,6 @@ import {
   Twitter,
   MessageCircle,
   Slack,
-  Moon,
-  Sun,
-  Monitor,
   Clock,
   ChevronUp,
   ChevronDown,
@@ -37,11 +34,13 @@ import {
   Eye,
   DollarSign,
   Check,
+  Menu,
+  X,
 } from "lucide-react";
 import WaitlistForm from "../components/WaitlistForm";
 import { useState, useEffect } from "react";
-import { CheckCircle, AlertCircle, X } from "lucide-react";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { CheckCircle, AlertCircle } from "lucide-react";
+import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
 
 // Matnlarni i18n uchun massivlarda saqlash
 const TEXT = {
@@ -613,8 +612,8 @@ const StaggerItem = ({ children, delay = 0 }) => (
 export default function LandingPage() {
   const [notification, setNotification] = useState(null);
   const [lang, setLang] = useState("en");
-  const [mode, setMode] = useState("system");
   const [openIndex, setOpenIndex] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [stats, setStats] = useState({
     users: 0,
     jobs: 0,
@@ -629,26 +628,27 @@ export default function LandingPage() {
   const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.95]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0.8]);
 
-  // Mode switcher
-  const handleModeChange = (newMode) => {
-    setMode(newMode);
-    if (newMode === "dark") {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-    } else if (newMode === "light") {
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.classList.remove("light");
-    }
-  };
+
 
   // Language switcher
   const handleLangChange = (newLang) => {
     setLang(newLang);
     // Bu yerda i18n yoki boshqa tilni almashtirish logikasini qo'shish mumkin
   };
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (mobileMenuOpen && !event.target.closest('.mobile-menu-container')) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [mobileMenuOpen]);
 
   // Fetch stats from API
   useEffect(() => {
@@ -671,17 +671,20 @@ export default function LandingPage() {
     <main className='min-h-screen bg-white text-gray-800 scroll-smooth'>
       {/* Header */}
       <motion.header
-        className='sticky top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-gray-100 px-6 py-4'>
-        <div className='max-w-7xl mx-auto flex justify-between items-center gap-20'>
-          <Link href="/" className="flex items-center gap-3">
+        className='sticky top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 sm:px-6 py-4 mobile-menu-container'>
+        <div className='max-w-7xl mx-auto flex justify-between items-center gap-4 lg:gap-8'>
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 flex-shrink-0">
             <div className="w-8 h-8 bg-gradient-to-br from-[#10B981] to-[#34D399] rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">F</span>
             </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+            <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
               FraiJob
             </h1>
           </Link>
-          <nav className='space-x-8 hidden md:flex text-sm'>
+
+          {/* Desktop Navigation */}
+          <nav className='space-x-6 lg:space-x-8 hidden lg:flex text-sm'>
             {TEXT.header[lang].map((label, i) => {
               // O'zbekcha va inglizcha linklar uchun ID mapping
               const linkMapping = {
@@ -711,14 +714,16 @@ export default function LandingPage() {
                 <Link
                   key={i}
                   href={href}
-                  className='text-gray-600 hover:text-[#10B981] transition-colors duration-300 font-medium relative group'>
+                  className='text-gray-600 hover:text-[#10B981] transition-colors duration-300 font-medium relative group whitespace-nowrap'>
                   {label}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#10B981] transition-all duration-300 group-hover:w-full"></span>
                 </Link>
               );
             })}
           </nav>
-          <div className="flex items-center gap-4">
+
+          {/* Desktop Controls */}
+          <div className="hidden lg:flex items-center gap-3 xl:gap-4">
             {/* Language Switcher */}
             <div className="flex bg-gray-100 rounded-full overflow-hidden text-xs font-semibold p-1">
               <button
@@ -730,33 +735,107 @@ export default function LandingPage() {
                 onClick={() => handleLangChange("en")}
               >EN</button>
             </div>
-            {/* Mode Switcher */}
-            <div className="flex bg-gray-100 rounded-full overflow-hidden p-1">
-              <button
-                className={`p-2 rounded-full transition-all duration-300 ${mode === "light" ? "bg-white text-[#10B981] shadow-sm" : "text-gray-600 hover:text-gray-900"}`}
-                onClick={() => handleModeChange("light")}
-                title="Light mode"
-              ><Sun size={16} /></button>
-              <button
-                className={`p-2 rounded-full transition-all duration-300 ${mode === "dark" ? "bg-white text-[#10B981] shadow-sm" : "text-gray-600 hover:text-gray-900"}`}
-                onClick={() => handleModeChange("dark")}
-                title="Dark mode"
-              ><Moon size={16} /></button>
-              <button
-                className={`p-2 rounded-full transition-all duration-300 ${mode === "system" ? "bg-white text-[#10B981] shadow-sm" : "text-gray-600 hover:text-gray-900"}`}
-                onClick={() => handleModeChange("system")}
-                title="System mode"
-              ><Monitor size={16} /></button>
-            </div>
+
             <Link
               href='/signup'
-              className='group relative bg-gradient-to-r from-[#10B981] to-[#34D399] text-white px-6 py-2.5 rounded-full text-sm font-semibold overflow-hidden transition-all duration-300 flex items-center gap-2 hover:shadow-[0_8px_20px_rgba(16,185,129,0.2)]'>
+              className='group relative bg-gradient-to-r from-[#10B981] to-[#34D399] text-white px-4 xl:px-6 py-2.5 rounded-full text-sm font-semibold overflow-hidden transition-all duration-300 flex items-center gap-2 hover:shadow-[0_8px_20px_rgba(16,185,129,0.2)]'>
               <div className="absolute inset-0 bg-gradient-to-r from-[#34D399] to-[#10B981] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <span className="relative z-10">{lang === 'uz' ? 'Boshlash' : 'Get started'}</span>
               <ArrowRight size={16} className="relative z-10 group-hover:translate-x-1.5 transition-transform duration-300" />
             </Link>
           </div>
+
+          {/* Mobile Controls */}
+          <div className="flex lg:hidden items-center gap-2">
+            {/* Language Switcher for Mobile */}
+            <div className="flex bg-gray-100 rounded-full overflow-hidden text-xs font-semibold p-1">
+              <button
+                className={`px-2 py-1 rounded-full transition-all duration-300 ${lang === "uz" ? "bg-white text-[#10B981] shadow-sm" : "text-gray-600 hover:text-gray-900"}`}
+                onClick={() => handleLangChange("uz")}
+              >UZ</button>
+              <button
+                className={`px-2 py-1 rounded-full transition-all duration-300 ${lang === "en" ? "bg-white text-[#10B981] shadow-sm" : "text-gray-600 hover:text-gray-900"}`}
+                onClick={() => handleLangChange("en")}
+              >EN</button>
+            </div>
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
+            >
+              {mobileMenuOpen ? (
+                <X size={20} className="text-gray-700" />
+              ) : (
+                <Menu size={20} className="text-gray-700" />
+              )}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="lg:hidden mt-4 bg-white/95 backdrop-blur-xl rounded-2xl border border-gray-200 shadow-xl overflow-hidden"
+            >
+            <div className="p-6 space-y-4">
+              {/* Mobile Navigation */}
+              <nav className="space-y-3">
+                {TEXT.header[lang].map((label, i) => {
+                  const linkMapping = {
+                    'uz': {
+                      'Qanday ishlaydi': '#how-it-works',
+                      'Xususiyatlar': '#features',
+                      'Loyihalar': '#projects',
+                      'Jamiyat': '#community',
+                      'Narxlar': '#pricing',
+                      'Ishlar': '#jobs',
+                      'Fikrlar': '#testimonials'
+                    },
+                    'en': {
+                      'How It Works': '#how-it-works',
+                      'Features': '#features',
+                      'Projects': '#projects',
+                      'Community': '#community',
+                      'Pricing': '#pricing',
+                      'Jobs': '#jobs',
+                      'Testimonials': '#testimonials'
+                    }
+                  };
+
+                  const href = linkMapping[lang][label] || `#${label.toLowerCase().replace(/\s+/g, "-")}`;
+
+                  return (
+                    <Link
+                      key={i}
+                      href={href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className='block text-gray-700 hover:text-[#10B981] transition-colors duration-300 font-medium py-2 px-3 rounded-lg hover:bg-gray-50'>
+                      {label}
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              {/* Mobile Signup Button */}
+              <div className="pt-4 border-t border-gray-200">
+                <Link
+                  href='/signup'
+                  onClick={() => setMobileMenuOpen(false)}
+                  className='w-full group relative bg-gradient-to-r from-[#10B981] to-[#34D399] text-white py-3 px-4 rounded-xl text-sm font-semibold overflow-hidden transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-[0_8px_20px_rgba(16,185,129,0.2)]'>
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#34D399] to-[#10B981] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <span className="relative z-10">{lang === 'uz' ? 'Boshlash' : 'Get started'}</span>
+                  <ArrowRight size={16} className="relative z-10 group-hover:translate-x-1.5 transition-transform duration-300" />
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       </motion.header>
       {/* Toast */}
       {notification && (
