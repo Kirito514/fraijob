@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function GoogleAuthCallbackPage() {
+function GoogleAuthCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [error, setError] = useState(null)
@@ -105,5 +105,24 @@ export default function GoogleAuthCallbackPage() {
         <p className="text-gray-500 text-lg">Google orqali kirish amalga oshirilmoqda...</p>
       </div>
     </div>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+        <p className="text-gray-500 text-lg">Yuklanmoqda...</p>
+      </div>
+    </div>
+  )
+}
+
+export default function GoogleAuthCallbackPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <GoogleAuthCallbackContent />
+    </Suspense>
   )
 } 
