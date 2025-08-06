@@ -6,6 +6,7 @@ import { CheckCircle, AlertCircle, X, ArrowLeft, User, Mail, Lock, Eye, EyeOff, 
 import { motion, AnimatePresence } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { supabase } from "@/utils/supabase/client";
+import Image from "next/image";
 
 // Animation components
 const FadeInUp = ({ children, delay = 0, duration = 0.5 }) => (
@@ -167,11 +168,15 @@ export default function SignupPage() {
 
               {/* Branding */}
               <div className="relative z-10">
-                <a href="/" className="flex items-center gap-2 mb-6 hover:opacity-80 transition-opacity duration-300">
-                  <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                    <span className="text-[#10B981] font-bold text-lg">F</span>
+                <a href="/" className="flex items-center gap-3 mb-6 hover:opacity-80 transition-opacity duration-300">
+                  <div className="w-18 h-10 relative">
+                    <Image
+                      src="/logo-fraijob.svg"
+                      alt="FraiJob logo"
+                      fill
+                      className="object-contain brightness-0 invert"
+                    />
                   </div>
-                  <span className="text-white font-semibold text-lg">FraiJob</span>
                 </a>
 
                 {/* Call to Action */}

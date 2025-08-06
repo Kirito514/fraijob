@@ -1,160 +1,351 @@
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
-import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { PrismaClient } from "@prisma/client";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+const prisma = new PrismaClient();
 
-
-
-// POST - Yangi test boshlash
-export async function POST(request) {
+// JWT token'ni tekshirish
+async function verifyToken() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  
+  if (!token) {
+    return null;
+  }
+  
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-    }
-
-    const body = await request.json();
-    const { test_id, answers } = body;
-
-    if (!test_id) {
-      return NextResponse.json({ error: 'Test ID is required' }, { status: 400 });
-    }
-
-    // Test natijasini hisoblash (demo)
-    const score = Math.floor(Math.random() * 30) + 70; // 70-100 oralig'ida
-    const total = 100;
-
-    const testResult = {
-      id: Date.now(),
-      user_id: user.id,
-      test_id,
-      score,
-      total,
-      completed_date: new Date().toISOString(),
-      answers: answers || []
-    };
-
-    return NextResponse.json(testResult);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return decoded;
   } catch (error) {
-    console.error('Tests POST error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return null;
   }
 }
 
-// GET - Test natijalari va mavjud testlar olish
+// Demo testlarni yaratish
+async function createDemoTests() {
+  const demoTests = [
+    {
+      title: "JavaScript Basics",
+      description: "Test your JavaScript fundamentals",
+      timeLimit: 15,
+      questions: [
+        {
+          question: "What is the correct way to declare a variable in JavaScript?",
+          options: [
+            { text: "var x = 5;", isCorrect: true },
+            { text: "variable x = 5;", isCorrect: false },
+            { text: "v x = 5;", isCorrect: false },
+            { text: "let x = 5;", isCorrect: false }
+          ]
+        },
+        {
+          question: "Which method is used to add an element to the end of an array?",
+          options: [
+            { text: "push()", isCorrect: true },
+            { text: "pop()", isCorrect: false },
+            { text: "shift()", isCorrect: false },
+            { text: "unshift()", isCorrect: false }
+          ]
+        },
+        {
+          question: "What does 'typeof' operator return?",
+          options: [
+            { text: "A string", isCorrect: true },
+            { text: "A number", isCorrect: false },
+            { text: "A boolean", isCorrect: false },
+            { text: "An object", isCorrect: false }
+          ]
+        }
+      ]
+    },
+    {
+      title: "React Fundamentals",
+      description: "Test your React knowledge",
+      timeLimit: 20,
+      questions: [
+        {
+          question: "What is a React component?",
+          options: [
+            { text: "A function that returns JSX", isCorrect: true },
+            { text: "A CSS class", isCorrect: false },
+            { text: "A database table", isCorrect: false },
+            { text: "A server endpoint", isCorrect: false }
+          ]
+        },
+        {
+          question: "What hook is used for side effects in React?",
+          options: [
+            { text: "useEffect", isCorrect: true },
+            { text: "useState", isCorrect: false },
+            { text: "useContext", isCorrect: false },
+            { text: "useReducer", isCorrect: false }
+          ]
+        },
+        {
+          question: "What is JSX?",
+          options: [
+            { text: "JavaScript XML", isCorrect: true },
+            { text: "Java Script Extension", isCorrect: false },
+            { text: "JavaScript XHTML", isCorrect: false },
+            { text: "JavaScript XMLHttpRequest", isCorrect: false }
+          ]
+        }
+      ]
+    },
+    {
+      title: "HTML & CSS Basics",
+      description: "Test your HTML and CSS knowledge",
+      timeLimit: 15,
+      questions: [
+        {
+          question: "What does HTML stand for?",
+          options: [
+            { text: "HyperText Markup Language", isCorrect: true },
+            { text: "High Tech Modern Language", isCorrect: false },
+            { text: "Home Tool Markup Language", isCorrect: false },
+            { text: "Hyperlink and Text Markup Language", isCorrect: false }
+          ]
+        },
+        {
+          question: "Which CSS property controls the text size?",
+          options: [
+            { text: "font-size", isCorrect: true },
+            { text: "text-size", isCorrect: false },
+            { text: "size", isCorrect: false },
+            { text: "font-style", isCorrect: false }
+          ]
+        },
+        {
+          question: "What is the correct HTML for creating a hyperlink?",
+          options: [
+            { text: "<a href='url'>link</a>", isCorrect: true },
+            { text: "<link>url</link>", isCorrect: false },
+            { text: "<url>link</url>", isCorrect: false },
+            { text: "<a>url</a>", isCorrect: false }
+          ]
+        }
+      ]
+    }
+  ];
+
+  for (const demoTest of demoTests) {
+    // Test mavjudligini tekshirish
+    const existingTest = await prisma.test.findFirst({
+      where: { title: demoTest.title }
+    });
+
+    if (!existingTest) {
+      await prisma.test.create({
+        data: {
+          title: demoTest.title,
+          description: demoTest.description,
+          timeLimit: demoTest.timeLimit,
+          isActive: true,
+          createdBy: "demo", // Demo testlar uchun
+          questions: {
+            create: demoTest.questions.map((question, index) => ({
+              question: question.question,
+              type: "multiple_choice",
+              order: index + 1,
+              options: {
+                create: question.options.map((option, optionIndex) => ({
+                  text: option.text,
+                  isCorrect: option.isCorrect,
+                  order: optionIndex + 1
+                }))
+              }
+            }))
+          }
+        }
+      });
+    }
+  }
+}
+
+// GET - Testlarni olish
 export async function GET(request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-    
+    const user = await verifyToken();
     if (!user) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    // Demo testlarni yaratish (faqat bir marta)
+    await createDemoTests();
 
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type');
+    const type = searchParams.get("type");
+    const userId = user.id;
 
-    if (type === 'available') {
-      // Mavjud testlar ro'yxati
-      const availableTests = [
-        { 
-          id: 1, 
-          title: "React Advanced", 
-          category: "Frontend",
-          duration: "60 min",
-          questions: 40,
-          difficulty: "Intermediate",
-          description: "Test your React knowledge with advanced concepts"
+    if (type === "available") {
+      // Foydalanuvchi uchun mavjud testlarni olish
+      const availableTests = await prisma.test.findMany({
+        where: {
+          isActive: true,
+          userResults: {
+            none: {
+              userId: userId
+            }
+          }
         },
-        { 
-          id: 2, 
-          title: "Python for Data Science", 
-          category: "Data Science",
-          duration: "90 min",
-          questions: 50,
-          difficulty: "Advanced",
-          description: "Comprehensive Python and data science assessment"
-        },
-        { 
-          id: 3, 
-          title: "System Design", 
-          category: "Architecture",
-          duration: "120 min",
-          questions: 25,
-          difficulty: "Expert",
-          description: "Design scalable system architectures"
+        include: {
+          questions: {
+            include: {
+              options: true
+            }
+          }
         }
-      ];
-
+      });
+      
       return NextResponse.json(availableTests);
+    } else {
+      // Admin uchun barcha testlarni olish
+      if (user.role !== "admin") {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      
+      const allTests = await prisma.test.findMany({
+        include: {
+          questions: {
+            include: {
+              options: true
+            }
+          },
+          userResults: {
+            include: {
+              user: {
+                select: {
+                  name: true,
+                  email: true
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      return NextResponse.json(allTests);
+    }
+  } catch (error) {
+    console.error("Error fetching tests:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+// POST - Yangi test yaratish (faqat admin)
+export async function POST(request) {
+  try {
+    const user = await verifyToken();
+    if (!user || user.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Test natijalari olish (demo data for now)
-    const demoTests = [
-      { 
-        id: 1, 
-        title: "React Basics", 
-        score: 85, 
-        total: 100,
-        category: "Frontend",
-        completed_date: "2024-01-15",
-        duration: "45 min",
-        questions: 30
-      },
-      { 
-        id: 2, 
-        title: "AI Fundamentals", 
-        score: 92, 
-        total: 100,
-        category: "AI/ML",
-        completed_date: "2024-01-10",
-        duration: "60 min",
-        questions: 40
-      },
-      { 
-        id: 3, 
-        title: "JavaScript Advanced", 
-        score: 78, 
-        total: 100,
-        category: "Programming",
-        completed_date: "2024-01-05",
-        duration: "90 min",
-        questions: 50
-      },
-      { 
-        id: 4, 
-        title: "Node.js Backend", 
-        score: 88, 
-        total: 100,
-        category: "Backend",
-        completed_date: "2024-01-01",
-        duration: "75 min",
-        questions: 35
-      }
-    ];
+    const body = await request.json();
+    const { title, description, timeLimit, questions } = body;
 
-    return NextResponse.json(demoTests);
+    // Test yaratish
+    const test = await prisma.test.create({
+      data: {
+        title,
+        description,
+        timeLimit: timeLimit || 30, // default 30 daqiqa
+        isActive: true,
+        createdBy: user.id,
+        questions: {
+          create: questions.map((question, index) => ({
+            question: question.question,
+            type: question.type || "multiple_choice",
+            order: index + 1,
+            options: {
+              create: question.options.map((option, optionIndex) => ({
+                text: option.text,
+                isCorrect: option.isCorrect || false,
+                order: optionIndex + 1
+              }))
+            }
+          }))
+        }
+      },
+      include: {
+        questions: {
+          include: {
+            options: true
+          }
+        }
+      }
+    });
+
+    return NextResponse.json(test, { status: 201 });
   } catch (error) {
-    console.error('Tests GET error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error creating test:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+// PATCH - Test natijalarini saqlash
+export async function PATCH(request) {
+  try {
+    const user = await verifyToken();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { testId, answers, timeSpent } = body;
+
+    // Testni olish
+    const test = await prisma.test.findUnique({
+      where: { id: testId },
+      include: {
+        questions: {
+          include: {
+            options: true
+          }
+        }
+      }
+    });
+
+    if (!test) {
+      return NextResponse.json({ error: "Test not found" }, { status: 404 });
+    }
+
+    // Natijalarni hisoblash
+    let correctAnswers = 0;
+    let totalQuestions = test.questions.length;
+
+    for (const answer of answers) {
+      const question = test.questions.find(q => q.id === answer.questionId);
+      if (question) {
+        const correctOption = question.options.find(opt => opt.isCorrect);
+        if (correctOption && correctOption.id === answer.selectedOptionId) {
+          correctAnswers++;
+        }
+      }
+    }
+
+    const score = Math.round((correctAnswers / totalQuestions) * 100);
+
+    // Natijani saqlash
+    const result = await prisma.testResult.create({
+      data: {
+        userId: user.id,
+        testId: testId,
+        score: score,
+        timeSpent: timeSpent,
+        answers: answers,
+        completedAt: new Date()
+      }
+    });
+
+    return NextResponse.json({
+      result,
+      score,
+      correctAnswers,
+      totalQuestions
+    });
+  } catch (error) {
+    console.error("Error saving test result:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 } 

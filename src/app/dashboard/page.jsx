@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { motion, AnimatePresence } from "framer-motion";
+import socketManager from '@/lib/socket';
 import {
   LayoutDashboard,
   FileText,
@@ -31,7 +32,9 @@ import {
   Download,
   Share2,
   X,
+  Clock,
 } from "lucide-react";
+import Image from "next/image";
 
 
 // Animation components
@@ -70,6 +73,236 @@ const menuItems = [
   { label: "Admin Panel", icon: Users, adminOnly: true },
 ];
 
+// Test Creation Form Component
+const TestCreationForm = ({ onTestCreated, setNotifications }) => {
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    timeLimit: 30,
+    questions: [
+      {
+        question: "",
+        type: "multiple_choice",
+        options: [
+          { text: "", isCorrect: false },
+          { text: "", isCorrect: false },
+          { text: "", isCorrect: false },
+          { text: "", isCorrect: false }
+        ]
+      }
+    ]
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const addQuestion = () => {
+    setFormData(prev => ({
+      ...prev,
+      questions: [...prev.questions, {
+        question: "",
+        type: "multiple_choice",
+        options: [
+          { text: "", isCorrect: false },
+          { text: "", isCorrect: false },
+          { text: "", isCorrect: false },
+          { text: "", isCorrect: false }
+        ]
+      }]
+    }));
+  };
+
+  const updateQuestion = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      questions: prev.questions.map((q, i) => 
+        i === index ? { ...q, [field]: value } : q
+      )
+    }));
+  };
+
+  const updateOption = (questionIndex, optionIndex, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      questions: prev.questions.map((q, qIndex) => 
+        qIndex === questionIndex ? {
+          ...q,
+          options: q.options.map((opt, oIndex) => 
+            oIndex === optionIndex ? { ...opt, [field]: value } : opt
+          )
+        } : q
+      )
+    }));
+  };
+
+  const removeQuestion = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      questions: prev.questions.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/tests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        onTestCreated();
+        // Add notification
+        setNotifications(prev => [...prev, {
+          id: Date.now(),
+          type: "success",
+          message: "Test created successfully!",
+          time: "Just now"
+        }]);
+      }
+    } catch (error) {
+      console.error('Error creating test:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Basic Info */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Test Title</label>
+          <input
+            type="text"
+            value={formData.title}
+            onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+            className="w-full border border-gray-300 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Time Limit (minutes)</label>
+          <input
+            type="number"
+            value={formData.timeLimit}
+            onChange={(e) => setFormData(prev => ({ ...prev, timeLimit: parseInt(e.target.value) }))}
+            className="w-full border border-gray-300 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+            min="1"
+            required
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+        <textarea
+          value={formData.description}
+          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+          className="w-full border border-gray-300 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+          rows="3"
+        />
+      </div>
+
+      {/* Questions */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-800">Questions</h3>
+          <button
+            type="button"
+            onClick={addQuestion}
+            className="bg-[#10B981] text-white px-4 py-2 rounded-lg hover:bg-[#0ea672] transition-colors"
+          >
+            Add Question
+          </button>
+        </div>
+
+        <div className="space-y-6">
+          {formData.questions.map((question, qIndex) => (
+            <div key={qIndex} className="border border-gray-200 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-semibold text-gray-800">Question {qIndex + 1}</h4>
+                {formData.questions.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeQuestion(qIndex)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Question Text</label>
+                  <textarea
+                    value={question.question}
+                    onChange={(e) => updateQuestion(qIndex, 'question', e.target.value)}
+                    className="w-full border border-gray-300 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                    rows="2"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Options</label>
+                  <div className="space-y-3">
+                    {question.options.map((option, oIndex) => (
+                      <div key={oIndex} className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name={`correct-${qIndex}`}
+                          checked={option.isCorrect}
+                          onChange={() => {
+                            // Reset all options to false, then set current to true
+                            question.options.forEach((_, index) => {
+                              updateOption(qIndex, index, 'isCorrect', false);
+                            });
+                            updateOption(qIndex, oIndex, 'isCorrect', true);
+                          }}
+                          className="text-[#10B981] focus:ring-[#10B981]"
+                        />
+                        <input
+                          type="text"
+                          value={option.text}
+                          onChange={(e) => updateOption(qIndex, oIndex, 'text', e.target.value)}
+                          className="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                          placeholder={`Option ${oIndex + 1}`}
+                          required
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-4">
+        <button
+          type="button"
+          onClick={() => onTestCreated()}
+          className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="px-6 py-3 bg-gradient-to-r from-[#10B981] to-[#34D399] text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+        >
+          {isSubmitting ? 'Creating...' : 'Create Test'}
+        </button>
+      </div>
+    </form>
+  );
+};
+
 export default function DashboardPage() {
   // All useState hooks must be at the top
   const [user, setUser] = useState(null);
@@ -93,6 +326,11 @@ export default function DashboardPage() {
   const [chatMessages, setChatMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [editingMessage, setEditingMessage] = useState(null);
+  const [editMessageText, setEditMessageText] = useState('');
+  const [typingUsers, setTypingUsers] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const typingTimeoutRef = useRef(null);
   
   // Portfolio state
   const [portfolio, setPortfolio] = useState(null);
@@ -144,26 +382,18 @@ export default function DashboardPage() {
       }
       const { user } = await res.json();
       setUser(user);
-      // Profil ma'lumotlari (users jadvali)
-      const { data } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-      if (data) {
-        setProfile({
-          name: data.name || "",
-          email: user.email,
-          bio: data.bio || "",
-          avatar_url: data.avatar_url || "",
-          lang: data.lang || "en",
-          github: data.github || "",
-          telegram: data.telegram || "",
-          role: user.role || "user", // JWT dan kelgan role ni ishlatamiz
-        });
-      } else {
-        setProfile((p) => ({ ...p, email: user.email, role: user.role || "user" }));
-      }
+      
+      // Profil ma'lumotlarini to'g'ridan-to'g'ri user'dan olish
+      setProfile({
+        name: user.name || "",
+        email: user.email,
+        bio: user.bio || "",
+        avatar_url: user.image || "",
+        lang: user.lang || "en",
+        github: user.github || "",
+        telegram: user.telegram || "",
+        role: user.role || "user",
+      });
     };
     fetchProfile();
   }, []);
@@ -179,36 +409,45 @@ export default function DashboardPage() {
     setLoading(true);
     setSuccess("");
     setError("");
-    const { error } = await supabase
-      .from("users")
-      .upsert({
-        id: user.id,
-        name: profile.name,
-        bio: profile.bio,
-        avatar_url: profile.avatar_url,
-        lang: profile.lang,
-        github: profile.github,
-        telegram: profile.telegram,
+    
+    try {
+      const response = await fetch(`/api/users/${user.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: profile.name,
+          bio: profile.bio,
+          avatar_url: profile.avatar_url,
+          lang: profile.lang,
+          github: profile.github,
+          telegram: profile.telegram,
+        })
       });
-    if (!error) {
-      setSuccess("Profile updated!");
-      // Add notification
-      setNotifications(prev => [...prev, {
-        id: Date.now(),
-        type: "success",
-        message: "Profile updated successfully!",
-        time: "Just now"
-      }]);
-    } else {
+      
+      if (response.ok) {
+        setSuccess("Profile updated!");
+        // Add notification
+        setNotifications(prev => [...prev, {
+          id: Date.now(),
+          type: "success",
+          message: "Profile updated successfully!",
+          time: "Just now"
+        }]);
+      } else {
+        setError("Error updating profile");
+        // Add error notification
+        setNotifications(prev => [...prev, {
+          id: Date.now(),
+          type: "warning",
+          message: "Failed to update profile. Please try again.",
+          time: "Just now"
+        }]);
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
       setError("Error updating profile");
-      // Add error notification
-      setNotifications(prev => [...prev, {
-        id: Date.now(),
-        type: "warning",
-        message: "Failed to update profile. Please try again.",
-        time: "Just now"
-      }]);
     }
+    
     setLoading(false);
   };
 
@@ -240,10 +479,15 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const res = await fetch("/api/chats");
+        const token = localStorage.getItem('token');
+        const res = await fetch("/api/chats", {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         if (res.ok) {
-          const messages = await res.json();
-          setChatMessages(messages);
+          const data = await res.json();
+          setChatMessages(data.messages || []);
         }
       } catch (error) {
         console.error("Error fetching messages:", error);
@@ -371,6 +615,86 @@ export default function DashboardPage() {
     }
   };
 
+  // Socket.IO connection
+  useEffect(() => {
+    if (user && active === "Chats") {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const socket = socketManager.connect(token);
+        
+        // Listen for new messages
+        socketManager.onNewMessage((message) => {
+          setChatMessages(prev => [...prev, message]);
+        });
+
+        // Listen for message updates
+        socketManager.onMessageUpdated((updatedMessage) => {
+          setChatMessages(prev => 
+            prev.map(msg => 
+              msg.id === updatedMessage.id ? updatedMessage : msg
+            )
+          );
+        });
+
+        // Listen for message deletions
+        socketManager.onMessageDeleted(({ messageId }) => {
+          setChatMessages(prev => 
+            prev.filter(msg => msg.id !== messageId)
+          );
+        });
+
+        // Listen for typing indicators
+        socketManager.onUserTyping(({ userId, userName }) => {
+          setTypingUsers(prev => {
+            const existing = prev.find(u => u.userId === userId);
+            if (!existing) {
+              return [...prev, { userId, userName }];
+            }
+            return prev;
+          });
+        });
+
+        socketManager.onUserStoppedTyping(({ userId }) => {
+          setTypingUsers(prev => 
+            prev.filter(u => u.userId !== userId)
+          );
+        });
+
+        // Listen for errors
+        socketManager.onError((error) => {
+          console.error('Socket error:', error);
+        });
+
+        return () => {
+          socketManager.disconnect();
+        };
+      }
+    }
+  }, [user, active]);
+
+  // Typing indicator
+  useEffect(() => {
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    if (isTyping) {
+      socketManager.startTyping();
+      typingTimeoutRef.current = setTimeout(() => {
+        setIsTyping(false);
+        socketManager.stopTyping();
+      }, 2000);
+    } else {
+      socketManager.stopTyping();
+    }
+
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, [isTyping]);
+
   // Xabar yuborish
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -378,50 +702,148 @@ export default function DashboardPage() {
 
     setSendingMessage(true);
     try {
-      const res = await fetch("/api/chats", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: newMessage.trim() }),
-      });
-
-      if (res.ok) {
-        setNewMessage("");
-        // Xabarlarni qayta yuklash
-        const messagesRes = await fetch("/api/chats");
-        if (messagesRes.ok) {
-          const messages = await messagesRes.json();
-          setChatMessages(messages);
-        }
-        
-        // Add notification for successful message
-        setNotifications(prev => [...prev, {
-          id: Date.now(),
-          type: "success",
-          message: "Message sent successfully!",
-          time: "Just now"
-        }]);
-      } else {
-        console.error("Failed to send message");
-        // Add error notification
-        setNotifications(prev => [...prev, {
-          id: Date.now(),
-          type: "warning",
-          message: "Failed to send message. Please try again.",
-          time: "Just now"
-        }]);
-      }
+      socketManager.sendMessage(newMessage.trim());
+      setNewMessage('');
+      setIsTyping(false);
     } catch (error) {
-      console.error("Error sending message:", error);
-      // Add error notification
-      setNotifications(prev => [...prev, {
-        id: Date.now(),
-        type: "warning",
-        message: "Error sending message. Please check your connection.",
-        time: "Just now"
-      }]);
+      console.error('Error sending message:', error);
     } finally {
       setSendingMessage(false);
     }
+  };
+
+  const handleEditMessage = (messageId, currentText) => {
+    setEditingMessage(messageId);
+    setEditMessageText(currentText);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editMessageText.trim()) return;
+    
+    socketManager.editMessage(editingMessage, editMessageText.trim());
+    setEditingMessage(null);
+    setEditMessageText('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMessage(null);
+    setEditMessageText('');
+  };
+
+  const handleDeleteMessage = (messageId) => {
+    if (confirm('Are you sure you want to delete this message?')) {
+      socketManager.deleteMessage(messageId);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setNewMessage(e.target.value);
+    if (!isTyping) {
+      setIsTyping(true);
+    }
+  };
+
+  // Test state
+  const [currentTest, setCurrentTest] = useState(null);
+  const [testAnswers, setTestAnswers] = useState({});
+  const [testTimer, setTestTimer] = useState(null);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [isTestActive, setIsTestActive] = useState(false);
+
+  // Test boshlash funksiyasi
+  const startTest = (test) => {
+    setCurrentTest(test);
+    setTestAnswers({});
+    setTimeRemaining(test.timeLimit * 60); // daqiqalarni soniyaga o'tkazish
+    setIsTestActive(true);
+    setActive("Test");
+  };
+
+
+
+  // Test timer
+  useEffect(() => {
+    let interval;
+    if (isTestActive && timeRemaining > 0) {
+      interval = setInterval(() => {
+        setTimeRemaining(prev => {
+          if (prev <= 1) {
+            // Vaqt tugadi, testni avtomatik yuborish
+            submitTest();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isTestActive, timeRemaining]);
+
+  // Test yuborish
+  const submitTest = async () => {
+    if (!currentTest) return;
+
+    const answers = Object.entries(testAnswers).map(([questionId, selectedOptionId]) => ({
+      questionId,
+      selectedOptionId
+    }));
+
+    const timeSpent = currentTest.timeLimit * 60 - timeRemaining;
+
+    try {
+      const response = await fetch('/api/tests', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          testId: currentTest.id,
+          answers,
+          timeSpent: Math.floor(timeSpent / 60)
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Add notification
+        setNotifications(prev => [...prev, {
+          id: Date.now(),
+          type: "success",
+          message: `Test completed! Score: ${result.score}%`,
+          time: "Just now"
+        }]);
+
+        // Reset test state
+        setCurrentTest(null);
+        setTestAnswers({});
+        setTimeRemaining(0);
+        setIsTestActive(false);
+        setActive("Test");
+
+        // Refresh tests
+        const testsResponse = await fetch('/api/tests');
+        if (testsResponse.ok) {
+          const testsData = await testsResponse.json();
+          setTests(testsData);
+        }
+      }
+    } catch (error) {
+      console.error('Error submitting test:', error);
+    }
+  };
+
+  // Test javobini saqlash
+  const saveAnswer = (questionId, optionId) => {
+    setTestAnswers(prev => ({
+      ...prev,
+      [questionId]: optionId
+    }));
+  };
+
+  // Vaqtni formatlash
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   if (!user) return (
@@ -487,10 +909,14 @@ export default function DashboardPage() {
         <div>
           <div className={`flex items-center ${sidebarOpen ? 'justify-between' : 'justify-center'} mb-8`}>
             <div className="flex items-center gap-3">
-              <div className={`${sidebarOpen ? 'w-10 h-10' : 'w-8 h-8'} bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-xl flex items-center justify-center`}>
-                <span className={`text-white font-bold ${sidebarOpen ? 'text-lg' : 'text-sm'}`}>F</span>
-          </div>
-              {sidebarOpen && <div className="text-xl font-bold text-gray-800">FraiJob</div>}
+              <div className={`${sidebarOpen ? 'w-16 h-16' : 'w-12 h-12'} relative`}>
+                <Image
+                  src="/logo.svg"
+                  alt="Logo"
+                  fill
+                  className="object-contain"
+                />
+              </div>
             </div>
           </div>
           
@@ -540,7 +966,7 @@ export default function DashboardPage() {
           </div>
           {sidebarOpen && (
               <div className="text-center">
-                <div className="font-semibold text-gray-800 text-sm">{profile.name}</div>
+                <div className="font-semibold text-gray-800 text-sm">{profile.name || "User"}</div>
                 <div className="text-gray-500 text-xs">{profile.email}</div>
             </div>
           )}
@@ -1105,7 +1531,7 @@ export default function DashboardPage() {
               </motion.div>
             )}
 
-        {active === "Jobs" && (
+            {active === "Jobs" && (
               <motion.div
                 key="jobs"
                 initial={{ opacity: 0, y: 20 }}
@@ -1207,7 +1633,7 @@ export default function DashboardPage() {
               </motion.div>
             )}
 
-        {active === "Test" && (
+            {active === "Test" && !isTestActive && (
               <motion.div
                 key="test"
                 initial={{ opacity: 0, y: 20 }}
@@ -1216,130 +1642,201 @@ export default function DashboardPage() {
                 transition={{ duration: 0.3 }}
                 className="space-y-6"
               >
+                {/* Header */}
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-gray-800">Skill Tests</h2>
-                  <button className="bg-gradient-to-r from-[#10B981] to-[#34D399] text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2">
-                    <Zap size={20} />
-                    Take New Test
-                  </button>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">Test Center</h2>
+                    <p className="text-gray-600">Take tests to improve your skills and showcase your knowledge</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-gray-500">Role: {profile.role}</span>
+                  </div>
                 </div>
 
-                {loadingTests ? (
-                  <div className="flex items-center justify-center py-20">
-                    <div className="animate-spin w-8 h-8 border-4 border-[#10B981] border-t-transparent rounded-full"></div>
-                  </div>
-                ) : tests.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full flex items-center justify-center mx-auto mb-4">
-                      <FileText className="w-8 h-8 text-white" />
+                {/* Available Tests */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {loadingTests ? (
+                    <div className="col-span-full flex items-center justify-center py-20">
+                      <div className="animate-spin w-8 h-8 border-4 border-[#10B981] border-t-transparent rounded-full"></div>
                     </div>
-                    <p className="text-gray-500 text-lg font-medium">No test results yet</p>
-                    <p className="text-gray-400 text-sm">Take your first skill test to see results here</p>
-                  </div>
-                ) : (
-                  <>
-                    {/* Completed Tests */}
-                    {tests.length > 0 && (
-                      <div className="mb-8">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Completed Tests</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {tests.map((test, index) => (
-                            <FadeInUp key={test.id} delay={index * 0.1}>
-                              <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300">
-                                <div className="flex items-center justify-between mb-4">
-                                  <h3 className="text-lg font-semibold text-gray-800">{test.title}</h3>
-                                  <div className="text-2xl font-bold text-[#10B981]">{test.score}%</div>
-                                </div>
-                                <div className="flex items-center gap-2 mb-3">
-                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">{test.category}</span>
-                                  <span className="text-xs text-gray-500">{test.duration}</span>
-                                  <span className="text-xs text-gray-500">{test.questions} questions</span>
-                                </div>
-                                <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                                  <div 
-                                    className="bg-gradient-to-r from-[#10B981] to-[#34D399] h-2 rounded-full transition-all duration-500"
-                                    style={{ width: `${test.score}%` }}
-                                  ></div>
-                                </div>
-                                <div className="flex items-center justify-between text-sm text-gray-500">
-                                  <span>Score: {test.score}/{test.total}</span>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-xs text-gray-400">{test.completed_date}</span>
-                                    <button className="text-[#10B981] hover:text-[#0ea672] transition-colors duration-200">
-                                      <Download size={16} />
-                                    </button>
-                                  </div>
-                                </div>
+                  ) : availableTests.length > 0 ? (
+                    availableTests.map((test, index) => (
+                      <FadeInUp key={test.id} delay={index * 0.1}>
+                        <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex-1">
+                              <h3 className="text-lg font-bold text-gray-800 mb-2">{test.title}</h3>
+                              <p className="text-gray-600 text-sm mb-3">{test.description}</p>
+                              <div className="flex items-center gap-4 text-sm text-gray-500">
+                                <span className="flex items-center gap-1">
+                                  <Clock size={14} />
+                                  {test.timeLimit} min
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <FileText size={14} />
+                                  {test.questions?.length || 0} questions
+                                </span>
                               </div>
-                            </FadeInUp>
-                          ))}
+                            </div>
+                            <div className="w-12 h-12 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-xl flex items-center justify-center">
+                              <FileText size={20} className="text-white" />
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => startTest(test)}
+                            className="w-full bg-gradient-to-r from-[#10B981] to-[#34D399] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
+                          >
+                            Start Test
+                          </button>
                         </div>
+                      </FadeInUp>
+                    ))
+                  ) : (
+                    <div className="col-span-full text-center py-20">
+                      <div className="w-16 h-16 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <FileText size={24} className="text-gray-500" />
                       </div>
-                    )}
+                      <h3 className="text-lg font-semibold text-gray-800 mb-2">No Tests Available</h3>
+                      <p className="text-gray-600">Check back later for new tests or contact an admin to create tests.</p>
+                    </div>
+                  )}
+                </div>
 
-                    {/* Available Tests */}
-                    {availableTests.length > 0 && (
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Available Tests</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {availableTests.map((test, index) => (
-                            <FadeInUp key={test.id} delay={index * 0.1}>
-                              <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300">
-                                <div className="flex items-center justify-between mb-4">
-                                  <h3 className="text-lg font-semibold text-gray-800">{test.title}</h3>
-                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">{test.difficulty}</span>
-                                </div>
-                                <p className="text-sm text-gray-600 mb-4">{test.description}</p>
-                                <div className="flex items-center gap-2 mb-4">
-                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">{test.category}</span>
-                                  <span className="text-xs text-gray-500">{test.duration}</span>
-                                  <span className="text-xs text-gray-500">{test.questions} questions</span>
-                                </div>
-                                <button 
-                                  onClick={async () => {
-                                    try {
-                                      const response = await fetch('/api/tests', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ test_id: test.id })
-                                      });
-                                      
-                                      if (response.ok) {
-                                        const result = await response.json();
-                                        // Add notification
-                                        setNotifications(prev => [...prev, {
-                                          id: Date.now(),
-                                          type: "success",
-                                          message: `Completed ${test.title} with ${result.score}% score!`,
-                                          time: "Just now"
-                                        }]);
-                                        // Refresh tests
-                                        const testsResponse = await fetch('/api/tests');
-                                        if (testsResponse.ok) {
-                                          const testsData = await testsResponse.json();
-                                          setTests(testsData);
-                                        }
-                                      }
-                                    } catch (error) {
-                                      console.error('Error taking test:', error);
-                                    }
-                                  }}
-                                  className="w-full bg-gradient-to-r from-[#10B981] to-[#34D399] text-white py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-300"
-                                >
-                                  Start Test
-                                </button>
+                {/* Completed Tests */}
+                {tests.length > 0 && (
+                  <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg">
+                    <h3 className="text-lg font-bold text-gray-800 mb-4">Completed Tests</h3>
+                    <div className="space-y-4">
+                      {tests.map((test, index) => (
+                        <FadeInUp key={test.id} delay={index * 0.1}>
+                          <div className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl">
+                            <div className="flex items-center gap-4">
+                              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                                test.score >= 80 ? 'bg-green-100 text-green-600' :
+                                test.score >= 60 ? 'bg-yellow-100 text-yellow-600' :
+                                'bg-red-100 text-red-600'
+                              }`}>
+                                <Award size={20} />
                               </div>
-                            </FadeInUp>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </>
+                              <div>
+                                <h4 className="font-semibold text-gray-800">{test.title}</h4>
+                                <p className="text-sm text-gray-500">Completed {new Date(test.completedAt).toLocaleDateString()}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-2xl font-bold text-gray-800">{test.score}%</div>
+                              <div className="text-sm text-gray-500">{test.timeSpent} min</div>
+                            </div>
+                          </div>
+                        </FadeInUp>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </motion.div>
             )}
 
-        {active === "Chats" && (
+            {/* Create Test (Admin Only) */}
+            {active === "Create Test" && profile.role === "admin" && (
+              <motion.div
+                key="create-test"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6">Create New Test</h2>
+                  <TestCreationForm onTestCreated={() => setActive("Test")} setNotifications={setNotifications} />
+                </div>
+              </motion.div>
+            )}
+
+            {/* Active Test View */}
+            {active === "Test" && isTestActive && currentTest && (
+              <motion.div
+                key="active-test"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                {/* Test Header */}
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-800">{currentTest.title}</h2>
+                      <p className="text-gray-600">{currentTest.description}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-red-600">{formatTime(timeRemaining)}</div>
+                      <div className="text-sm text-gray-500">Time Remaining</div>
+                    </div>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-red-500 h-2 rounded-full transition-all duration-1000" 
+                      style={{ 
+                        width: `${((currentTest.timeLimit * 60 - timeRemaining) / (currentTest.timeLimit * 60)) * 100}%` 
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Test Questions */}
+                <div className="space-y-6">
+                  {currentTest.questions?.map((question, qIndex) => (
+                    <FadeInUp key={question.id} delay={qIndex * 0.1}>
+                      <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                          Question {qIndex + 1}: {question.question}
+                        </h3>
+                        <div className="space-y-3">
+                          {question.options?.map((option, oIndex) => (
+                            <label key={option.id} className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:bg-gray-50 cursor-pointer transition-all duration-200">
+                              <input
+                                type="radio"
+                                name={`question-${question.id}`}
+                                value={option.id}
+                                checked={testAnswers[question.id] === option.id}
+                                onChange={() => saveAnswer(question.id, option.id)}
+                                className="text-[#10B981] focus:ring-[#10B981]"
+                              />
+                              <span className="text-gray-800">{option.text}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </FadeInUp>
+                  ))}
+                </div>
+
+                {/* Test Actions */}
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={() => {
+                      setIsTestActive(false);
+                      setCurrentTest(null);
+                      setTestAnswers({});
+                      setTimeRemaining(0);
+                    }}
+                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel Test
+                  </button>
+                  <button
+                    onClick={submitTest}
+                    className="px-6 py-3 bg-gradient-to-r from-[#10B981] to-[#34D399] text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
+                  >
+                    Submit Test
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {active === "Chats" && (
               <motion.div
                 key="chats"
                 initial={{ opacity: 0, y: 20 }}
@@ -1348,124 +1845,71 @@ export default function DashboardPage() {
                 transition={{ duration: 0.3 }}
                 className="h-full flex gap-6"
               >
-                {/* Left Sidebar - Chat List */}
-                <div className="w-80 bg-white/80 backdrop-blur-xl rounded-2xl border border-white/30 shadow-lg p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-gray-800">Messages</h2>
-                    <button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:shadow-lg transition-all duration-300">
-                      Create New Group
-                    </button>
+                {/* Left Sidebar - Community Groups */}
+                <div className="w-80 bg-white/80 backdrop-blur-xl rounded-2xl border border-white/30 shadow-lg flex flex-col h-full">
+                  <div className="p-6 border-b border-gray-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl font-bold text-gray-800">Community</h2>
+                      <button className="bg-gradient-to-r from-[#10B981] to-[#34D399] text-white px-4 py-2 rounded-xl text-sm font-medium hover:shadow-lg transition-all duration-300">
+                        Create Group
+                      </button>
+                    </div>
+                    <p className="text-sm text-gray-600">Join groups to connect with other professionals</p>
                   </div>
 
-                  {/* Search */}
-                  <div className="relative mb-6">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      placeholder="Search messages..."
-                      className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:bg-white transition-all duration-300"
-                    />
-                  </div>
-
-                  {/* Messages List */}
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-semibold text-gray-600 mb-3">Messages</h3>
-                    {[
-                      { name: "Jerome Bell", message: "Hello, how are you!", time: "Just Now", unread: 2, avatar: "J" },
-                      { name: "Guy Hawkins", message: "Thanks! Looks great!", time: "1 min ago", unread: 0, avatar: "G" },
-                      { name: "Marvin McKinney", message: "Can you find a house for...", time: "1 min ago", unread: 3, avatar: "M" },
-                      { name: "Darlene Robertson", message: "Sent me over the latest....", time: "3 mins ago", unread: 0, avatar: "D" },
-                      { name: "Darrell Steward", message: "I will give you a nice com...", time: "15 mins ago", unread: 0, avatar: "D" },
-                      { name: "Arlene McCoy", message: "Such an affordable house", time: "20 mins ago", unread: 0, avatar: "A" },
-                      { name: "Kristin Watson", message: "I get my commission!", time: "1 day ago", unread: 0, avatar: "K" },
-                    ].map((chat, index) => (
-                      <motion.div
-                        key={chat.name}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer transition-all duration-200"
-                      >
-                        <div className="w-10 h-10 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                          {chat.avatar}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <h4 className="font-medium text-gray-800 text-sm truncate">{chat.name}</h4>
-                            <span className="text-xs text-gray-500">{chat.time}</span>
+                  {/* Groups List */}
+                  <div className="flex-1 overflow-y-auto p-6">
+                    <div className="space-y-3">
+                      {[
+                        { name: "General", members: 342, active: true, avatar: "G" },
+                      ].map((group, index) => (
+                        <motion.div
+                          key={group.name}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="flex items-center gap-3 p-4 rounded-xl hover:bg-gray-50 cursor-pointer transition-all duration-200 border border-gray-100"
+                        >
+                          <div className="w-12 h-12 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                            {group.avatar}
                           </div>
-                          <p className="text-xs text-gray-600 truncate">{chat.message}</p>
-                        </div>
-                        {chat.unread > 0 && (
-                          <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                            {chat.unread}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-medium text-gray-800 text-sm truncate">{group.name}</h4>
+                              {group.active && (
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500">{group.members} members</p>
                           </div>
-                        )}
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  {/* Groups */}
-                  <div className="mt-6 space-y-2">
-                    <h3 className="text-sm font-semibold text-gray-600 mb-3">Groups</h3>
-                    {[
-                      { name: "Design Team", message: "I will have a look today.", time: "1 min ago", unread: 0, avatar: "D" },
-                      { name: "Human Resource Department", message: "I've just published the....", time: "2 mins ago", unread: 0, avatar: "H" },
-                      { name: "Campaigns", message: "", time: "10 mins ago", unread: 0, avatar: "C" },
-                    ].map((group, index) => (
-                      <motion.div
-                        key={group.name}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: (index + 7) * 0.1 }}
-                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer transition-all duration-200"
-                      >
-                        <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                          {group.avatar}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <h4 className="font-medium text-gray-800 text-sm truncate">{group.name}</h4>
-                            <span className="text-xs text-gray-500">{group.time}</span>
-                          </div>
-                          {group.message && <p className="text-xs text-gray-600 truncate">{group.message}</p>}
-                        </div>
-                      </motion.div>
-                    ))}
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                {/* Middle - Chat Area */}
+                                {/* Middle - Chat Area */}
                 <div className="flex-1 bg-white/80 backdrop-blur-xl rounded-2xl border border-white/30 shadow-lg flex flex-col">
                   {/* Chat Header */}
                   <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                        M
-                  </div>
-                  <div>
-                        <h3 className="font-semibold text-gray-800">Marketing Team</h3>
-                        <p className="text-sm text-gray-500">24 members</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full flex items-center justify-center text-white font-semibold">
+                        G
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-800">General</h3>
+                        <p className="text-sm text-gray-500">342 members • Active now</p>
+                      </div>
                     </div>
-                  </div>
                     <div className="flex items-center gap-2">
                       <button className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200">
-                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
+                        <Users className="w-5 h-5 text-gray-600" />
                       </button>
                       <button className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200">
-                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
+                        <Settings className="w-5 h-5 text-gray-600" />
                       </button>
-                      <button className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200">
-                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                        </svg>
-                      </button>
-                </div>
-                </div>
+                    </div>
+                  </div>
 
                   {/* Chat Messages */}
                   <div className="flex-1 overflow-y-auto p-6 space-y-4">
@@ -1473,9 +1917,9 @@ export default function DashboardPage() {
                       <div className="text-center py-12">
                         <div className="w-16 h-16 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full flex items-center justify-center mx-auto mb-4">
                           <MessagesSquare className="w-8 h-8 text-white" />
-            </div>
-                        <p className="text-gray-500 text-lg font-medium">No messages yet</p>
-                        <p className="text-gray-400 text-sm">Start the conversation!</p>
+                        </div>
+                        <p className="text-gray-500 text-lg font-medium">Welcome to General!</p>
+                        <p className="text-gray-400 text-sm">Start chatting with the community</p>
                       </div>
                     ) : (
                       chatMessages.map((msg, index) => (
@@ -1484,50 +1928,116 @@ export default function DashboardPage() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.1 }}
-                          className={`flex ${msg.user_id === user?.id ? "justify-end" : "justify-start"}`}
+                          className={`flex ${msg.userId === user?.id ? "justify-end" : "justify-start"}`}
                         >
-                          <div className="flex items-start gap-3 max-w-[70%]">
-                            {msg.user_id !== user?.id && (
+                          <div className="flex items-start gap-3 max-w-[70%] group">
+                            {msg.userId !== user?.id && (
                               <div className="w-8 h-8 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
-                                {msg.user_name?.[0]?.toUpperCase() || "U"}
+                                {msg.userName?.[0]?.toUpperCase() || "U"}
                               </div>
                             )}
-                            <div className="flex-1">
+                            <div className="flex-1 relative">
                               <div className="flex items-center gap-2 mb-1">
-                                {msg.user_id !== user?.id && (
-                                  <span className="font-medium text-gray-800 text-sm">{msg.user_name}</span>
+                                {msg.userId !== user?.id && (
+                                  <span className="font-medium text-gray-800 text-sm">{msg.userName}</span>
                                 )}
                                 <span className="text-xs text-gray-500">
-                                  {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </span>
+                                {msg.updatedAt && msg.updatedAt !== msg.createdAt && (
+                                  <span className="text-xs text-gray-400">(edited)</span>
+                                )}
                               </div>
-                              <div className={`px-4 py-3 text-sm break-words whitespace-pre-line border shadow-sm rounded-2xl ${
-                                msg.user_id === user?.id
-                                  ? "bg-gradient-to-r from-[#10B981] to-[#34D399] text-white border-[#10B981]"
-                                  : "bg-white text-gray-900 border-gray-200"
-                              }`}>
-                                {msg.message}
-                              </div>
+                              
+                              {editingMessage === msg.id ? (
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="text"
+                                    value={editMessageText}
+                                    onChange={(e) => setEditMessageText(e.target.value)}
+                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]"
+                                    onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
+                                    autoFocus
+                                  />
+                                  <button
+                                    onClick={handleSaveEdit}
+                                    className="px-3 py-1 bg-green-500 text-white rounded-lg text-xs hover:bg-green-600 transition-colors"
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    onClick={handleCancelEdit}
+                                    className="px-3 py-1 bg-gray-500 text-white rounded-lg text-xs hover:bg-gray-600 transition-colors"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className={`px-4 py-3 text-sm break-words whitespace-pre-line border shadow-sm rounded-2xl relative ${
+                                  msg.userId === user?.id
+                                    ? "bg-gradient-to-r from-[#10B981] to-[#34D399] text-white border-[#10B981]"
+                                    : "bg-white text-gray-900 border-gray-200"
+                                }`}>
+                                  {msg.message}
+                                  
+                                  {/* Message actions (only for own messages) */}
+                                  {msg.userId === user?.id && (
+                                    <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <div className="flex items-center gap-1">
+                                        <button
+                                          onClick={() => handleEditMessage(msg.id, msg.message)}
+                                          className="p-1 rounded hover:bg-white/20 transition-colors"
+                                          title="Edit message"
+                                        >
+                                          <Edit className="w-3 h-3" />
+                                        </button>
+                                        <button
+                                          onClick={() => handleDeleteMessage(msg.id)}
+                                          className="p-1 rounded hover:bg-white/20 transition-colors"
+                                          title="Delete message"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </motion.div>
-                                            ))
+                      ))
+                    )}
+
+                    {/* Typing indicator */}
+                    {typingUsers.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex justify-start"
+                      >
+                        <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl">
+                          <div className="flex space-x-1">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                          </div>
+                          <span className="text-xs text-gray-500">
+                            {typingUsers.map(u => u.userName).join(', ')} typing...
+                          </span>
+                        </div>
+                      </motion.div>
                     )}
                   </div>
 
                   {/* Chat Input */}
                   <div className="p-6 border-t border-gray-200">
                     <form onSubmit={handleSendMessage} className="flex items-center gap-3">
-                      <button type="button" className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200">
-                        <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                        </svg>
-                      </button>
                       <div className="flex-1 relative">
                         <input
                           type="text"
                           value={newMessage}
-                          onChange={(e) => setNewMessage(e.target.value)}
+                          onChange={handleInputChange}
                           placeholder="Type a message..."
                           className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition-all duration-300"
                           disabled={sendingMessage}
@@ -1536,135 +2046,68 @@ export default function DashboardPage() {
                       <button 
                         type="submit"
                         disabled={!newMessage.trim() || sendingMessage}
-                        className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200 disabled:opacity-50"
+                        className="p-3 bg-gradient-to-r from-[#10B981] to-[#34D399] text-white rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50"
                       >
-                        <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 2 9-2zm0 0v-8" />
                         </svg>
                       </button>
                     </form>
                   </div>
                 </div>
 
-                {/* Right Sidebar - Group Information */}
-                <div className="w-80 bg-white/80 backdrop-blur-xl rounded-2xl border border-white/30 shadow-lg p-6">
-                  <h3 className="text-lg font-bold text-gray-800 mb-6">Group Information</h3>
-                  
-                  {/* Group Profile */}
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                      M
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800">Marketing Team</h4>
-                      <p className="text-sm text-gray-500">24 members</p>
-                    </div>
+                {/* Right Sidebar - Group Info */}
+                <div className="w-80 bg-white/80 backdrop-blur-xl rounded-2xl border border-white/30 shadow-lg flex flex-col h-full">
+                  <div className="p-6 border-b border-gray-200">
+                    <h3 className="text-lg font-bold text-gray-800 mb-4">Group Information</h3>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex items-center justify-between mb-6">
-                    <button className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200">
-                      <Bell className="w-5 h-5 text-gray-600" />
-                    </button>
-                    <button className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200">
-                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                      </svg>
-                    </button>
-                    <button className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200">
-                      <Users className="w-5 h-5 text-gray-600" />
-                    </button>
-                    <button className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200">
-                      <Settings className="w-5 h-5 text-gray-600" />
-                    </button>
-                  </div>
-
-                  {/* Members */}
-                  <div className="mb-6">
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-semibold text-gray-800">Members</h4>
-                      <button className="text-sm text-blue-600 hover:text-blue-700">View All</button>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {Array.from({ length: 8 }, (_, i) => (
-                        <div key={i} className="w-8 h-8 bg-gradient-to-r from-gray-400 to-gray-500 rounded-full flex items-center justify-center text-white text-xs font-semibold">
-                          {String.fromCharCode(65 + i)}
+                  {/* Group Info */}
+                  <div className="flex-1 overflow-y-auto p-6">
+                    <div className="space-y-6">
+                      {/* General */}
+                      <div>
+                        <h4 className="font-semibold text-gray-800 mb-3">General</h4>
+                        <div className="bg-gray-50 rounded-xl p-4">
+                          <p className="text-sm text-gray-600 leading-relaxed">
+                            Welcome to our community! This is a space for all professionals to connect, 
+                            share knowledge, and collaborate on projects. Feel free to introduce yourself 
+                            and start meaningful conversations.
+                          </p>
                         </div>
-                      ))}
-                    </div>
-                  </div>
+                      </div>
 
-                  {/* Images */}
-                  <div className="mb-6">
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-semibold text-gray-800">Images</h4>
-                      <button className="text-sm text-blue-600 hover:text-blue-700">View All</button>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {Array.from({ length: 6 }, (_, i) => (
-                        <div key={i} className="w-16 h-16 bg-gradient-to-r from-blue-400 to-purple-500 rounded-lg"></div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Files */}
-                  <div className="mb-6">
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-semibold text-gray-800">Files</h4>
-                      <button className="text-sm text-blue-600 hover:text-blue-700">View All</button>
-                    </div>
-                    <div className="space-y-2">
-                      {[
-                        { name: "642 TB-DSHN_0001.pdf", size: "3.58MB", date: "12 Nov, 2023" },
-                        { name: "Report_week42.mp4", size: "66.75MB", date: "12 Nov, 2023" },
-                        { name: "Marketing Campaign Brief.word", size: "2.21MB", date: "12 Nov, 2023" },
-                      ].map((file, index) => (
-                        <div key={index} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
-                          <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-                            <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-800 truncate">{file.name}</p>
-                            <p className="text-xs text-gray-500">{file.size} • {file.date}</p>
+                      {/* Bio */}
+                      <div>
+                        <h4 className="font-semibold text-gray-800 mb-3">About This Group</h4>
+                        <div className="bg-gray-50 rounded-xl p-4">
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              <span className="text-sm text-gray-600">342 members</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              <span className="text-sm text-gray-600">Professional networking</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                              <span className="text-sm text-gray-600">Knowledge sharing</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                              <span className="text-sm text-gray-600">Project collaboration</span>
+                            </div>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Links */}
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-semibold text-gray-800">Links</h4>
-                      <button className="text-sm text-blue-600 hover:text-blue-700">View All</button>
-                    </div>
-                    <div className="space-y-2">
-                      {[
-                        { title: "Neuro Marketing: How brands are...", platform: "Youtube", date: "12 Nov, 2023" },
-                        { title: "Accomplish More Together", platform: "Confluence", date: "12 Nov, 2023" },
-                        { title: "How Apple and Nike have branded....", platform: "Youtube", date: "12 Nov, 2023" },
-                      ].map((link, index) => (
-                        <div key={index} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
-                          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                            </svg>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-800 truncate">{link.title}</p>
-                            <p className="text-xs text-gray-500">{link.platform} • {link.date}</p>
-                          </div>
-                        </div>
-                      ))}
+                      </div>
                     </div>
                   </div>
                 </div>
               </motion.div>
             )}
 
-        {active === "Settings" && (
+            {active === "Settings" && (
               <motion.div
                 key="settings"
                 initial={{ opacity: 0, y: 20 }}
@@ -1772,6 +2215,90 @@ export default function DashboardPage() {
             </form>
           </div>
                 </FadeInUp>
+              </motion.div>
+            )}
+
+            {/* Take Test */}
+            {active === "Take Test" && currentTest && (
+              <motion.div
+                key="take-test"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                {/* Test Header */}
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-800">{currentTest.title}</h2>
+                      <p className="text-gray-600">{currentTest.description}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className={`text-2xl font-bold ${
+                        timeRemaining < 300 ? 'text-red-600' : 'text-gray-800'
+                      }`}>
+                        {formatTime(timeRemaining)}
+                      </div>
+                      <div className="text-sm text-gray-500">Time Remaining</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-600">
+                      {Object.keys(testAnswers).length} of {currentTest.questions?.length || 0} questions answered
+                    </div>
+                    <button
+                      onClick={submitTest}
+                      className="bg-gradient-to-r from-[#10B981] to-[#34D399] text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
+                    >
+                      Submit Test
+                    </button>
+                  </div>
+                </div>
+
+                {/* Questions */}
+                <div className="space-y-6">
+                  {currentTest.questions?.map((question, index) => (
+                    <FadeInUp key={question.id} delay={index * 0.1}>
+                      <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg">
+                        <div className="mb-6">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="w-8 h-8 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full flex items-center justify-center text-white font-bold text-sm">
+                              {index + 1}
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-800">Question {index + 1}</h3>
+                          </div>
+                          <p className="text-gray-700 text-lg">{question.question}</p>
+                        </div>
+
+                        <div className="space-y-3">
+                          {question.options?.map((option, optionIndex) => (
+                            <label
+                              key={option.id}
+                              className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                                testAnswers[question.id] === option.id
+                                  ? 'border-[#10B981] bg-green-50'
+                                  : 'border-gray-200 hover:border-gray-300'
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name={`question-${question.id}`}
+                                value={option.id}
+                                checked={testAnswers[question.id] === option.id}
+                                onChange={() => saveAnswer(question.id, option.id)}
+                                className="text-[#10B981] focus:ring-[#10B981]"
+                              />
+                              <span className="flex-1 text-gray-700">{option.text}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </FadeInUp>
+                  ))}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

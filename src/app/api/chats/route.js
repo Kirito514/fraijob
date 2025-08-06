@@ -1,194 +1,187 @@
-import jwt from "jsonwebtoken";
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { prisma } from '@/lib/prisma';
+import { getUserFromToken } from '@/lib/auth';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
-
-// GET - Chat xabarlarini olish
-export async function GET() {
+// GET - Fetch chat messages
+export async function GET(request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-
+    const token = request.headers.get('authorization')?.replace('Bearer ', '');
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // JWT token orqali foydalanuvchini aniqlash
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-    
-    if (!user) {
+    const decoded = getUserFromToken(token);
+    if (!decoded) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    // Chat xabarlarini olish - demo data bilan
-    const demoMessages = [
-      {
-        id: 1,
-        user_id: user.id,
-        user_name: user.name || user.email,
-        message: "Salom! Qanday yordam bera olaman?",
-        created_at: new Date(Date.now() - 3600000).toISOString()
-      },
-      {
-        id: 2,
-        user_id: user.id,
-        user_name: user.name || user.email,
-        message: "Portfolio haqida savolim bor",
-        created_at: new Date(Date.now() - 1800000).toISOString()
+    // Get messages from database
+    const messages = await prisma.chatMessage.findMany({
+      orderBy: { createdAt: 'asc' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true
+          }
+        }
       }
-    ];
+    });
 
-    return NextResponse.json(demoMessages);
+    return NextResponse.json({ messages });
   } catch (error) {
-    console.error('Chat GET error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Error fetching messages:', error);
+    return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 });
   }
 }
 
-// POST - Yangi xabar yuborish
+// POST - Create new message
 export async function POST(request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-
+    const token = request.headers.get('authorization')?.replace('Bearer ', '');
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-    
-    if (!user) {
+    const decoded = getUserFromToken(token);
+    if (!decoded) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { message, reply_to_id } = body;
-
-    if (!message || !message.trim()) {
-      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+    const { message } = await request.json();
+    
+    if (!message || message.trim().length === 0) {
+      return NextResponse.json({ error: 'Message cannot be empty' }, { status: 400 });
     }
 
-    // Yangi xabar yaratish
-    const { data, error } = await supabase
-      .from('chat_messages')
-      .insert({
-        user_id: user.id,
-        user_name: user.name || user.email,
+    // Create new message
+    const newMessage = await prisma.chatMessage.create({
+      data: {
         message: message.trim(),
-        reply_to_id: reply_to_id || null
-      })
-      .select()
-      .single();
+        userId: decoded.id,
+        groupId: 'general' // For MVP, we only have one general group
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true
+          }
+        }
+      }
+    });
 
-    if (error) {
-      console.error('Chat insert error:', error);
-      // Return demo message if table doesn't exist
-      return NextResponse.json({
-        id: Date.now(),
-        user_id: user.id,
-        user_name: user.name || user.email,
-        message: message.trim(),
-        created_at: new Date().toISOString()
-      });
-    }
-
-    return NextResponse.json(data);
+    return NextResponse.json({ message: newMessage });
   } catch (error) {
-    console.error('Chat POST error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Error creating message:', error);
+    return NextResponse.json({ error: 'Failed to create message' }, { status: 500 });
   }
 }
 
-// PATCH - Xabarni tahrirlash
+// PATCH - Update message
 export async function PATCH(request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-
+    const token = request.headers.get('authorization')?.replace('Bearer ', '');
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-    
-    if (!user) {
+    const decoded = getUserFromToken(token);
+    if (!decoded) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { id, message } = body;
-
-    if (!id || !message) {
-      return NextResponse.json({ error: 'Message ID and content are required' }, { status: 400 });
+    const { messageId, message } = await request.json();
+    
+    if (!messageId || !message || message.trim().length === 0) {
+      return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
 
-    // Xabarni yangilash (faqat o'z xabarini)
-    const { data, error } = await supabase
-      .from('chat_messages')
-      .update({
+    // Check if message exists and user owns it
+    const existingMessage = await prisma.chatMessage.findUnique({
+      where: { id: messageId },
+      include: { user: true }
+    });
+
+    if (!existingMessage) {
+      return NextResponse.json({ error: 'Message not found' }, { status: 404 });
+    }
+
+    if (existingMessage.userId !== decoded.id) {
+      return NextResponse.json({ error: 'Not authorized to edit this message' }, { status: 403 });
+    }
+
+    // Update message
+    const updatedMessage = await prisma.chatMessage.update({
+      where: { id: messageId },
+      data: { 
         message: message.trim(),
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-      .eq('user_id', user.id) // Faqat o'z xabarini tahrirlash
-      .select()
-      .single();
+        updatedAt: new Date()
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true
+          }
+        }
+      }
+    });
 
-    if (error) {
-      console.error('Chat update error:', error);
-      return NextResponse.json({ error: 'Failed to update message' }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
+    return NextResponse.json({ message: updatedMessage });
   } catch (error) {
-    console.error('Chat PATCH error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Error updating message:', error);
+    return NextResponse.json({ error: 'Failed to update message' }, { status: 500 });
   }
 }
 
-// DELETE - Xabarni o'chirish
+// DELETE - Delete message
 export async function DELETE(request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-
+    const token = request.headers.get('authorization')?.replace('Bearer ', '');
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-    
-    if (!user) {
+    const decoded = getUserFromToken(token);
+    if (!decoded) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-
-    if (!id) {
-      return NextResponse.json({ error: 'Message ID is required' }, { status: 400 });
+    const { messageId } = await request.json();
+    
+    if (!messageId) {
+      return NextResponse.json({ error: 'Message ID required' }, { status: 400 });
     }
 
-    // Xabarni o'chirish (faqat o'z xabarini)
-    const { error } = await supabase
-      .from('chat_messages')
-      .delete()
-      .eq('id', id)
-      .eq('user_id', user.id); // Faqat o'z xabarini o'chirish
+    // Check if message exists and user owns it
+    const existingMessage = await prisma.chatMessage.findUnique({
+      where: { id: messageId },
+      include: { user: true }
+    });
 
-    if (error) {
-      console.error('Chat delete error:', error);
-      return NextResponse.json({ error: 'Failed to delete message' }, { status: 500 });
+    if (!existingMessage) {
+      return NextResponse.json({ error: 'Message not found' }, { status: 404 });
     }
+
+    if (existingMessage.userId !== decoded.id) {
+      return NextResponse.json({ error: 'Not authorized to delete this message' }, { status: 403 });
+    }
+
+    // Delete message
+    await prisma.chatMessage.delete({
+      where: { id: messageId }
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Chat DELETE error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Error deleting message:', error);
+    return NextResponse.json({ error: 'Failed to delete message' }, { status: 500 });
   }
 } 

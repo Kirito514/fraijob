@@ -8,17 +8,20 @@ datasource db {
 }
 
 model User {
-  id          String     @id @default(uuid())
+  id          String       @id @default(uuid())
   name        String?
-  email       String     @unique
+  email       String       @unique
   password    String?
-  firebaseUid String?    @unique
+  firebaseUid String?      @unique
   image       String?
-  role        Role       @default(USER)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  verified    Boolean    @default(false)
+  role        Role         @default(USER)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  verified    Boolean      @default(false)
   waitlist    Waitlist[]
+  testResults TestResult[]
+  createdTests Test[] @relation("TestCreator")
+  chatMessages ChatMessage[]
 }
 
 model Waitlist {
@@ -52,4 +55,67 @@ model Job {
   type        String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// Test tizimi uchun modellar
+model Test {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  timeLimit   Int          @default(30) // daqiqalarda
+  isActive    Boolean      @default(true)
+  createdBy   String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  questions   TestQuestion[]
+  userResults TestResult[]
+  creator     User         @relation("TestCreator", fields: [createdBy], references: [id])
+}
+
+model TestQuestion {
+  id       String      @id @default(uuid())
+  question String
+  type     String      @default("multiple_choice") // multiple_choice, true_false, text
+  order    Int
+  testId   String
+  test     Test        @relation(fields: [testId], references: [id], onDelete: Cascade)
+  options  TestOption[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model TestOption {
+  id         String       @id @default(uuid())
+  text       String
+  isCorrect  Boolean      @default(false)
+  order      Int
+  questionId String
+  question   TestQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+model TestResult {
+  id          String   @id @default(uuid())
+  userId      String
+  testId      String
+  score       Int      // foizda (0-100)
+  timeSpent   Int      // daqiqalarda
+  answers     Json     // savollarga javoblar
+  completedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  test        Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+}
+
+// Chat tizimi uchun modellar
+model ChatMessage {
+  id        String   @id @default(uuid())
+  message   String
+  userId    String
+  groupId   String   @default("general")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
