@@ -621,29 +621,25 @@ export default function DashboardPage() {
       const token = localStorage.getItem('token');
       if (token) {
         const socket = socketManager.connect(token);
-        
-        // Listen for new messages
+
+        // Remove previous listeners to avoid duplicates
+        socket.off && socket.off();
+
         socketManager.onNewMessage((message) => {
           setChatMessages(prev => [...prev, message]);
         });
-
-        // Listen for message updates
         socketManager.onMessageUpdated((updatedMessage) => {
-          setChatMessages(prev => 
-            prev.map(msg => 
+          setChatMessages(prev =>
+            prev.map(msg =>
               msg.id === updatedMessage.id ? updatedMessage : msg
             )
           );
         });
-
-        // Listen for message deletions
         socketManager.onMessageDeleted(({ messageId }) => {
-          setChatMessages(prev => 
+          setChatMessages(prev =>
             prev.filter(msg => msg.id !== messageId)
           );
         });
-
-        // Listen for typing indicators
         socketManager.onUserTyping(({ userId, userName }) => {
           setTypingUsers(prev => {
             const existing = prev.find(u => u.userId === userId);
@@ -653,14 +649,11 @@ export default function DashboardPage() {
             return prev;
           });
         });
-
         socketManager.onUserStoppedTyping(({ userId }) => {
-          setTypingUsers(prev => 
+          setTypingUsers(prev =>
             prev.filter(u => u.userId !== userId)
           );
         });
-
-        // Listen for errors
         socketManager.onError((error) => {
           console.error('Socket error:', error);
         });

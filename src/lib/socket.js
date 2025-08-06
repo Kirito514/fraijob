@@ -13,10 +13,7 @@ class SocketManager {
 
     this.socket = io('http://localhost:3001', {
       auth: { token },
-      transports: ['websocket', 'polling'],
-      cors: {
-        origin: "http://localhost:3002"
-      }
+      transports: ['websocket', 'polling']
     });
 
     this.socket.on('connect', () => {

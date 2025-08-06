@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 const io = new Server(3001, {
   cors: {
-    origin: "http://localhost:3002",
+    origin: ["http://localhost:3000","http://localhost:3001", "http://localhost:3002"],
     methods: ["GET", "POST"]
   }
 });
@@ -41,7 +41,7 @@ io.on('connection', (socket) => {
   socket.on('send_message', async (data) => {
     try {
       const { message } = data;
-      
+
       // Save to database
       const newMessage = await prisma.chatMessage.create({
         data: {
@@ -82,7 +82,7 @@ io.on('connection', (socket) => {
   socket.on('edit_message', async (data) => {
     try {
       const { messageId, message } = data;
-      
+
       // Check if message exists and user owns it
       const existingMessage = await prisma.chatMessage.findUnique({
         where: { id: messageId },
@@ -97,7 +97,7 @@ io.on('connection', (socket) => {
       // Update message
       const updatedMessage = await prisma.chatMessage.update({
         where: { id: messageId },
-        data: { 
+        data: {
           message: message.trim(),
           updatedAt: new Date()
         },
@@ -134,7 +134,7 @@ io.on('connection', (socket) => {
   socket.on('delete_message', async (data) => {
     try {
       const { messageId } = data;
-      
+
       // Check if message exists and user owns it
       const existingMessage = await prisma.chatMessage.findUnique({
         where: { id: messageId },
