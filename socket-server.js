@@ -4,6 +4,14 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
+// Use environment JWT_SECRET from .env.local
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  console.error('JWT_SECRET not found in environment variables!');
+  process.exit(1);
+}
+
 const io = new Server(3001, {
   cors: {
     origin: ["http://localhost:3000","http://localhost:3001", "http://localhost:3002"],
@@ -15,18 +23,22 @@ const io = new Server(3001, {
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
   if (!token) {
+    console.log('No token provided');
     return next(new Error('Authentication error'));
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     if (!decoded) {
+      console.log('Invalid token');
       return next(new Error('Invalid token'));
     }
     socket.userId = decoded.id;
     socket.userName = decoded.name || decoded.email;
+    console.log(`User authenticated: ${socket.userName} (${socket.userId})`);
     next();
   } catch (error) {
+    console.log('Token verification failed:', error.message);
     return next(new Error('Authentication error'));
   }
 });
@@ -41,6 +53,7 @@ io.on('connection', (socket) => {
   socket.on('send_message', async (data) => {
     try {
       const { message } = data;
+      console.log(`Message received from ${socket.userName}: ${message}`);
 
       // Save to database
       const newMessage = await prisma.chatMessage.create({
@@ -61,6 +74,8 @@ io.on('connection', (socket) => {
         }
       });
 
+      console.log(`Message saved to database: ${newMessage.id}`);
+
       // Broadcast to all users in general room
       io.to('general').emit('new_message', {
         id: newMessage.id,
@@ -72,6 +87,8 @@ io.on('connection', (socket) => {
         createdAt: newMessage.createdAt,
         updatedAt: newMessage.updatedAt
       });
+
+      console.log(`Message broadcasted to all users`);
     } catch (error) {
       console.error('Error saving message:', error);
       socket.emit('error', 'Failed to send message');

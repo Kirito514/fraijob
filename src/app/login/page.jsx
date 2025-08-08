@@ -56,6 +56,16 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok) {
+        // Token'ni localStorage'ga saqlash (chat uchun)
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+        
+        // Foydalanuvchi ma'lumotlarini localStorage'ga saqlash
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+        
         setNotification({
           type: "success",
           message: "✅ Kirish muvaffaqiyatli!",

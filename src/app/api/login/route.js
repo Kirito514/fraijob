@@ -27,25 +27,35 @@ export async function POST(request) {
       return NextResponse.json({ error: "Parol noto‘g‘ri" }, { status: 401 });
     }
 
+    // JWT token yaratish
     const token = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
+      { 
+        id: user.id, 
+        email: user.email, 
         name: user.name,
-        role: user.role,
-      },
+        role: user.role 
+      }, 
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: '7d' }
     );
 
-    const response = NextResponse.json({ message: "Login ok" });
+    // Cookie'ga token saqlash
+    const response = NextResponse.json({ 
+      success: true, 
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      },
+      token: token // Frontend uchun token qaytarish
+    });
 
-    response.cookies.set("token", token, {
+    response.cookies.set('token', token, {
       httpOnly: true,
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-      sameSite: "lax",
-      // secure: process.env.NODE_ENV === "production"
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 // 7 kun
     });
 
     return response;
