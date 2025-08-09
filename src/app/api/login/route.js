@@ -2,11 +2,24 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
+import { validateEmail, sanitizeInput } from '@/lib/validation';
 
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    let { email, password } = body;
+
+    // Input validation
+    if (!email || !password) {
+      return NextResponse.json({ error: "Email va parol kiritilishi shart" }, { status: 400 });
+    }
+
+    if (!validateEmail(email)) {
+      return NextResponse.json({ error: "Email formati noto'g'ri" }, { status: 400 });
+    }
+
+    // Input sanitization
+    email = sanitizeInput(email.toLowerCase());
 
     const user = await prisma.user.findUnique({ where: { email } });
 

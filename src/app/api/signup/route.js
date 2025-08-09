@@ -1,10 +1,41 @@
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs'
+import { validateEmail, validatePassword, sanitizeInput } from '@/lib/validation';
 
 export async function POST(request) {
   try {
     const body = await request.json()
-    const { name, email, password } = body
+    let { name, email, password } = body
+
+    // Input validation
+    if (!name || !email || !password) {
+      return new Response(JSON.stringify({ error: 'Barcha maydonlar to\'ldirilishi shart' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Email validation
+    if (!validateEmail(email)) {
+      return new Response(JSON.stringify({ error: 'Email formati noto\'g\'ri' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Password validation
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      const errorMessages = Object.values(passwordValidation.errors).filter(Boolean);
+      return new Response(JSON.stringify({ error: errorMessages.join(', ') }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Input sanitization
+    name = sanitizeInput(name);
+    email = sanitizeInput(email.toLowerCase());
 
     const existingUser = await prisma.user.findUnique({
       where: { email },

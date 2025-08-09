@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken";
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { PrismaClient } from '@prisma/client';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+const prisma = new PrismaClient();
+
+// Portfolio model uchun Prisma schema yangilanishi kerak
+// Hozircha User modeliga portfolio fieldlarini qo'shamiz
 
 // GET - Portfolio ma'lumotlarini olish
 export async function GET() {
@@ -25,44 +25,68 @@ export async function GET() {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    // Portfolio ma'lumotlarini olish - demo data bilan
-    const demoPortfolio = {
-      id: user.id,
-      name: user.name || 'Foydalanuvchi',
-      email: user.email || '',
-      bio: 'Dasturchi va texnologiya entuziasti',
-      avatar_url: '',
-      lang: 'en',
-      github: 'https://github.com/username',
-      telegram: '@username',
-      title: 'Full-Stack Developer',
-      phone: '+998 90 123 45 67',
-      website: 'https://portfolio.com',
-      location: 'Tashkent, Uzbekistan',
-      github_url: 'https://github.com/username',
-      linkedin_url: 'https://linkedin.com/in/username',
-      twitter_url: 'https://twitter.com/username',
-      technical_skills: 'React, Node.js, TypeScript, MongoDB, AWS',
-      soft_skills: 'Leadership, Communication, Problem Solving',
-      experience_company: 'TechSoft',
-      experience_position: 'Frontend Developer',
-      experience_duration: '2022 - Present',
-      experience_location: 'Tashkent, Uzbekistan',
-      experience_description: 'Web ilovalarini ishlab chiqish va optimizatsiya qilish',
-      education_institution: 'Tashkent University',
-      education_degree: 'Bachelor in Computer Science',
-      education_duration: '2020-2024',
-      education_gpa: '3.8/4.0',
-      project_name: 'E-commerce Platform',
-      project_technologies: 'React, Node.js, MongoDB',
-      project_url: 'https://project-demo.com',
-      project_description: 'To\'liq funksional e-commerce platformasi',
-      language_1: 'English',
-      language_2: 'Uzbek',
-      language_3: 'Russian'
-    };
+    try {
+      // Database'dan portfolio ma'lumotlarini olish
+      const userProfile = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      });
 
-    return NextResponse.json(demoPortfolio);
+      if (!userProfile) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+
+      // Portfolio ma'lumotlarini qaytarish (hozircha User modelidan)
+      const portfolio = {
+        id: userProfile.id,
+        name: userProfile.name || 'Foydalanuvchi',
+        email: userProfile.email || '',
+        bio: 'Dasturchi va texnologiya entuziasti',
+        avatar_url: userProfile.image || '',
+        lang: 'en',
+        github: '',
+        telegram: '',
+        title: '',
+        phone: '',
+        website: '',
+        location: '',
+        github_url: '',
+        linkedin_url: '',
+        twitter_url: '',
+        technical_skills: '',
+        soft_skills: '',
+        experience_company: '',
+        experience_position: '',
+        experience_duration: '',
+        experience_location: '',
+        experience_description: '',
+        education_institution: '',
+        education_degree: '',
+        education_duration: '',
+        education_gpa: '',
+        project_name: '',
+        project_technologies: '',
+        project_url: '',
+        project_description: '',
+        language_1: '',
+        language_2: '',
+        language_3: '',
+        created_at: userProfile.createdAt,
+        updated_at: userProfile.updatedAt
+      };
+
+      return NextResponse.json(portfolio);
+    } catch (error) {
+      console.error('Portfolio GET error:', error);
+      return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    }
   } catch (error) {
     console.error('Portfolio GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -87,14 +111,39 @@ export async function POST(request) {
 
     const body = await request.json();
 
-    // Portfolio ma'lumotlarini yangilash - demo data bilan
-    const updatedPortfolio = {
-      id: user.id,
-      ...body,
-      updated_at: new Date().toISOString()
-    };
+    try {
+      // Foydalanuvchi mavjudligini tekshirish
+      const existingUser = await prisma.user.findUnique({
+        where: { id: user.id }
+      });
 
-    return NextResponse.json(updatedPortfolio);
+      if (!existingUser) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+
+      // Portfolio ma'lumotlarini yangilash
+      const updatedUser = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          name: body.name || existingUser.name,
+          // Boshqa fieldlar uchun User modelini kengaytirish kerak
+          updatedAt: new Date()
+        }
+      });
+
+      const updatedPortfolio = {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        ...body,
+        updated_at: updatedUser.updatedAt
+      };
+
+      return NextResponse.json(updatedPortfolio);
+    } catch (error) {
+      console.error('Portfolio POST error:', error);
+      return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    }
   } catch (error) {
     console.error('Portfolio POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -119,14 +168,42 @@ export async function PATCH(request) {
 
     const body = await request.json();
 
-    // Portfolio ma'lumotlarini qisman yangilash - demo data bilan
-    const updatedPortfolio = {
-      id: user.id,
-      ...body,
-      updated_at: new Date().toISOString()
-    };
+    try {
+      // Foydalanuvchi mavjudligini tekshirish
+      const existingUser = await prisma.user.findUnique({
+        where: { id: user.id }
+      });
 
-    return NextResponse.json(updatedPortfolio);
+      if (!existingUser) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+
+      // Faqat kelgan fieldlarni yangilash
+      const updateData = {};
+      if (body.name) updateData.name = body.name;
+      if (body.image) updateData.image = body.image;
+      
+      updateData.updatedAt = new Date();
+
+      const updatedUser = await prisma.user.update({
+        where: { id: user.id },
+        data: updateData
+      });
+
+      const updatedPortfolio = {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        image: updatedUser.image,
+        ...body,
+        updated_at: updatedUser.updatedAt
+      };
+
+      return NextResponse.json(updatedPortfolio);
+    } catch (error) {
+      console.error('Portfolio PATCH error:', error);
+      return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    }
   } catch (error) {
     console.error('Portfolio PATCH error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
