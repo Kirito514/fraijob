@@ -961,10 +961,7 @@ export default function DashboardPage() {
 
         chatManager.onNewMessage((message) => {
           setChatMessages((prev) => [...prev, message]);
-          // Scroll to bottom when new message arrives
-          setTimeout(() => {
-            scrollToBottom();
-          }, 100);
+          // Don't auto-scroll when receiving messages - let user control scroll
         });
         chatManager.onMessageUpdated((updatedMessage) => {
           setChatMessages((prev) =>
@@ -983,10 +980,7 @@ export default function DashboardPage() {
         // Fetch initial chat messages
         fetchChatMessages();
 
-        // Scroll to bottom after initial load
-        setTimeout(() => {
-          scrollToBottom();
-        }, 500);
+        // Don't auto-scroll on initial load - let user see from top
 
         // Update user activity every 30 seconds
         const activityInterval = setInterval(() => {
@@ -1002,13 +996,14 @@ export default function DashboardPage() {
   }, [user, active]);
 
   // Auto scroll when messages change
-  useEffect(() => {
-    if (chatMessages.length > 0) {
-      setTimeout(() => {
-        scrollToBottom();
-      }, 100);
-    }
-  }, [chatMessages]);
+  // Auto-scroll only when user sends a message, not when viewing old messages
+  // useEffect(() => {
+  //   if (chatMessages.length > 0) {
+  //     setTimeout(() => {
+  //       scrollToBottom();
+  //     }, 100);
+  //   }
+  // }, [chatMessages]);
 
   // Typing indicator
   useEffect(() => {
@@ -4471,9 +4466,9 @@ export default function DashboardPage() {
                 {/* Main Chat Area - Full width on mobile */}
                 <div className='flex-1 flex gap-4'>
                   {/* Chat Container */}
-                  <div className='w-full bg-white/80 backdrop-blur-xl rounded-2xl border border-white/30 shadow-lg flex flex-col'>
+                  <div className='w-full bg-white/80 backdrop-blur-xl rounded-2xl border border-white/30 shadow-lg flex flex-col h-[calc(100vh-200px)] md:h-[600px]'>
                     {/* Chat Header - Simplified on mobile */}
-                    <div className='flex items-center justify-between p-4 md:p-6 border-b border-gray-200'>
+                    <div className='flex items-center justify-between p-4 md:p-6 border-b border-gray-200 flex-shrink-0'>
                       <div className='flex items-center gap-2 md:gap-3'>
                         <div className='w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full flex items-center justify-center text-white font-semibold text-sm md:text-base'>
                           G
@@ -4495,7 +4490,9 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Chat Messages */}
-                    <div className='flex-1 overflow-y-auto p-3 md:p-6 space-y-3 md:space-y-4'>
+                    <div
+                      className='flex-1 overflow-y-auto overflow-x-hidden p-3 md:p-6 space-y-3 md:space-y-4'
+                      style={{ scrollBehavior: "smooth" }}>
                       {chatMessages.length === 0 ? (
                         <div className='text-center py-12'>
                           <div className='w-16 h-16 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full flex items-center justify-center mx-auto mb-4'>
@@ -4601,11 +4598,16 @@ export default function DashboardPage() {
                                   </div>
                                 ) : (
                                   <div
-                                    className={`px-4 py-3 text-sm break-words whitespace-pre-line border shadow-sm rounded-2xl relative group/message hover:shadow-md transition-all duration-200 ${
+                                    className={`px-3 md:px-4 py-2 md:py-3 text-sm break-words word-wrap overflow-wrap-anywhere border shadow-sm rounded-2xl relative group/message hover:shadow-md transition-all duration-200 max-w-full ${
                                       msg.userId === user?.id
                                         ? "bg-gradient-to-r from-[#10B981] to-[#34D399] text-white border-[#10B981]"
                                         : "bg-white text-gray-900 border-gray-200"
-                                    }`}>
+                                    }`}
+                                    style={{
+                                      wordBreak: "break-word",
+                                      overflowWrap: "break-word",
+                                      hyphens: "auto",
+                                    }}>
                                     {/* Reply indicator */}
                                     {msg.replyTo && (
                                       <div
@@ -4648,16 +4650,16 @@ export default function DashboardPage() {
 
                                     {/* Message actions */}
                                     {editingMessage !== msg.id && (
-                                      <div className='absolute -top-2 -right-2 opacity-0 group-hover/message:opacity-100 transition-all duration-300 transform scale-90 group-hover/message:scale-100'>
-                                        <div className='flex items-center gap-0.5 bg-white rounded-full shadow-lg border border-gray-200 p-1'>
+                                      <div className='absolute -top-2 -right-2 opacity-100 md:opacity-0 md:group-hover/message:opacity-100 md:transition-all md:duration-300 md:transform md:scale-90 md:group-hover/message:scale-100'>
+                                        <div className='flex items-center gap-0.5 md:gap-1 bg-white rounded-full shadow-lg border border-gray-200 p-1'>
                                           {/* Reply button for all messages */}
                                           <button
                                             onClick={() =>
                                               handleReplyMessage(msg)
                                             }
-                                            className='p-2 rounded-full hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 text-gray-600'
+                                            className='p-1.5 md:p-2 rounded-full hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 text-gray-600'
                                             title='Reply to message'>
-                                            <Reply className='w-3.5 h-3.5' />
+                                            <Reply className='w-3 h-3 md:w-3.5 md:h-3.5' />
                                           </button>
 
                                           {/* Edit and Delete only for own messages */}
@@ -4676,7 +4678,7 @@ export default function DashboardPage() {
                                                     msg.id
                                                   ) || editingMessage !== null
                                                 }
-                                                className={`p-2 rounded-full transition-all duration-200 ${
+                                                className={`p-1.5 md:p-2 rounded-full transition-all duration-200 ${
                                                   deletingMessages.has(
                                                     msg.id
                                                   ) || editingMessage !== null
@@ -4690,7 +4692,7 @@ export default function DashboardPage() {
                                                       ? "Finish editing current message first"
                                                       : "Edit message"
                                                 }>
-                                                <Edit className='w-3.5 h-3.5' />
+                                                <Edit className='w-3 h-3 md:w-3.5 md:h-3.5' />
                                               </button>
                                               <div className='w-px h-4 bg-gray-200'></div>
                                               <button
@@ -4702,7 +4704,7 @@ export default function DashboardPage() {
                                                     msg.id
                                                   ) || editingMessage !== null
                                                 }
-                                                className={`p-2 rounded-full transition-all duration-200 ${
+                                                className={`p-1.5 md:p-2 rounded-full transition-all duration-200 ${
                                                   deletingMessages.has(msg.id)
                                                     ? "bg-red-100 text-red-500 cursor-not-allowed"
                                                     : editingMessage !== null
@@ -4719,9 +4721,9 @@ export default function DashboardPage() {
                                                 {deletingMessages.has(
                                                   msg.id
                                                 ) ? (
-                                                  <div className='w-3.5 h-3.5 border-2 border-red-300 border-t-red-500 rounded-full animate-spin'></div>
+                                                  <div className='w-3 h-3 md:w-3.5 md:h-3.5 border-2 border-red-300 border-t-red-500 rounded-full animate-spin'></div>
                                                 ) : (
-                                                  <Trash2 className='w-3.5 h-3.5' />
+                                                  <Trash2 className='w-3 h-3 md:w-3.5 md:h-3.5' />
                                                 )}
                                               </button>
                                             </>
@@ -4792,7 +4794,7 @@ export default function DashboardPage() {
                         </div>
                       )}
 
-                      <div className='p-3 md:p-6'>
+                      <div className='border-t border-gray-200 p-3 md:p-6 bg-white/90 backdrop-blur-sm flex-shrink-0'>
                         <form
                           onSubmit={handleSendMessage}
                           className='flex items-center gap-2 md:gap-3'>
