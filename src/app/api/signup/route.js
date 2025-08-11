@@ -1,36 +1,49 @@
-import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcryptjs'
-import { validateEmail, validatePassword, sanitizeInput } from '@/lib/validation';
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+import {
+  validateEmail,
+  validatePassword,
+  sanitizeInput,
+} from "@/lib/validation";
+import { sendNewUserNotification } from "@/lib/telegram";
 
 export async function POST(request) {
   try {
-    const body = await request.json()
-    let { name, email, password } = body
+    const body = await request.json();
+    let { name, email, password } = body;
 
     // Input validation
     if (!name || !email || !password) {
-      return new Response(JSON.stringify({ error: 'Barcha maydonlar to\'ldirilishi shart' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      })
+      return new Response(
+        JSON.stringify({ error: "Barcha maydonlar to'ldirilishi shart" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     // Email validation
     if (!validateEmail(email)) {
-      return new Response(JSON.stringify({ error: 'Email formati noto\'g\'ri' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      })
+      return new Response(
+        JSON.stringify({ error: "Email formati noto'g'ri" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     // Password validation
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
-      const errorMessages = Object.values(passwordValidation.errors).filter(Boolean);
-      return new Response(JSON.stringify({ error: errorMessages.join(', ') }), {
+      const errorMessages = Object.values(passwordValidation.errors).filter(
+        Boolean
+      );
+      return new Response(JSON.stringify({ error: errorMessages.join(", ") }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      })
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Input sanitization
@@ -39,36 +52,53 @@ export async function POST(request) {
 
     const existingUser = await prisma.user.findUnique({
       where: { email },
-    })
+    });
 
     if (existingUser) {
-      return new Response(JSON.stringify({ error: 'Email allaqachon mavjud' }), {
-        status: 409,
-        headers: { 'Content-Type': 'application/json' },
-      })
+      return new Response(
+        JSON.stringify({ error: "Email allaqachon mavjud" }),
+        {
+          status: 409,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
         verified: true, // ✅ Verification talab qilinmagani uchun true
       },
-    })
+    });
 
-    return new Response(JSON.stringify({ message: 'Foydalanuvchi yaratildi', email }), {
-      status: 201,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    // Telegram botga xabar yuborish
+    try {
+      await sendNewUserNotification({
+        name: newUser.name,
+        email: newUser.email,
+        createdAt: newUser.createdAt,
+      });
+    } catch (telegramError) {
+      console.error("❌ Telegram xabar yuborishda xatolik:", telegramError);
+      // Telegram xatosi signup jarayonini to'xtatmasin
+    }
 
+    return new Response(
+      JSON.stringify({ message: "Foydalanuvchi yaratildi", email }),
+      {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (err) {
-    console.error('❌ Serverda xatolik:', err)
-    return new Response(JSON.stringify({ error: 'Server xatosi' }), {
+    console.error("❌ Serverda xatolik:", err);
+    return new Response(JSON.stringify({ error: "Server xatosi" }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

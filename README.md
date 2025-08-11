@@ -141,6 +141,10 @@ JWT_SECRET="your-super-secret-jwt-key"
 # Optional: Supabase (if using)
 NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+
+# Telegram Bot (for user registration notifications)
+TELEGRAM_BOT_TOKEN="your-telegram-bot-token"
+TELEGRAM_CHAT_ID="your-telegram-chat-id"
 ```
 
 ### 3. **Database Setup**
@@ -163,6 +167,31 @@ npm run dev
 node socket-server.js
 
 # Open http://localhost:3000
+```
+
+### 5. **Telegram Bot Setup (Optional)**
+
+Yangi foydalanuvchilar haqida Telegram orqali xabar olish uchun:
+
+1. **Bot yaratish**:
+   - Telegram'da `@BotFather` botini toping
+   - `/newbot` buyrug'ini yuboring
+   - Bot uchun nom va username bering
+   - Olingan bot tokenni `.env.local` fayliga qo'shing
+
+2. **Chat ID olish**:
+   - Botga biror xabar yuboring (masalan: `/start`)
+   - `http://localhost:3000/admin/telegram` sahifasiga o'ting
+   - "Chat ID olish" tugmasini bosing
+   - Olingan Chat ID ni `.env.local` fayliga qo'shing
+
+3. **Test qilish**:
+   - Admin sahifasida "Test xabari yuborish" tugmasini bosing
+   - Telegram'da xabar kelganini tekshiring
+
+```env
+TELEGRAM_BOT_TOKEN="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz"
+TELEGRAM_CHAT_ID="123456789"
 ```
 
 ## 📱 **Complete User Experience Flow**

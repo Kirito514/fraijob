@@ -70,264 +70,672 @@ const menuItems = [
   { label: "Admin Panel", icon: Users, adminOnly: true },
 ];
 
-// Test Creation Form Component
-const TestCreationForm = ({ onTestCreated, setNotifications }) => {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    timeLimit: 30,
-    questions: [
-      {
-        question: "",
-        type: "multiple_choice",
+// Career Assessment Test System
+const CAREER_CATEGORIES = {
+  technical: {
+    name: "Texnik sohalar",
+    careers: [
+      "Frontend Developer", "Backend Developer", "Fullstack Developer", 
+      "Mobile Developer", "Game Developer", "AR/VR Developer", "AI/ML Engineer",
+      "Data Scientist", "Data Analyst", "Data Engineer", "Cybersecurity Specialist",
+      "DevOps Engineer", "QA Engineer", "System Administrator", "Embedded/IoT Developer"
+    ]
+  },
+  design: {
+    name: "Dizayn va kreativ",
+    careers: [
+      "UX/UI Designer", "Graphic Designer", "Motion Designer", 
+      "3D Artist", "Animator", "Illustrator"
+    ]
+  },
+  business: {
+    name: "Biznes va boshqaruv",
+    careers: [
+      "Product Manager", "Project Manager", "Team Lead", 
+      "Business Analyst", "Scrum Master"
+    ]
+  },
+  content: {
+    name: "Kontent va hamjamiyat",
+    careers: [
+      "Content Creator", "Copywriter", "Technical Writer", 
+      "Community Manager", "DevRel"
+    ]
+  },
+  marketing: {
+    name: "Marketing va mijoz bilan ish",
+    careers: [
+      "Digital Marketing Specialist", "SEO/SEM Specialist", "SMM Specialist",
+      "CRM Specialist", "Customer Support Specialist", "IT Recruiter"
+    ]
+  }
+};
+
+// Career Assessment Questions
+const CAREER_ASSESSMENT_QUESTIONS = [
+  // PSIXOTIP BLOK (10 questions)
+  {
+    id: 1,
+    category: "personality",
+    question: "Dam olish kuni bo'lsa, nimani xohlaysan?",
         options: [
-          { text: "", isCorrect: false },
-          { text: "", isCorrect: false },
-          { text: "", isCorrect: false },
-          { text: "", isCorrect: false },
-        ],
-      },
-    ],
-  });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const addQuestion = () => {
-    setFormData((prev) => ({
-      ...prev,
-      questions: [
-        ...prev.questions,
-        {
-          question: "",
-          type: "multiple_choice",
+      { text: "Uyda qolib, kompyuter bilan ishlash", careers: ["Frontend Developer", "Backend Developer", "Game Developer"] },
+      { text: "Do'stlar bilan chiroyli joylarda surat tushirish", careers: ["UX/UI Designer", "Graphic Designer", "Content Creator"] },
+      { text: "Yangi joylarni kashf qilish va sayohat qilish", careers: ["Product Manager", "Project Manager", "Business Analyst"] },
+      { text: "Jamiyat bilan bog'lanish va yangi odamlar bilan tanishish", careers: ["Community Manager", "DevRel", "IT Recruiter"] }
+    ]
+  },
+  {
+    id: 2,
+    category: "personality",
+    question: "Do'stlar bilan safar, sen qayerda qulay?",
           options: [
-            { text: "", isCorrect: false },
-            { text: "", isCorrect: false },
-            { text: "", isCorrect: false },
-            { text: "", isCorrect: false },
-          ],
-        },
-      ],
-    }));
-  };
+      { text: "Texnik masalalar bo'yicha maslahat berish", careers: ["System Administrator", "DevOps Engineer", "Cybersecurity Specialist"] },
+      { text: "Safar rejasini tuzish va tashkil qilish", careers: ["Project Manager", "Product Manager", "Team Lead"] },
+      { text: "Chiroyli joylarni topish va surat tushirish", careers: ["Graphic Designer", "Motion Designer", "Content Creator"] },
+      { text: "Harakatli o'yinlar va qiziqarli faoliyatlar", careers: ["Game Developer", "AR/VR Developer", "Mobile Developer"] }
+    ]
+  },
+  {
+    id: 3,
+    category: "personality",
+    question: "Tug'ilgan kun sovg'asi tayyorlashda roling?",
+    options: [
+      { text: "Sovg'ani tanlash va sotib olish", careers: ["Business Analyst", "Product Manager", "Digital Marketing Specialist"] },
+      { text: "Sovg'ani chiroyli o'rab, dizayn qilish", careers: ["Graphic Designer", "UX/UI Designer", "Illustrator"] },
+      { text: "Sovg'ani yashirincha saqlash va kutilmagan taassurot qoldirish", careers: ["Game Developer", "AR/VR Developer", "Content Creator"] },
+      { text: "Sovg'ani texnik jihatdan ishlab chiqish", careers: ["Embedded/IoT Developer", "AI/ML Engineer", "Data Engineer"] }
+    ]
+  },
+  {
+    id: 4,
+    category: "personality",
+    question: "Katta tadbirda qaysi ishni olasan?",
+    options: [
+      { text: "Tadbirni texnik jihatdan ta'minlash", careers: ["System Administrator", "DevOps Engineer", "Backend Developer"] },
+      { text: "Tadbirni tashkil qilish va boshqarish", careers: ["Project Manager", "Event Manager", "Team Lead"] },
+      { text: "Tadbir uchun materiallar tayyorlash", careers: ["Graphic Designer", "Content Creator", "Copywriter"] },
+      { text: "Mehmonlar bilan bog'lanish va ularni kutib olish", careers: ["Community Manager", "Customer Support Specialist", "IT Recruiter"] }
+    ]
+  },
+  {
+    id: 5,
+    category: "personality",
+    question: "Biror ishda xatolik chiqsa, nima qilasan?",
+    options: [
+      { text: "Xatolikni tahlil qilib, texnik yechim topish", careers: ["QA Engineer", "Data Analyst", "Cybersecurity Specialist"] },
+      { text: "Muammoni hal qilish uchun jamoa bilan ishlash", careers: ["Team Lead", "Scrum Master", "Project Manager"] },
+      { text: "Xatolikni yashirish va yaxshiroq natija ko'rsatish", careers: ["Marketing Specialist", "Content Creator", "DevRel"] },
+      { text: "Xatolikni tuzatish va kelajakda oldini olish", careers: ["DevOps Engineer", "System Administrator", "Fullstack Developer"] }
+    ]
+  },
+  {
+    id: 6,
+    category: "personality",
+    question: "Yangi narsani o'rganganingda qanday yo'l tanlaysan?",
+    options: [
+      { text: "Amaliy mashg'ulotlar va kod yozish", careers: ["Frontend Developer", "Backend Developer", "Mobile Developer"] },
+      { text: "Vizual materiallar va dizayn namunalari", careers: ["UX/UI Designer", "Graphic Designer", "3D Artist"] },
+      { text: "Tahlil va ma'lumotlarni o'rganish", careers: ["Data Scientist", "Data Analyst", "Business Analyst"] },
+      { text: "Boshqalar bilan muloqot va tajriba almashish", careers: ["Community Manager", "DevRel", "Technical Writer"] }
+    ]
+  },
+  {
+    id: 7,
+    category: "personality",
+    question: "Qiyin vaziyatda birinchi o'ylaganing?",
+    options: [
+      { text: "Muammoni texnik jihatdan hal qilish", careers: ["System Administrator", "DevOps Engineer", "Cybersecurity Specialist"] },
+      { text: "Jamoa bilan maslahatlashish va yordam so'rash", careers: ["Team Lead", "Scrum Master", "Project Manager"] },
+      { text: "Muammoni tahlil qilib, ma'lumotlar asosida hal qilish", careers: ["Data Scientist", "Business Analyst", "Product Manager"] },
+      { text: "Muammoni ijodiy yo'l bilan hal qilish", careers: ["UX/UI Designer", "Content Creator", "Game Developer"] }
+    ]
+  },
+  {
+    id: 8,
+    category: "personality",
+    question: "Qanday vazifa senga eng yoqadi?",
+    options: [
+      { text: "Murakkab texnik muammolarni hal qilish", careers: ["AI/ML Engineer", "Data Engineer", "Embedded/IoT Developer"] },
+      { text: "Jamoa bilan ishlash va loyihalarni boshqarish", careers: ["Project Manager", "Team Lead", "Scrum Master"] },
+      { text: "Ijodiy ishlar va dizayn qilish", careers: ["Graphic Designer", "Motion Designer", "Illustrator"] },
+      { text: "Odamlar bilan ishlash va ularga yordam berish", careers: ["Customer Support Specialist", "IT Recruiter", "Community Manager"] }
+    ]
+  },
+  {
+    id: 9,
+    category: "personality",
+    question: "Qaysi ishni ertalab birinchi qilasan?",
+    options: [
+      { text: "Kod yozish va texnik masalalar ustida ishlash", careers: ["Fullstack Developer", "Mobile Developer", "Game Developer"] },
+      { text: "Kunlik rejani ko'rib chiqish va vazifalarni taqsimlash", careers: ["Product Manager", "Project Manager", "Business Analyst"] },
+      { text: "Ijodiy ishlar va dizayn ustida ishlash", careers: ["UX/UI Designer", "Graphic Designer", "3D Artist"] },
+      { text: "Jamiyat bilan bog'lanish va yangi ma'lumotlarni o'rganish", careers: ["Content Creator", "DevRel", "Technical Writer"] }
+    ]
+  },
+  {
+    id: 10,
+    category: "personality",
+    question: "Ishlashda senga muhim narsa nima?",
+    options: [
+      { text: "Texnik jihatdan mukammallik va aniq natijalar", careers: ["QA Engineer", "Data Analyst", "System Administrator"] },
+      { text: "Jamoa bilan ishlash va hamkorlik", careers: ["Team Lead", "Scrum Master", "Community Manager"] },
+      { text: "Ijodiy erkinlik va yangi g'oyalar", careers: ["UX/UI Designer", "Content Creator", "Game Developer"] },
+      { text: "Odamlar bilan ishlash va ularga foyda keltirish", careers: ["Customer Support Specialist", "IT Recruiter", "DevRel"] }
+    ]
+  },
+  // MOTIVATSIYA BLOK (10 questions)
+  {
+    id: 11,
+    category: "motivation",
+    question: "Ishni nega qilasan? Pul, shon-shuhrat, qiziqish?",
+    options: [
+      { text: "Texnik qobiliyatlarni rivojlantirish va yangi texnologiyalarni o'rganish", careers: ["AI/ML Engineer", "Data Scientist", "AR/VR Developer"] },
+      { text: "Jamoa bilan ishlash va loyihalarni muvaffaqiyatli bajarish", careers: ["Project Manager", "Team Lead", "Scrum Master"] },
+      { text: "Ijodiy erkinlik va o'z g'oyalarini amalga oshirish", careers: ["Graphic Designer", "Content Creator", "Game Developer"] },
+      { text: "Odamlarga yordam berish va jamiyatga foyda keltirish", careers: ["Customer Support Specialist", "Community Manager", "IT Recruiter"] }
+    ]
+  },
+  {
+    id: 12,
+    category: "motivation",
+    question: "Kimni ishini ko'rib havas qilasan?",
+    options: [
+      { text: "Mashhur texnologiya kompaniyalarida ishlaydigan dasturchilar", careers: ["Frontend Developer", "Backend Developer", "Fullstack Developer"] },
+      { text: "Mashhur dizayn studiyalarida ishlaydigan dizaynchilar", careers: ["UX/UI Designer", "Graphic Designer", "Motion Designer"] },
+      { text: "Katta kompaniyalarda boshqaruv lavozimlarida ishlaydigan odamlar", careers: ["Product Manager", "Project Manager", "Team Lead"] },
+      { text: "Ijtimoiy tarmoqlarda mashhur bo'lgan kontent yaratuvchilar", careers: ["Content Creator", "DevRel", "Community Manager"] }
+    ]
+  },
+  {
+    id: 13,
+    category: "motivation",
+    question: "Biror narsani do'stlarga ko'rsatganda nimaga qaraysan?",
+    options: [
+      { text: "Texnik jihatdan qanday ishlashini tushuntirish", careers: ["System Administrator", "DevOps Engineer", "Data Engineer"] },
+      { text: "Dizayn va ko'rinishiga qarash", careers: ["UX/UI Designer", "Graphic Designer", "Illustrator"] },
+      { text: "Foydalanish qulayligi va funksionalligiga qarash", careers: ["Product Manager", "Business Analyst", "QA Engineer"] },
+      { text: "Odamlar reaksiyasiga va ularning fikriga qarash", careers: ["Community Manager", "Customer Support Specialist", "Marketing Specialist"] }
+    ]
+  },
+  {
+    id: 14,
+    category: "motivation",
+    question: "Ishning qaysi natijasi sen uchun zavq?",
+    options: [
+      { text: "Murakkab texnik muammolarni hal qilish", careers: ["AI/ML Engineer", "Cybersecurity Specialist", "Embedded/IoT Developer"] },
+      { text: "Jamoa bilan birgalikda muvaffaqiyatli natijaga erishish", careers: ["Team Lead", "Scrum Master", "Project Manager"] },
+      { text: "Ijodiy ishlar va chiroyli natijalar yaratish", careers: ["Graphic Designer", "Motion Designer", "3D Artist"] },
+      { text: "Odamlarga yordam berish va ularning hayotini yaxshilash", careers: ["Customer Support Specialist", "Community Manager", "IT Recruiter"] }
+    ]
+  },
+  {
+    id: 15,
+    category: "motivation",
+    question: "Hammaning oldida gapirishni xohlaysanmi?",
+    options: [
+      { text: "Texnik masalalar bo'yicha ma'ruza qilish", careers: ["DevRel", "Technical Writer", "System Administrator"] },
+      { text: "Loyiha natijalarini taqdim etish", careers: ["Project Manager", "Product Manager", "Business Analyst"] },
+      { text: "Ijodiy ishlarni ko'rsatish va tushuntirish", careers: ["Content Creator", "Graphic Designer", "Motion Designer"] },
+      { text: "Jamiyat bilan bog'lanish va ularga ma'lumot berish", careers: ["Community Manager", "Marketing Specialist", "DevRel"] }
+    ]
+  },
+  {
+    id: 16,
+    category: "motivation",
+    question: "O'z ustingdan ko'proq nimaga vaqt ajratasan?",
+    options: [
+      { text: "Yangi texnologiyalarni o'rganish va kod yozish", careers: ["Fullstack Developer", "Mobile Developer", "Game Developer"] },
+      { text: "Dizayn va ijodiy ishlar ustida ishlash", careers: ["UX/UI Designer", "Graphic Designer", "Illustrator"] },
+      { text: "Ma'lumotlarni tahlil qilish va hisobotlar tayyorlash", careers: ["Data Scientist", "Data Analyst", "Business Analyst"] },
+      { text: "Jamiyat bilan bog'lanish va kontent yaratish", careers: ["Content Creator", "Community Manager", "DevRel"] }
+    ]
+  },
+  {
+    id: 17,
+    category: "motivation",
+    question: "Internetda nimani ko'p o'qiysan?",
+    options: [
+      { text: "Texnik maqolalar va dasturlash bo'yicha yangiliklar", careers: ["Backend Developer", "AI/ML Engineer", "Data Engineer"] },
+      { text: "Dizayn va ijodiy ishlar bo'yicha maqolalar", careers: ["Graphic Designer", "Motion Designer", "3D Artist"] },
+      { text: "Biznes va boshqaruv bo'yicha maqolalar", careers: ["Product Manager", "Business Analyst", "Project Manager"] },
+      { text: "Ijtimoiy tarmoqlar va marketing bo'yicha maqolalar", careers: ["Marketing Specialist", "Content Creator", "SMM Specialist"] }
+    ]
+  },
+  {
+    id: 18,
+    category: "motivation",
+    question: "Senga nima tez yetishmaydi?",
+    options: [
+      { text: "Yangi texnologiyalar va dasturlash tillari", careers: ["Frontend Developer", "Mobile Developer", "AR/VR Developer"] },
+      { text: "Dizayn va ijodiy ishlar bo'yicha yangi g'oyalar", careers: ["UX/UI Designer", "Graphic Designer", "Illustrator"] },
+      { text: "Biznes va boshqaruv bo'yicha yangi metodlar", careers: ["Product Manager", "Project Manager", "Scrum Master"] },
+      { text: "Jamiyat bilan bog'lanish va marketing bo'yicha yangi usullar", careers: ["Community Manager", "Marketing Specialist", "DevRel"] }
+    ]
+  },
+  {
+    id: 19,
+    category: "motivation",
+    question: "Kim bilan ishlash qulay: do'stlar, tanishlar, begona?",
+    options: [
+      { text: "Kichik jamoa bilan ishlash va hamkorlik qilish", careers: ["Team Lead", "Scrum Master", "Project Manager"] },
+      { text: "Mustaqil ishlash va o'z vazifalarini bajarish", careers: ["Data Scientist", "AI/ML Engineer", "Graphic Designer"] },
+      { text: "Katta jamoa bilan ishlash va ko'p odamlar bilan bog'lanish", careers: ["Community Manager", "IT Recruiter", "Marketing Specialist"] },
+      { text: "Har xil odamlar bilan ishlash va ularga yordam berish", careers: ["Customer Support Specialist", "DevRel", "Technical Writer"] }
+    ]
+  },
+  {
+    id: 20,
+    category: "motivation",
+    question: "Mas'uliyatni bo'yningga olishni yoqtirasanmi?",
+    options: [
+      { text: "Texnik masalalar bo'yicha mas'uliyat", careers: ["System Administrator", "DevOps Engineer", "Cybersecurity Specialist"] },
+      { text: "Loyiha va jamoa boshqaruvi bo'yicha mas'uliyat", careers: ["Project Manager", "Team Lead", "Product Manager"] },
+      { text: "Ijodiy ishlar va dizayn bo'yicha mas'uliyat", careers: ["UX/UI Designer", "Graphic Designer", "Creative Director"] },
+      { text: "Jamiyat va mijozlar bilan ishlash bo'yicha mas'uliyat", careers: ["Community Manager", "Customer Support Specialist", "DevRel"] }
+    ]
+  },
+  // QIZIQISH BLOK (10 questions)
+  {
+    id: 21,
+    category: "interest",
+    question: "Do'stlaring senga qaysi masalada murojaat qiladi?",
+    options: [
+      { text: "Kompyuter va texnik muammolar bo'yicha", careers: ["System Administrator", "DevOps Engineer", "IT Support"] },
+      { text: "Dizayn va ko'rinish bo'yicha", careers: ["Graphic Designer", "UX/UI Designer", "Illustrator"] },
+      { text: "Biznes va rejalar bo'yicha", careers: ["Business Analyst", "Product Manager", "Project Manager"] },
+      { text: "Ijtimoiy tarmoqlar va kontent bo'yicha", careers: ["Content Creator", "SMM Specialist", "Community Manager"] }
+    ]
+  },
+  {
+    id: 22,
+    category: "interest",
+    question: "Biror qurilmani tuzatganmisan?",
+    options: [
+      { text: "Kompyuter va texnik qurilmalar", careers: ["System Administrator", "Embedded/IoT Developer", "Hardware Engineer"] },
+      { text: "Telefon va mobil qurilmalar", careers: ["Mobile Developer", "QA Engineer", "DevOps Engineer"] },
+      { text: "O'yin konsollari va o'yin qurilmalari", careers: ["Game Developer", "AR/VR Developer", "Hardware Engineer"] },
+      { text: "Uy texnikasi va oddiy qurilmalar", careers: ["Embedded/IoT Developer", "System Administrator", "Hardware Engineer"] }
+    ]
+  },
+  {
+    id: 23,
+    category: "interest",
+    question: "Do'stlaring bilan kontent tayyorlaganmisan?",
+    options: [
+      { text: "Video va fotolar tayyorlash", careers: ["Content Creator", "Motion Designer", "Video Editor"] },
+      { text: "Dizayn va grafik materiallar", careers: ["Graphic Designer", "Illustrator", "UX/UI Designer"] },
+      { text: "Matn va maqolalar yozish", careers: ["Copywriter", "Technical Writer", "Content Creator"] },
+      { text: "Ijtimoiy tarmoqlar uchun materiallar", careers: ["SMM Specialist", "Community Manager", "Content Creator"] }
+    ]
+  },
+  {
+    id: 24,
+    category: "interest",
+    question: "Voqea-suratlarni qanday saqlaysan?",
+    options: [
+      { text: "Kompyuterda tashkil etib saqlash", careers: ["Data Engineer", "System Administrator", "Backend Developer"] },
+      { text: "Bulut xizmatlarida saqlash", careers: ["DevOps Engineer", "Data Engineer", "Cloud Engineer"] },
+      { text: "Ijtimoiy tarmoqlarda joylashtirish", careers: ["Content Creator", "SMM Specialist", "Community Manager"] },
+      { text: "Fizik albomda saqlash", careers: ["Graphic Designer", "Photographer", "Content Creator"] }
+    ]
+  },
+  {
+    id: 25,
+    category: "interest",
+    question: "Tez-tez reja tuzasanmi?",
+    options: [
+      { text: "Kunlik va haftalik rejalar", careers: ["Project Manager", "Product Manager", "Business Analyst"] },
+      { text: "Texnik loyihalar rejasi", careers: ["System Administrator", "DevOps Engineer", "Data Engineer"] },
+      { text: "Ijodiy ishlar rejasi", careers: ["Graphic Designer", "Content Creator", "Motion Designer"] },
+      { text: "Jamiyat va tadbirlar rejasi", careers: ["Community Manager", "Event Manager", "Marketing Specialist"] }
+    ]
+  },
+  {
+    id: 26,
+    category: "interest",
+    question: "Senga nimani ishonib topshirishadi?",
+    options: [
+      { text: "Texnik masalalar va kompyuter muammolari", careers: ["System Administrator", "IT Support", "DevOps Engineer"] },
+      { text: "Dizayn va ko'rinish masalalar", careers: ["Graphic Designer", "UX/UI Designer", "Illustrator"] },
+      { text: "Biznes va boshqaruv masalalar", careers: ["Business Analyst", "Product Manager", "Project Manager"] },
+      { text: "Jamiyat va mijozlar bilan ishlash", careers: ["Customer Support Specialist", "Community Manager", "IT Recruiter"] }
+    ]
+  },
+  {
+    id: 27,
+    category: "interest",
+    question: "Tug'ilgan kun yoki to'yni kim tashkil qiladi?",
+    options: [
+      { text: "Men tashkil qilaman va boshqaraman", careers: ["Event Manager", "Project Manager", "Community Manager"] },
+      { text: "Men yordam beraman va texnik jihatdan ta'minlayman", careers: ["System Administrator", "DevOps Engineer", "IT Support"] },
+      { text: "Men dizayn va ko'rinishni tayyorlayman", careers: ["Graphic Designer", "UX/UI Designer", "Motion Designer"] },
+      { text: "Men kontent va fotolar tayyorlayman", careers: ["Content Creator", "Photographer", "Video Editor"] }
+    ]
+  },
+  {
+    id: 28,
+    category: "interest",
+    question: "Blog, video, rasm tayyorlaganmisan?",
+    options: [
+      { text: "Texnik blog va dasturlash bo'yicha maqolalar", careers: ["Technical Writer", "DevRel", "Backend Developer"] },
+      { text: "Dizayn va ijodiy ishlar", careers: ["Graphic Designer", "Content Creator", "Illustrator"] },
+      { text: "Video va fotolar tayyorlash", careers: ["Content Creator", "Motion Designer", "Video Editor"] },
+      { text: "Ijtimoiy tarmoqlar uchun kontent", careers: ["SMM Specialist", "Community Manager", "Content Creator"] }
+    ]
+  },
+  {
+    id: 29,
+    category: "interest",
+    question: "Telefonning qaysi qismi qiziq? Kamera, sozlash, xavfsizlik?",
+    options: [
+      { text: "Kamera va fotolar tayyorlash", careers: ["Content Creator", "Graphic Designer", "Photographer"] },
+      { text: "Sozlash va dasturlar", careers: ["Mobile Developer", "App Developer", "QA Engineer"] },
+      { text: "Xavfsizlik va ma'lumotlarni himoya qilish", careers: ["Cybersecurity Specialist", "Data Engineer", "System Administrator"] },
+      { text: "Ijtimoiy tarmoqlar va ilovalar", careers: ["SMM Specialist", "Community Manager", "Mobile Developer"] }
+    ]
+  },
+  {
+    id: 30,
+    category: "interest",
+    question: "O'zingni qanday so'z bilan ta'riflaysan?",
+    options: [
+      { text: "Texnik va mantiqiy fikrlash", careers: ["Data Scientist", "AI/ML Engineer", "System Administrator"] },
+      { text: "Ijodiy va dizayn fikrlash", careers: ["UX/UI Designer", "Graphic Designer", "Creative Director"] },
+      { text: "Tashkiliy va boshqaruv qobiliyati", careers: ["Project Manager", "Team Lead", "Product Manager"] },
+      { text: "Ijtimoiy va kommunikativ", careers: ["Community Manager", "DevRel", "IT Recruiter"] }
+    ]
+  }
+];
 
-  const updateQuestion = (index, field, value) => {
-    setFormData((prev) => ({
+// Career Assessment Test Component
+const CareerAssessmentTest = ({ onTestCompleted, setNotifications }) => {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [careerResults, setCareerResults] = useState({});
+  const [testStarted, setTestStarted] = useState(false);
+
+  const handleAnswer = (questionId, optionIndex) => {
+    setAnswers(prev => ({
       ...prev,
-      questions: prev.questions.map((q, i) =>
-        i === index ? { ...q, [field]: value } : q
-      ),
+      [questionId]: optionIndex
     }));
   };
 
-  const updateOption = (questionIndex, optionIndex, field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      questions: prev.questions.map((q, qIndex) =>
-        qIndex === questionIndex
-          ? {
-              ...q,
-              options: q.options.map((opt, oIndex) =>
-                oIndex === optionIndex ? { ...opt, [field]: value } : opt
-              ),
-            }
-          : q
-      ),
-    }));
+  const calculateResults = () => {
+    const careerScores = {};
+    
+    // Initialize all careers with 0 score
+    Object.values(CAREER_CATEGORIES).forEach(category => {
+      category.careers.forEach(career => {
+        careerScores[career] = 0;
+      });
+    });
+
+    // Calculate scores based on answers
+    Object.entries(answers).forEach(([questionId, optionIndex]) => {
+      const question = CAREER_ASSESSMENT_QUESTIONS.find(q => q.id === parseInt(questionId));
+      if (question && question.options[optionIndex]) {
+        const selectedCareers = question.options[optionIndex].careers;
+        selectedCareers.forEach(career => {
+          careerScores[career] = (careerScores[career] || 0) + 1;
+        });
+      }
+    });
+
+    // Sort careers by score
+    const sortedCareers = Object.entries(careerScores)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 10); // Top 10 careers
+
+    return sortedCareers;
   };
 
-  const removeQuestion = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      questions: prev.questions.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsSubmitting(true);
 
-    try {
-      const response = await fetch("/api/tests", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+    const results = calculateResults();
+    setCareerResults(results);
+    setShowResults(true);
 
-      if (response.ok) {
-        onTestCreated();
         // Add notification
-        setNotifications((prev) => [
+    setNotifications(prev => [
           ...prev,
           {
             id: Date.now(),
             type: "success",
-            message: "Test created successfully!",
+        message: "Career assessment completed! Check your results.",
             time: "Just now",
           },
         ]);
-      }
-    } catch (error) {
-      console.error("Error creating test:", error);
-    } finally {
+
       setIsSubmitting(false);
-    }
   };
 
+  const resetTest = () => {
+    setCurrentQuestion(0);
+    setAnswers({});
+    setShowResults(false);
+    setCareerResults({});
+    setTestStarted(false);
+  };
+
+  const startTest = () => {
+    setTestStarted(true);
+  };
+
+  // Test Overview Screen
+  if (!testStarted) {
   return (
-    <form onSubmit={handleSubmit} className='space-y-6'>
-      {/* Basic Info */}
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-        <div>
-          <label className='block text-sm font-medium text-gray-700 mb-2'>
-            Test Title
-          </label>
-          <input
-            type='text'
-            value={formData.title}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, title: e.target.value }))
-            }
-            className='w-full border border-gray-300 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]'
-            required
-          />
+      <div className='space-y-6 max-w-4xl mx-auto'>
+        <div className='text-center mb-8'>
+          <div className='w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6'>
+            <FileText className='w-10 h-10 text-white' />
+          </div>
+          <h2 className='text-3xl font-bold text-gray-800 mb-4'>🎯 Career Assessment Test</h2>
+          <p className='text-gray-600 mb-8'>Discover which IT career path best matches your personality and interests</p>
+        </div>
+
+        {/* Test Information */}
+        <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-8 border border-white/30 shadow-lg'>
+          <h3 className='text-xl font-semibold text-gray-800 mb-6'>Test Information</h3>
+          
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-8'>
+            <div className='space-y-4'>
+              <div className='flex items-center gap-3'>
+                <div className='w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center'>
+                  <span className='text-blue-600 font-semibold'>📝</span>
         </div>
         <div>
-          <label className='block text-sm font-medium text-gray-700 mb-2'>
-            Time Limit (minutes)
-          </label>
-          <input
-            type='number'
-            value={formData.timeLimit}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                timeLimit: parseInt(e.target.value),
-              }))
-            }
-            className='w-full border border-gray-300 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]'
-            min='1'
-            required
-          />
+                  <h4 className='font-semibold text-gray-800'>Total Questions</h4>
+                  <p className='text-gray-600'>30 questions</p>
         </div>
       </div>
 
+              <div className='flex items-center gap-3'>
+                <div className='w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center'>
+                  <span className='text-green-600 font-semibold'>⏱️</span>
+                </div>
       <div>
-        <label className='block text-sm font-medium text-gray-700 mb-2'>
-          Description
-        </label>
-        <textarea
-          value={formData.description}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, description: e.target.value }))
-          }
-          className='w-full border border-gray-300 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]'
-          rows='3'
-        />
+                  <h4 className='font-semibold text-gray-800'>Estimated Time</h4>
+                  <p className='text-gray-600'>10-15 minutes</p>
+                </div>
       </div>
 
-      {/* Questions */}
+              <div className='flex items-center gap-3'>
+                <div className='w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center'>
+                  <span className='text-purple-600 font-semibold'>🎯</span>
+                </div>
       <div>
-        <div className='flex items-center justify-between mb-4'>
-          <h3 className='text-lg font-semibold text-gray-800'>Questions</h3>
-          <button
-            type='button'
-            onClick={addQuestion}
-            className='bg-[#10B981] text-white px-4 py-2 rounded-lg hover:bg-[#0ea672] transition-colors'>
-            Add Question
-          </button>
+                  <h4 className='font-semibold text-gray-800'>Career Categories</h4>
+                  <p className='text-gray-600'>35+ IT careers</p>
         </div>
-
-        <div className='space-y-6'>
-          {formData.questions.map((question, qIndex) => (
-            <div key={qIndex} className='border border-gray-200 rounded-xl p-6'>
-              <div className='flex items-center justify-between mb-4'>
-                <h4 className='font-semibold text-gray-800'>
-                  Question {qIndex + 1}
-                </h4>
-                {formData.questions.length > 1 && (
-                  <button
-                    type='button'
-                    onClick={() => removeQuestion(qIndex)}
-                    className='text-red-600 hover:text-red-700'>
-                    <Trash2 size={16} />
-                  </button>
-                )}
+              </div>
               </div>
 
               <div className='space-y-4'>
+              <div className='flex items-center gap-3'>
+                <div className='w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center'>
+                  <span className='text-orange-600 font-semibold'>🧠</span>
+                </div>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Question Text
-                  </label>
-                  <textarea
-                    value={question.question}
-                    onChange={(e) =>
-                      updateQuestion(qIndex, "question", e.target.value)
-                    }
-                    className='w-full border border-gray-300 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]'
-                    rows='2'
-                    required
-                  />
+                  <h4 className='font-semibold text-gray-800'>Test Sections</h4>
+                  <p className='text-gray-600'>Personality, Motivation, Interests</p>
+                </div>
                 </div>
 
+              <div className='flex items-center gap-3'>
+                <div className='w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center'>
+                  <span className='text-red-600 font-semibold'>📊</span>
+                </div>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Options
-                  </label>
-                  <div className='space-y-3'>
-                    {question.options.map((option, oIndex) => (
-                      <div key={oIndex} className='flex items-center gap-3'>
-                        <input
-                          type='radio'
-                          name={`correct-${qIndex}`}
-                          checked={option.isCorrect}
-                          onChange={() => {
-                            // Reset all options to false, then set current to true
-                            question.options.forEach((_, index) => {
-                              updateOption(qIndex, index, "isCorrect", false);
-                            });
-                            updateOption(qIndex, oIndex, "isCorrect", true);
-                          }}
-                          className='text-[#10B981] focus:ring-[#10B981]'
-                        />
-                        <input
-                          type='text'
-                          value={option.text}
-                          onChange={(e) =>
-                            updateOption(qIndex, oIndex, "text", e.target.value)
-                          }
-                          className='flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981]'
-                          placeholder={`Option ${oIndex + 1}`}
-                          required
-                        />
-                      </div>
-                    ))}
-                  </div>
+                  <h4 className='font-semibold text-gray-800'>Results</h4>
+                  <p className='text-gray-600'>Top 10 career matches</p>
+                </div>
+              </div>
+              
+              <div className='flex items-center gap-3'>
+                <div className='w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center'>
+                  <span className='text-indigo-600 font-semibold'>🔄</span>
+                </div>
+                <div>
+                  <h4 className='font-semibold text-gray-800'>Retake</h4>
+                  <p className='text-gray-600'>Unlimited attempts</p>
                 </div>
               </div>
             </div>
-          ))}
+          </div>
+
+          {/* Test Instructions */}
+          <div className='bg-blue-50 rounded-xl p-6 mb-8'>
+            <h4 className='font-semibold text-blue-800 mb-3'>📋 Instructions:</h4>
+            <ul className='space-y-2 text-blue-700'>
+              <li>• Answer each question honestly based on your preferences</li>
+              <li>• You can go back to previous questions and change answers</li>
+              <li>• There are no right or wrong answers - be yourself!</li>
+              <li>• Take your time to think about each question</li>
+              <li>• You can retake the test anytime</li>
+            </ul>
+          </div>
+
+          {/* Start Button */}
+          <div className='text-center'>
+            <button
+              onClick={startTest}
+              className='bg-gradient-to-r from-blue-500 to-purple-600 text-white px-12 py-4 rounded-2xl font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105'>
+              🚀 Start Career Assessment
+            </button>
+          </div>
         </div>
       </div>
+    );
+  }
 
-      <div className='flex justify-end gap-4'>
-        <button
-          type='button'
-          onClick={() => onTestCreated()}
-          className='px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors'>
-          Cancel
-        </button>
-        <button
-          type='submit'
-          disabled={isSubmitting}
-          className='px-6 py-3 bg-gradient-to-r from-[#10B981] to-[#34D399] text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50'>
-          {isSubmitting ? "Creating..." : "Create Test"}
-        </button>
+  if (showResults) {
+    return (
+      <div className='space-y-6'>
+        <div className='text-center'>
+          <h2 className='text-3xl font-bold text-gray-800 mb-4'>🎯 Your Career Results</h2>
+          <p className='text-gray-600 mb-8'>Based on your answers, here are the careers that best match your personality and interests:</p>
+        </div>
+
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          {careerResults.map(([career, score], index) => (
+            <div key={career} className='bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg'>
+              <div className='flex items-center justify-between mb-4'>
+                <h3 className='text-lg font-semibold text-gray-800'>{career}</h3>
+                <span className='text-sm font-medium text-green-600'>Score: {score}</span>
+              </div>
+              <div className='w-full bg-gray-200 rounded-full h-2'>
+                <div 
+                  className='bg-gradient-to-r from-green-500 to-blue-600 h-2 rounded-full'
+                  style={{ width: `${(score / 30) * 100}%` }}
+                ></div>
+              </div>
+                      </div>
+                    ))}
+                  </div>
+
+        <div className='text-center'>
+          <button
+            onClick={resetTest}
+            className='bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-2xl font-semibold hover:shadow-xl transition-all duration-300'>
+            🔄 Take Test Again
+          </button>
+                </div>
+              </div>
+    );
+  }
+
+  const question = CAREER_ASSESSMENT_QUESTIONS[currentQuestion];
+  const progress = ((currentQuestion + 1) / CAREER_ASSESSMENT_QUESTIONS.length) * 100;
+
+  return (
+    <div className='space-y-6 max-w-4xl mx-auto'>
+      <div className='text-center mb-8'>
+        <h2 className='text-3xl font-bold text-gray-800 mb-4'>🎯 Career Assessment Test</h2>
+        <p className='text-gray-600 mb-6'>Discover which IT career path best matches your personality and interests</p>
+        
+        {/* Progress Bar */}
+        <div className='w-full bg-gray-200 rounded-full h-3 mb-4'>
+          <div 
+            className='bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500'
+            style={{ width: `${progress}%` }}
+          ></div>
+            </div>
+        <p className='text-sm text-gray-600'>Question {currentQuestion + 1} of {CAREER_ASSESSMENT_QUESTIONS.length}</p>
       </div>
-    </form>
+
+      <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-8 border border-white/30 shadow-lg'>
+        <h3 className='text-xl font-semibold text-gray-800 mb-6'>{question.question}</h3>
+        
+        <div className='space-y-4'>
+          {question.options.map((option, index) => (
+            <button
+              key={index}
+              onClick={() => handleAnswer(question.id, index)}
+              className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-300 ${
+                answers[question.id] === index
+                  ? 'border-blue-500 bg-blue-50 text-blue-800'
+                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+              }`}>
+              <span className='font-medium'>{option.text}</span>
+            </button>
+          ))}
+      </div>
+
+        <div className='flex justify-between items-center mt-8'>
+        <button
+            onClick={() => setCurrentQuestion(prev => Math.max(0, prev - 1))}
+            disabled={currentQuestion === 0}
+            className='px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'>
+            ← Previous
+        </button>
+
+          {currentQuestion === CAREER_ASSESSMENT_QUESTIONS.length - 1 ? (
+        <button
+              onClick={handleSubmit}
+              disabled={Object.keys(answers).length < CAREER_ASSESSMENT_QUESTIONS.length || isSubmitting}
+              className='px-8 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'>
+              {isSubmitting ? 'Calculating...' : '🎯 Get Results'}
+        </button>
+          ) : (
+            <button
+              onClick={() => setCurrentQuestion(prev => prev + 1)}
+              disabled={!answers[question.id]}
+              className='px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'>
+              Next →
+            </button>
+          )}
+      </div>
+      </div>
+    </div>
   );
 };
+
+
 
 export default function DashboardPage() {
   // All useState hooks must be at the top
@@ -347,7 +755,6 @@ export default function DashboardPage() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [testMenu, setTestMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -379,12 +786,9 @@ export default function DashboardPage() {
   // Profile image state
   const [profileImage, setProfileImage] = useState(null);
 
-  // Jobs va Tests state
+  // Jobs state
   const [jobs, setJobs] = useState([]);
-  const [tests, setTests] = useState([]);
   const [loadingJobs, setLoadingJobs] = useState(false);
-  const [loadingTests, setLoadingTests] = useState(false);
-  const [availableTests, setAvailableTests] = useState([]);
   const [jobApplications, setJobApplications] = useState([]);
   const [showApplications, setShowApplications] = useState(false);
 
@@ -701,40 +1105,7 @@ export default function DashboardPage() {
     }
   }, [active]);
 
-  // Tests ma'lumotlarini olish
-  useEffect(() => {
-    const fetchTests = async () => {
-      setLoadingTests(true);
-      try {
-        const response = await fetch("/api/tests");
-        if (response.ok) {
-          const data = await response.json();
-          setTests(data);
-        }
-      } catch (error) {
-        console.error("Error fetching tests:", error);
-      } finally {
-        setLoadingTests(false);
-      }
-    };
 
-    const fetchAvailableTests = async () => {
-      try {
-        const response = await fetch("/api/tests?type=available");
-        if (response.ok) {
-          const data = await response.json();
-          setAvailableTests(data);
-        }
-      } catch (error) {
-        console.error("Error fetching available tests:", error);
-      }
-    };
-
-    if (active === "Test") {
-      fetchTests();
-      fetchAvailableTests();
-    }
-  }, [active]);
 
   // Mobile detection
   useEffect(() => {
@@ -1165,111 +1536,7 @@ export default function DashboardPage() {
     }
   };
 
-  // Test state
-  const [currentTest, setCurrentTest] = useState(null);
-  const [testAnswers, setTestAnswers] = useState({});
-  const [testTimer, setTestTimer] = useState(null);
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [isTestActive, setIsTestActive] = useState(false);
 
-  // Test boshlash funksiyasi
-  const startTest = (test) => {
-    setCurrentTest(test);
-    setTestAnswers({});
-    setTimeRemaining(test.timeLimit * 60); // daqiqalarni soniyaga o'tkazish
-    setIsTestActive(true);
-    setActive("Test");
-  };
-
-  // Test timer
-  useEffect(() => {
-    let interval;
-    if (isTestActive && timeRemaining > 0) {
-      interval = setInterval(() => {
-        setTimeRemaining((prev) => {
-          if (prev <= 1) {
-            // Vaqt tugadi, testni avtomatik yuborish
-            submitTest();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isTestActive, timeRemaining]);
-
-  // Test yuborish
-  const submitTest = async () => {
-    if (!currentTest) return;
-
-    const answers = Object.entries(testAnswers).map(
-      ([questionId, selectedOptionId]) => ({
-        questionId,
-        selectedOptionId,
-      })
-    );
-
-    const timeSpent = currentTest.timeLimit * 60 - timeRemaining;
-
-    try {
-      const response = await fetch("/api/tests", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          testId: currentTest.id,
-          answers,
-          timeSpent: Math.floor(timeSpent / 60),
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-
-        // Add notification
-        setNotifications((prev) => [
-          ...prev,
-          {
-            id: Date.now(),
-            type: "success",
-            message: `Test completed! Score: ${result.score}%`,
-            time: "Just now",
-          },
-        ]);
-
-        // Reset test state
-        setCurrentTest(null);
-        setTestAnswers({});
-        setTimeRemaining(0);
-        setIsTestActive(false);
-        setActive("Test");
-
-        // Refresh tests
-        const testsResponse = await fetch("/api/tests");
-        if (testsResponse.ok) {
-          const testsData = await testsResponse.json();
-          setTests(testsData);
-        }
-      }
-    } catch (error) {
-      console.error("Error submitting test:", error);
-    }
-  };
-
-  // Test javobini saqlash
-  const saveAnswer = (questionId, optionId) => {
-    setTestAnswers((prev) => ({
-      ...prev,
-      [questionId]: optionId,
-    }));
-  };
-
-  // Vaqtni formatlash
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
 
   if (!user)
     return (
@@ -3414,89 +3681,155 @@ export default function DashboardPage() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
                 className='space-y-6'>
-                <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
-                  <h2 className='text-xl md:text-2xl font-bold text-gray-800'>
-                    Available Jobs
-                  </h2>
-                  <div className='flex gap-2 md:gap-3'>
-                    <button
-                      onClick={() => setShowApplications(!showApplications)}
-                      className='bg-blue-500 text-white px-3 md:px-4 py-2 rounded-xl font-medium hover:bg-blue-600 transition-all duration-300 flex items-center gap-1 md:gap-2 text-sm md:text-base'>
-                      <Briefcase className='w-4 h-4 md:w-4 md:h-4' />
-                      <span className='hidden sm:inline'>
-                        {showApplications ? "View Jobs" : "My Applications"}
-                      </span>
-                      <span className='sm:hidden'>
-                        {showApplications ? "Jobs" : "Apps"}
-                      </span>
-                    </button>
+                {/* Clean Header Section */}
+                <div className='bg-white rounded-2xl p-6 md:p-8 border border-gray-200 shadow-sm'>
+                  <div className='flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6'>
+                    <div className='flex-1'>
+                      <div className='flex items-center gap-3 mb-4'>
+                        <div className='w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center border border-gray-200'>
+                          <Briefcase className='w-6 h-6 text-gray-700' />
+                        </div>
+                        <div>
+                          <h1 className='text-2xl md:text-3xl font-bold text-gray-900'>
+                            Job Opportunities
+                          </h1>
+                          <p className='text-gray-600 font-medium'>
+                            Discover your next career move
+                          </p>
+                        </div>
+                      </div>
+                      <div className='flex flex-wrap items-center gap-3 mt-4'>
+                        <div className='flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200'>
+                          <div className='w-2 h-2 bg-green-500 rounded-full'></div>
+                          <span className='text-sm font-medium text-gray-700'>
+                            {jobs.length} Active Jobs
+                          </span>
+                        </div>
+                        <div className='flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200'>
+                          <div className='w-2 h-2 bg-blue-500 rounded-full'></div>
+                          <span className='text-sm font-medium text-gray-700'>
+                            {jobApplications.length} Applications
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className='flex gap-3'>
+                      <button
+                        onClick={() => setShowApplications(!showApplications)}
+                        className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 ${
+                          showApplications
+                            ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+                        }`}>
+                        <Briefcase className='w-5 h-5' />
+                        <span className='hidden sm:inline'>
+                          {showApplications ? "Browse Jobs" : "My Applications"}
+                        </span>
+                        <span className='sm:hidden'>
+                          {showApplications ? "Jobs" : "Apps"}
+                        </span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
                 {showApplications ? (
-                  // Job Applications View
-                  <div className='space-y-4'>
-                    <h3 className='text-lg font-semibold text-gray-800 mb-4'>
-                      My Job Applications ({jobApplications.length})
-                    </h3>
-                    {jobApplications.length === 0 ? (
-                      <div className='text-center py-12'>
-                        <div className='w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4'>
-                          <Briefcase className='w-8 h-8 text-white' />
+                  // Enhanced Job Applications View
+                  <div className='space-y-6'>
+                    <div className='flex items-center justify-between'>
+                      <h2 className='text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-3'>
+                        <div className='w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center'>
+                          <span className='text-white font-bold text-sm'>{jobApplications.length}</span>
                         </div>
-                        <p className='text-gray-500 text-lg font-medium'>
-                          No job applications yet
+                        My Applications
+                      </h2>
+                    </div>
+                    
+                    {jobApplications.length === 0 ? (
+                      <div className='text-center py-16 bg-gray-50 rounded-2xl border border-gray-200'>
+                        <div className='w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6'>
+                          <Briefcase className='w-10 h-10 text-gray-600' />
+                        </div>
+                        <h3 className='text-xl font-bold text-gray-800 mb-2'>
+                          No Applications Yet
+                        </h3>
+                        <p className='text-gray-600 mb-4 max-w-md mx-auto'>
+                          Start applying for jobs to track your applications and progress here
                         </p>
-                        <p className='text-gray-400 text-sm'>
-                          Apply for jobs to see your applications here
-                        </p>
+                        <button
+                          onClick={() => setShowApplications(false)}
+                          className='bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors duration-200'>
+                          Browse Available Jobs
+                        </button>
                       </div>
                     ) : (
-                      <div className='space-y-4'>
+                      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
                         {jobApplications.map((application, index) => (
                           <FadeInUp key={application.id} delay={index * 0.1}>
-                            <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300'>
-                              <div className='flex items-center justify-between'>
-                                <div className='flex-1'>
-                                  <h3 className='text-lg font-semibold text-gray-800'>
-                                    {application.job.title}
-                                  </h3>
-                                  <p className='text-gray-600'>
-                                    {application.job.company}
-                                  </p>
-                                  <div className='flex items-center gap-4 mt-2'>
-                                    <p className='text-sm text-gray-500'>
-                                      {application.job.salary}
-                                    </p>
-                                    <p className='text-sm text-gray-500'>
-                                      {application.job.location}
-                                    </p>
-                                    <p className='text-sm text-gray-500'>
-                                      {application.job.type}
-                                    </p>
+                            <div className='group bg-white/90 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/50 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] overflow-hidden relative'>
+                              {/* Status Indicator Bar */}
+                              <div className={`absolute top-0 left-0 right-0 h-1 ${
+                                application.status === "Applied" ? "bg-blue-500" :
+                                application.status === "Interview" ? "bg-green-500" :
+                                application.status === "Rejected" ? "bg-red-500" :
+                                application.status === "Accepted" ? "bg-emerald-500" :
+                                "bg-gray-400"
+                              }`}></div>
+                              
+                              <div className='space-y-4'>
+                                <div className='flex items-start justify-between'>
+                                  <div className='flex-1'>
+                                    <h3 className='text-lg font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors'>
+                                      {application.job.title}
+                                    </h3>
+                                    <div className='flex items-center gap-2 mb-3'>
+                                      <div className='w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center'>
+                                        <svg className='w-4 h-4 text-blue-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' />
+                                        </svg>
+                                      </div>
+                                      <span className='text-gray-700 font-medium'>{application.job.company}</span>
+                                    </div>
                                   </div>
-                                  <p className='text-xs text-gray-400 mt-2'>
-                                    Applied:{" "}
-                                    {new Date(
-                                      application.appliedAt
-                                    ).toLocaleDateString()}
-                                  </p>
-                                </div>
-                                <div className='flex items-center gap-3'>
-                                  <span
-                                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                      application.status === "Applied"
-                                        ? "bg-blue-100 text-blue-700"
-                                        : application.status === "Interview"
-                                          ? "bg-green-100 text-green-700"
-                                          : application.status === "Rejected"
-                                            ? "bg-red-100 text-red-700"
-                                            : application.status === "Accepted"
-                                              ? "bg-green-100 text-green-700"
-                                              : "bg-gray-100 text-gray-700"
-                                    }`}>
+                                  
+                                  <span className={`px-4 py-2 rounded-full text-sm font-semibold shadow-sm ${
+                                    application.status === "Applied" ? "bg-blue-100 text-blue-700 border border-blue-200" :
+                                    application.status === "Interview" ? "bg-green-100 text-green-700 border border-green-200" :
+                                    application.status === "Rejected" ? "bg-red-100 text-red-700 border border-red-200" :
+                                    application.status === "Accepted" ? "bg-emerald-100 text-emerald-700 border border-emerald-200" :
+                                    "bg-gray-100 text-gray-700 border border-gray-200"
+                                  }`}>
                                     {application.status}
                                   </span>
+                                </div>
+                                
+                                <div className='grid grid-cols-2 gap-4'>
+                                  <div className='flex items-center gap-2 text-sm text-gray-600'>
+                                    <svg className='w-4 h-4 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1' />
+                                    </svg>
+                                    <span>{application.job.salary}</span>
+                                  </div>
+                                  <div className='flex items-center gap-2 text-sm text-gray-600'>
+                                    <svg className='w-4 h-4 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />
+                                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 11a3 3 0 11-6 0 3 3 0 016 0z' />
+                                    </svg>
+                                    <span>{application.job.location}</span>
+                                  </div>
+                                  <div className='flex items-center gap-2 text-sm text-gray-600'>
+                                    <svg className='w-4 h-4 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.815-8.742-2.2M21 13.255v5.255A2.255 2.255 0 0118.745 21H5.255A2.255 2.255 0 013 18.495V13.255m0 0A23.931 23.931 0 0112 15c3.183 0 6.22-.815 8.742-2.2M21 13.255A23.931 23.931 0 0012 15c-3.183 0-6.22-.815-8.742-2.2' />
+                                    </svg>
+                                    <span>{application.job.type}</span>
+                                  </div>
+                                  <div className='flex items-center gap-2 text-sm text-gray-600'>
+                                    <svg className='w-4 h-4 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' />
+                                    </svg>
+                                    <span>Applied: {new Date(application.appliedAt).toLocaleDateString()}</span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -3508,142 +3841,194 @@ export default function DashboardPage() {
                 ) : (
                   // Available Jobs View
                   <div className='space-y-4'>
-                    <h3 className='text-lg font-semibold text-gray-800 mb-4'>
-                      Available Jobs ({jobs.length})
-                    </h3>
+                    <div className='flex items-center justify-between'>
+                      <h2 className='text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-3'>
+                        <div className='w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center'>
+                          <span className='text-white font-bold text-sm'>{jobs.length}</span>
+                        </div>
+                        Available Positions
+                      </h2>
+                      
+                      {/* Search and Filter Bar */}
+                      <div className='flex items-center gap-3'>
+                        <div className='relative'>
+                          <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4' />
+                          <input
+                            type='text'
+                            placeholder='Search jobs...'
+                            className='pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-48 md:w-64'
+                          />
+                        </div>
+                      </div>
+                    </div>
                     {loadingJobs ? (
                       <div className='flex items-center justify-center py-20'>
-                        <div className='animate-spin w-8 h-8 border-4 border-[#10B981] border-t-transparent rounded-full'></div>
+                        <div className='text-center'>
+                          <div className='animate-spin w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full mx-auto mb-4'></div>
+                          <p className='text-gray-600 font-medium'>Loading opportunities...</p>
+                        </div>
                       </div>
                     ) : jobs.length === 0 ? (
-                      <div className='text-center py-12'>
-                        <div className='w-16 h-16 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-full flex items-center justify-center mx-auto mb-4'>
-                          <Briefcase className='w-8 h-8 text-white' />
+                      <div className='text-center py-16 bg-gray-50 rounded-2xl border border-gray-200'>
+                        <div className='w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6'>
+                          <Briefcase className='w-10 h-10 text-gray-600' />
                         </div>
-                        <p className='text-gray-500 text-lg font-medium'>
-                          No jobs available
+                        <h3 className='text-xl font-bold text-gray-800 mb-2'>
+                          No Jobs Available Right Now
+                        </h3>
+                        <p className='text-gray-600 mb-4 max-w-md mx-auto'>
+                          Don't worry! New opportunities are added regularly. Check back soon for exciting positions.
                         </p>
-                        <p className='text-gray-400 text-sm'>
-                          Check back later for new opportunities
-                        </p>
+                        <div className='flex items-center justify-center gap-2 text-sm text-gray-500'>
+                          <div className='w-2 h-2 bg-gray-400 rounded-full'></div>
+                          <span>We'll notify you when new jobs arrive</span>
+                        </div>
                       </div>
                     ) : (
-                      <div className='space-y-4'>
+                                            <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
                         {jobs.map((job, index) => (
                           <FadeInUp key={job.id} delay={index * 0.1}>
-                            <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300'>
-                              <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
-                                <div className='flex-1'>
-                                  <h3 className='text-base md:text-lg font-semibold text-gray-800'>
-                                    {job.title}
-                                  </h3>
-                                  <p className='text-sm md:text-base text-gray-600'>
-                                    {job.company}
-                                  </p>
-                                  <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2'>
-                                    <p className='text-xs md:text-sm text-gray-500'>
-                                      {job.salary}
-                                    </p>
-                                    <p className='text-xs md:text-sm text-gray-500'>
-                                      {job.location}
-                                    </p>
-                                    <p className='text-xs md:text-sm text-gray-500'>
-                                      {job.type}
-                                    </p>
-                                  </div>
-                                  {job.description && (
-                                    <p className='text-xs md:text-sm text-gray-600 mt-2'>
-                                      {job.description}
-                                    </p>
+                            <div className='group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:border-gray-300 overflow-hidden'>
+                              {/* Job Type Badge */}
+                              <div className='px-4 py-3 border-b border-gray-100 bg-gray-50'>
+                                <div className='flex items-center justify-between'>
+                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                    job.type === "Full-time" ? "bg-blue-100 text-blue-800" :
+                                    job.type === "Part-time" ? "bg-green-100 text-green-800" :
+                                    job.type === "Contract" ? "bg-purple-100 text-purple-800" :
+                                    job.type === "Remote" ? "bg-orange-100 text-orange-800" :
+                                    "bg-gray-100 text-gray-800"
+                                  }`}>
+                                    {job.type}
+                                  </span>
+                                  {job.type === "Full-time" && (
+                                    <span className='text-xs text-gray-500 flex items-center gap-1'>
+                                      <span className='w-1.5 h-1.5 bg-yellow-400 rounded-full'></span>
+                                      Premium
+                                    </span>
                                   )}
                                 </div>
-                                <div className='flex items-center gap-2 md:gap-3 mt-4 md:mt-0'>
-                                  <button
-                                    onClick={async () => {
-                                      try {
-                                        const token =
-                                          localStorage.getItem("token");
-                                        const response = await fetch(
-                                          "/api/jobs",
-                                          {
+                              </div>
+                              
+                              <div className='p-4'>
+                                <div className='space-y-3'>
+                                  {/* Job Title & Company */}
+                                  <div>
+                                    <h3 className='text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1'>
+                                      {job.title}
+                                    </h3>
+                                    <div className='flex items-center gap-2'>
+                                      <div className='w-6 h-6 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0'>
+                                        <svg className='w-3 h-3 text-gray-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' />
+                                        </svg>
+                                      </div>
+                                      <span className='text-gray-700 font-medium text-sm'>{job.company}</span>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Job Details */}
+                                  <div className='grid grid-cols-2 gap-3'>
+                                    <div className='flex items-center gap-2 text-sm'>
+                                      <svg className='w-4 h-4 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1' />
+                                      </svg>
+                                      <span className='text-gray-700 font-medium'>{job.salary}</span>
+                                    </div>
+                                    
+                                    <div className='flex items-center gap-2 text-sm'>
+                                      <svg className='w-4 h-4 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />
+                                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 11a3 3 0 11-6 0 3 3 0 016 0z' />
+                                      </svg>
+                                      <span className='text-gray-700 font-medium'>{job.location}</span>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Job Description */}
+                                  {job.description && (
+                                    <div className='bg-gray-50 rounded-lg p-3 border border-gray-100'>
+                                      <p className='text-sm text-gray-600 leading-relaxed'>
+                                        {job.description}
+                                      </p>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Action Buttons */}
+                                  <div className='flex items-center gap-3 pt-2'>
+                                    <button
+                                      onClick={async () => {
+                                        try {
+                                          const token = localStorage.getItem("token");
+                                          const response = await fetch("/api/jobs", {
                                             method: "POST",
                                             headers: {
-                                              "Content-Type":
-                                                "application/json",
+                                              "Content-Type": "application/json",
                                               Authorization: `Bearer ${token}`,
                                             },
                                             body: JSON.stringify({
                                               jobId: job.id,
-                                              coverLetter:
-                                                "I'm interested in this position and would love to discuss how I can contribute to your team.",
+                                              coverLetter: "I'm interested in this position and would love to discuss how I can contribute to your team.",
                                             }),
-                                          }
-                                        );
+                                          });
 
-                                        if (response.ok) {
-                                          const result = await response.json();
-                                          // Add notification
-                                          setNotifications((prev) => [
-                                            ...prev,
-                                            {
-                                              id: Date.now(),
-                                              type: "success",
-                                              message:
-                                                "Job application submitted successfully!",
-                                              time: "Just now",
-                                            },
-                                          ]);
-                                          // Refresh job applications
-                                          const applicationsResponse =
-                                            await fetch(
-                                              "/api/job-applications",
+                                          if (response.ok) {
+                                            const result = await response.json();
+                                            setNotifications((prev) => [
+                                              ...prev,
                                               {
-                                                headers: {
-                                                  Authorization: `Bearer ${token}`,
-                                                },
-                                              }
-                                            );
-                                          if (applicationsResponse.ok) {
-                                            const applicationsData =
-                                              await applicationsResponse.json();
-                                            setJobApplications(
-                                              applicationsData
-                                            );
+                                                id: Date.now(),
+                                                type: "success",
+                                                message: "Job application submitted successfully!",
+                                                time: "Just now",
+                                              },
+                                            ]);
+                                            
+                                            const applicationsResponse = await fetch("/api/job-applications", {
+                                              headers: {
+                                                Authorization: `Bearer ${token}`,
+                                              },
+                                            });
+                                            if (applicationsResponse.ok) {
+                                              const applicationsData = await applicationsResponse.json();
+                                              setJobApplications(applicationsData);
+                                            }
+                                          } else {
+                                            const error = await response.json();
+                                            setNotifications((prev) => [
+                                              ...prev,
+                                              {
+                                                id: Date.now(),
+                                                type: "error",
+                                                message: error.error || "Failed to apply for job",
+                                                time: "Just now",
+                                              },
+                                            ]);
                                           }
-                                        } else {
-                                          const error = await response.json();
+                                        } catch (error) {
+                                          console.error("Error applying for job:", error);
                                           setNotifications((prev) => [
                                             ...prev,
                                             {
                                               id: Date.now(),
                                               type: "error",
-                                              message:
-                                                error.error ||
-                                                "Failed to apply for job",
+                                              message: "Failed to apply for job",
                                               time: "Just now",
                                             },
                                           ]);
                                         }
-                                      } catch (error) {
-                                        console.error(
-                                          "Error applying for job:",
-                                          error
-                                        );
-                                        setNotifications((prev) => [
-                                          ...prev,
-                                          {
-                                            id: Date.now(),
-                                            type: "error",
-                                            message: "Failed to apply for job",
-                                            time: "Just now",
-                                          },
-                                        ]);
-                                      }
-                                    }}
-                                    className='bg-gradient-to-r from-[#10B981] to-[#34D399] text-white px-3 md:px-4 py-2 rounded-xl font-medium hover:shadow-lg transition-all duration-300 flex flex-col md:flex-row items-center gap-1 md:gap-2 text-xs md:text-sm'>
-                                    <Briefcase className='w-4 h-4 md:w-4 md:h-4' />
-                                    <span>Apply</span>
-                                  </button>
+                                      }}
+                                      className='flex-1 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2'>
+                                      <Briefcase className='w-4 h-4' />
+                                      Apply Now
+                                    </button>
+                                    
+                                    <button className='p-2.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200 flex items-center justify-center'>
+                                      <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z' />
+                                      </svg>
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -3664,90 +4049,153 @@ export default function DashboardPage() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
                 className='space-y-6'>
-                <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
-                  <h2 className='text-xl md:text-2xl font-bold text-gray-800'>
-                    Freelance Projects
-                  </h2>
-                  <div className='flex gap-2 md:gap-3'>
-                    <button
-                      onClick={() => setShowProposals(!showProposals)}
-                      className='bg-purple-500 text-white px-3 md:px-4 py-2 rounded-xl font-medium hover:bg-purple-600 transition-all duration-300 flex items-center gap-1 md:gap-2 text-sm md:text-base'>
-                      <Users className='w-4 h-4 md:w-4 md:h-4' />
-                      <span className='hidden sm:inline'>
-                        {showProposals ? "View Projects" : "My Proposals"}
-                      </span>
-                      <span className='sm:hidden'>
-                        {showProposals ? "Projects" : "Proposals"}
-                      </span>
-                    </button>
+                {/* Clean Freelance Projects Header */}
+                <div className='bg-white rounded-2xl p-6 md:p-8 border border-gray-200 shadow-sm'>
+                  <div className='flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6'>
+                    <div className='flex-1'>
+                      <div className='flex items-center gap-3 mb-4'>
+                        <div className='w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center border border-gray-200'>
+                          <Users className='w-6 h-6 text-gray-700' />
+                        </div>
+                        <div>
+                          <h1 className='text-2xl md:text-3xl font-bold text-gray-900'>
+                            Freelance Projects
+                          </h1>
+                          <p className='text-gray-600 font-medium'>
+                            Find your next freelance opportunity
+                          </p>
+                        </div>
+                      </div>
+                      <div className='flex flex-wrap items-center gap-3 mt-4'>
+                        <div className='flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200'>
+                          <div className='w-2 h-2 bg-green-500 rounded-full'></div>
+                          <span className='text-sm font-medium text-gray-700'>
+                            {projects.length} Active Projects
+                          </span>
+                        </div>
+                        <div className='flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200'>
+                          <div className='w-2 h-2 bg-blue-500 rounded-full'></div>
+                          <span className='text-sm font-medium text-gray-700'>
+                            {projectProposals.length} My Proposals
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className='flex gap-3'>
+                      <button
+                        onClick={() => setShowProposals(!showProposals)}
+                        className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 ${
+                          showProposals
+                            ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+                        }`}>
+                        <Users className='w-5 h-5' />
+                        <span className='hidden sm:inline'>
+                          {showProposals ? "Browse Projects" : "My Proposals"}
+                        </span>
+                        <span className='sm:hidden'>
+                          {showProposals ? "Projects" : "Proposals"}
+                        </span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
                 {showProposals ? (
                   // Project Proposals View
-                  <div className='space-y-4'>
-                    <h3 className='text-lg font-semibold text-gray-800 mb-4'>
-                      My Project Proposals ({projectProposals.length})
-                    </h3>
-                    {projectProposals.length === 0 ? (
-                      <div className='text-center py-12'>
-                        <div className='w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4'>
-                          <Users className='w-8 h-8 text-white' />
+                  <div className='space-y-6'>
+                    <div className='flex items-center justify-between'>
+                      <h2 className='text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-3'>
+                        <div className='w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center'>
+                          <span className='text-white font-bold text-sm'>{projectProposals.length}</span>
                         </div>
-                        <p className='text-gray-500 text-lg font-medium'>
-                          No proposals submitted yet
+                        My Project Proposals
+                      </h2>
+                    </div>
+                    
+                    {projectProposals.length === 0 ? (
+                      <div className='text-center py-16 bg-gray-50 rounded-2xl border border-gray-200'>
+                        <div className='w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6'>
+                          <Users className='w-10 h-10 text-gray-600' />
+                        </div>
+                        <h3 className='text-xl font-bold text-gray-800 mb-2'>
+                          No Proposals Submitted Yet
+                        </h3>
+                        <p className='text-gray-600 mb-4 max-w-md mx-auto'>
+                          Start submitting proposals to projects to track your applications and progress here
                         </p>
-                        <p className='text-gray-400 text-sm'>
-                          Submit proposals to projects to see them here
-                        </p>
+                        <button
+                          onClick={() => setShowProposals(false)}
+                          className='bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors duration-200'>
+                          Browse Available Projects
+                        </button>
                       </div>
                     ) : (
-                      <div className='space-y-4'>
+                      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
                         {projectProposals.map((proposal, index) => (
                           <FadeInUp key={proposal.id} delay={index * 0.1}>
-                            <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300'>
-                              <div className='flex items-center justify-between'>
-                                <div className='flex-1'>
-                                  <h3 className='text-lg font-semibold text-gray-800'>
-                                    {proposal.project.title}
-                                  </h3>
-                                  <p className='text-gray-600'>
-                                    Client:{" "}
-                                    {proposal.project.client.name ||
-                                      proposal.project.client.email}
-                                  </p>
-                                  <div className='flex items-center gap-4 mt-2'>
-                                    <p className='text-sm text-gray-500'>
-                                      My Bid: {proposal.proposedBudget}
-                                    </p>
-                                    <p className='text-sm text-gray-500'>
-                                      Delivery: {proposal.deliveryTime}
-                                    </p>
-                                    <p className='text-sm text-gray-500'>
-                                      Category: {proposal.project.category}
-                                    </p>
-                                  </div>
-                                  <p className='text-xs text-gray-400 mt-2'>
-                                    Submitted:{" "}
-                                    {new Date(
-                                      proposal.createdAt
-                                    ).toLocaleDateString()}
-                                  </p>
-                                </div>
-                                <div className='flex items-center gap-3'>
-                                  <span
-                                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                      proposal.status === "pending"
-                                        ? "bg-yellow-100 text-yellow-700"
-                                        : proposal.status === "accepted"
-                                          ? "bg-green-100 text-green-700"
-                                          : proposal.status === "rejected"
-                                            ? "bg-red-100 text-red-700"
-                                            : "bg-gray-100 text-gray-700"
-                                    }`}>
-                                    {proposal.status.charAt(0).toUpperCase() +
-                                      proposal.status.slice(1)}
+                            <div className='group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:border-gray-300 overflow-hidden'>
+                              {/* Status Badge */}
+                              <div className='px-4 py-3 border-b border-gray-100 bg-gray-50'>
+                                <div className='flex items-center justify-between'>
+                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                    proposal.status === "pending" ? "bg-yellow-100 text-yellow-800" :
+                                    proposal.status === "accepted" ? "bg-green-100 text-green-800" :
+                                    proposal.status === "rejected" ? "bg-red-100 text-red-800" :
+                                    "bg-gray-100 text-gray-800"
+                                  }`}>
+                                    {proposal.status.charAt(0).toUpperCase() + proposal.status.slice(1)}
                                   </span>
+                                  <span className='text-xs text-gray-500'>
+                                    {new Date(proposal.createdAt).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              </div>
+                              
+                              <div className='p-4'>
+                                <div className='space-y-3'>
+                                  {/* Project Title & Client */}
+                                  <div>
+                                    <h3 className='text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1'>
+                                      {proposal.project.title}
+                                    </h3>
+                                    <div className='flex items-center gap-2'>
+                                      <div className='w-6 h-6 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0'>
+                                        <svg className='w-3 h-3 text-gray-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' />
+                                        </svg>
+                                      </div>
+                                      <span className='text-gray-700 font-medium text-sm'>
+                                        {proposal.project.client.name || proposal.project.client.email}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Proposal Details */}
+                                  <div className='grid grid-cols-2 gap-3'>
+                                    <div className='flex items-center gap-2 text-sm'>
+                                      <svg className='w-4 h-4 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1' />
+                                      </svg>
+                                      <span className='text-gray-700 font-medium'>${proposal.proposedBudget}</span>
+                                    </div>
+                                    
+                                    <div className='flex items-center gap-2 text-sm'>
+                                      <svg className='w-4 h-4 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' />
+                                      </svg>
+                                      <span className='text-gray-700 font-medium'>{proposal.deliveryTime}</span>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Project Category */}
+                                  <div className='flex items-center gap-2 text-sm'>
+                                    <svg className='w-4 h-4 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' />
+                                    </svg>
+                                    <span className='text-gray-700 font-medium'>{proposal.project.category}</span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -3758,186 +4206,100 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   // Available Projects View
-                  <div className='space-y-4'>
-                    <h3 className='text-lg font-semibold text-gray-800 mb-4'>
-                      Available Projects ({projects.length})
-                    </h3>
+                  <div className='space-y-6'>
+                    <div className='flex items-center justify-between'>
+                      <h2 className='text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-3'>
+                        <div className='w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center'>
+                          <span className='text-white font-bold text-sm'>{projects.length}</span>
+                        </div>
+                        Available Projects
+                      </h2>
+                    </div>
+                    
                     {loadingProjects ? (
                       <div className='flex items-center justify-center py-20'>
-                        <div className='animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full'></div>
+                        <div className='text-center'>
+                          <div className='animate-spin w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full mx-auto mb-4'></div>
+                          <p className='text-gray-600 font-medium'>Loading projects...</p>
+                        </div>
                       </div>
                     ) : projects.length === 0 ? (
-                      <div className='text-center py-12'>
-                        <div className='w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4'>
-                          <Users className='w-8 h-8 text-white' />
+                      <div className='text-center py-16 bg-gray-50 rounded-2xl border border-gray-200'>
+                        <div className='w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6'>
+                          <Users className='w-10 h-10 text-gray-600' />
                         </div>
-                        <p className='text-gray-500 text-lg font-medium'>
-                          No projects available
+                        <h3 className='text-xl font-bold text-gray-800 mb-2'>
+                          No Projects Available Right Now
+                        </h3>
+                        <p className='text-gray-600 mb-4 max-w-md mx-auto'>
+                          Don't worry! New freelance projects are added regularly. Check back soon for exciting opportunities.
                         </p>
-                        <p className='text-gray-400 text-sm'>
-                          Check back later for new projects
-                        </p>
+                        <div className='flex items-center justify-center gap-2 text-sm text-gray-500'>
+                          <div className='w-2 h-2 bg-gray-400 rounded-full'></div>
+                          <span>We'll notify you when new projects arrive</span>
+                        </div>
                       </div>
                     ) : (
-                      <div className='space-y-4'>
+                      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
                         {projects.map((project, index) => (
                           <FadeInUp key={project.id} delay={index * 0.1}>
-                            <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300'>
-                              <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
-                                <div className='flex-1'>
-                                  <h3 className='text-base md:text-lg font-semibold text-gray-800'>
+                            <div className="group bg-white border border-gray-200 rounded-xl shadow-sm hover:border-blue-400 hover:shadow-md transition-all duration-200 overflow-hidden">
+                              {/* Card Header */}
+                              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
+                                  {project.category}
+                                </span>
+                                <span className="flex items-center gap-1 text-xs text-gray-500">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-4a4 4 0 10-8 0 4 4 0 008 0z" /></svg>
+                                  {project._count?.proposals || 0}
+                                </span>
+                              </div>
+                              {/* Card Body */}
+                              <div className="p-4 space-y-3">
+                                {/* Title & Client */}
+                                <div>
+                                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1">
                                     {project.title}
                                   </h3>
-                                  <p className='text-sm md:text-base text-gray-600'>
-                                    Client:{" "}
-                                    {project.client.name ||
-                                      project.client.email}
-                                  </p>
-                                  <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2'>
-                                    <p className='text-xs md:text-sm text-gray-500'>
-                                      Budget: {project.budget}
-                                    </p>
-                                    <p className='text-xs md:text-sm text-gray-500'>
-                                      Category: {project.category}
-                                    </p>
-                                    <p className='text-xs md:text-sm text-gray-500'>
-                                      Duration: {project.duration}
-                                    </p>
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                    <span className="text-gray-700 text-sm">{project.client.name || project.client.email}</span>
                                   </div>
-                                  <p className='text-xs md:text-sm text-gray-600 mt-2 line-clamp-2'>
-                                    {project.description}
-                                  </p>
-                                  {project.skills &&
-                                    project.skills.length > 0 && (
-                                      <div className='flex flex-wrap gap-2 mt-3'>
-                                        {project.skills
-                                          .slice(0, 4)
-                                          .map((skill, skillIndex) => (
-                                            <span
-                                              key={skillIndex}
-                                              className='px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-lg'>
-                                              {skill}
-                                            </span>
-                                          ))}
-                                        {project.skills.length > 4 && (
-                                          <span className='px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg'>
-                                            +{project.skills.length - 4} more
-                                          </span>
-                                        )}
-                                      </div>
-                                    )}
-                                  <p className='text-xs text-gray-400 mt-2'>
-                                    Posted:{" "}
-                                    {new Date(
-                                      project.createdAt
-                                    ).toLocaleDateString()}{" "}
-                                    •{project._count?.proposals || 0} proposals
-                                  </p>
                                 </div>
-                                <div className='flex items-center gap-2 md:gap-3 mt-4 md:mt-0'>
-                                  <button
-                                    onClick={async () => {
-                                      // Simple proposal submission for demo
-                                      const coverLetter = prompt(
-                                        "Enter your cover letter:"
-                                      );
-                                      const proposedBudget = prompt(
-                                        "Enter your proposed budget:"
-                                      );
-                                      const deliveryTime = prompt(
-                                        "Enter delivery time (e.g., '1 week'):"
-                                      );
-
-                                      if (
-                                        coverLetter &&
-                                        proposedBudget &&
-                                        deliveryTime
-                                      ) {
-                                        try {
-                                          const token =
-                                            localStorage.getItem("token");
-                                          const response = await fetch(
-                                            "/api/project-proposals",
-                                            {
-                                              method: "POST",
-                                              headers: {
-                                                "Content-Type":
-                                                  "application/json",
-                                                Authorization: `Bearer ${token}`,
-                                              },
-                                              body: JSON.stringify({
-                                                projectId: project.id,
-                                                coverLetter,
-                                                proposedBudget,
-                                                deliveryTime,
-                                              }),
-                                            }
-                                          );
-
-                                          if (response.ok) {
-                                            setNotifications((prev) => [
-                                              ...prev,
-                                              {
-                                                id: Date.now(),
-                                                type: "success",
-                                                message:
-                                                  "Proposal submitted successfully!",
-                                                time: "Just now",
-                                              },
-                                            ]);
-                                            // Refresh proposals
-                                            const proposalsResponse =
-                                              await fetch(
-                                                "/api/project-proposals",
-                                                {
-                                                  headers: {
-                                                    Authorization: `Bearer ${token}`,
-                                                  },
-                                                }
-                                              );
-                                            if (proposalsResponse.ok) {
-                                              const proposalsData =
-                                                await proposalsResponse.json();
-                                              setProjectProposals(
-                                                proposalsData
-                                              );
-                                            }
-                                          } else {
-                                            const error = await response.json();
-                                            setNotifications((prev) => [
-                                              ...prev,
-                                              {
-                                                id: Date.now(),
-                                                type: "error",
-                                                message:
-                                                  error.error ||
-                                                  "Failed to submit proposal",
-                                                time: "Just now",
-                                              },
-                                            ]);
-                                          }
-                                        } catch (error) {
-                                          console.error(
-                                            "Error submitting proposal:",
-                                            error
-                                          );
-                                          setNotifications((prev) => [
-                                            ...prev,
-                                            {
-                                              id: Date.now(),
-                                              type: "error",
-                                              message:
-                                                "Failed to submit proposal",
-                                              time: "Just now",
-                                            },
-                                          ]);
-                                        }
-                                      }
-                                    }}
-                                    className='bg-gradient-to-r from-purple-500 to-purple-600 text-white px-3 md:px-4 py-2 rounded-xl font-medium hover:shadow-lg transition-all duration-300 flex flex-col md:flex-row items-center gap-1 md:gap-2 text-xs md:text-sm'>
-                                    <Users className='w-4 h-4 md:w-4 md:h-4' />
-                                    <span>Submit Proposal</span>
-                                  </button>
+                                {/* Info Grid */}
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" /></svg>
+                                    <span>{project.budget}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <span>{project.duration}</span>
+                                  </div>
+                                </div>
+                                {/* Description */}
+                                <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                                  <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">{project.description}</p>
+                                </div>
+                                {/* Skills */}
+                                {project.skills && project.skills.length > 0 && (
+                                  <div className="flex flex-wrap gap-2">
+                                    {project.skills.slice(0, 4).map((skill, skillIndex) => (
+                                      <span key={skillIndex} className="px-2 py-1 bg-gray-50 border border-gray-200 text-gray-700 text-xs rounded">
+                                        {skill}
+                                      </span>
+                                    ))}
+                                    {project.skills.length > 4 && (
+                                      <span className="px-2 py-1 bg-gray-50 border border-gray-200 text-gray-600 text-xs rounded">
+                                        +{project.skills.length - 4} more
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                                {/* Posted Date */}
+                                <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t border-gray-100">
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                  <span>Posted {new Date(project.createdAt).toLocaleDateString()}</span>
                                 </div>
                               </div>
                             </div>
@@ -3950,250 +4312,17 @@ export default function DashboardPage() {
               </motion.div>
             )}
 
-            {active === "Test" && !isTestActive && (
-              <motion.div
-                key='test'
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className='space-y-6'>
-                {/* Header */}
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <h2 className='text-2xl font-bold text-gray-800 mb-2'>
-                      Test Center
-                    </h2>
-                    <p className='text-gray-600'>
-                      Take tests to improve your skills and showcase your
-                      knowledge
-                    </p>
-                  </div>
-                  <div className='flex items-center gap-4'>
-                    <span className='text-sm text-gray-500'>
-                      Role: {profile.role}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Available Tests */}
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                  {loadingTests ? (
-                    <div className='col-span-full flex items-center justify-center py-20'>
-                      <div className='animate-spin w-8 h-8 border-4 border-[#10B981] border-t-transparent rounded-full'></div>
-                    </div>
-                  ) : availableTests.length > 0 ? (
-                    availableTests.map((test, index) => (
-                      <FadeInUp key={test.id} delay={index * 0.1}>
-                        <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300'>
-                          <div className='flex items-start justify-between mb-4'>
-                            <div className='flex-1'>
-                              <h3 className='text-lg font-bold text-gray-800 mb-2'>
-                                {test.title}
-                              </h3>
-                              <p className='text-gray-600 text-sm mb-3'>
-                                {test.description}
-                              </p>
-                              <div className='flex items-center gap-4 text-sm text-gray-500'>
-                                <span className='flex items-center gap-1'>
-                                  <Clock size={14} />
-                                  {test.timeLimit} min
-                                </span>
-                                <span className='flex items-center gap-1'>
-                                  <FileText size={14} />
-                                  {test.questions?.length || 0} questions
-                                </span>
-                              </div>
-                            </div>
-                            <div className='w-12 h-12 bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-xl flex items-center justify-center'>
-                              <FileText size={20} className='text-white' />
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => startTest(test)}
-                            className='w-full bg-gradient-to-r from-[#10B981] to-[#34D399] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300'>
-                            Start Test
-                          </button>
-                        </div>
-                      </FadeInUp>
-                    ))
-                  ) : (
-                    <div className='col-span-full text-center py-20'>
-                      <div className='w-16 h-16 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full flex items-center justify-center mx-auto mb-4'>
-                        <FileText size={24} className='text-gray-500' />
-                      </div>
-                      <h3 className='text-lg font-semibold text-gray-800 mb-2'>
-                        No Tests Available
-                      </h3>
-                      <p className='text-gray-600'>
-                        Check back later for new tests or contact an admin to
-                        create tests.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Completed Tests */}
-                {tests.length > 0 && (
-                  <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg'>
-                    <h3 className='text-lg font-bold text-gray-800 mb-4'>
-                      Completed Tests
-                    </h3>
-                    <div className='space-y-4'>
-                      {tests.map((test, index) => (
-                        <FadeInUp key={test.id} delay={index * 0.1}>
-                          <div className='flex items-center justify-between p-4 bg-gray-50/50 rounded-xl'>
-                            <div className='flex items-center gap-4'>
-                              <div
-                                className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                                  test.score >= 80
-                                    ? "bg-green-100 text-green-600"
-                                    : test.score >= 60
-                                      ? "bg-yellow-100 text-yellow-600"
-                                      : "bg-red-100 text-red-600"
-                                }`}>
-                                <Award size={20} />
-                              </div>
-                              <div>
-                                <h4 className='font-semibold text-gray-800'>
-                                  {test.title}
-                                </h4>
-                                <p className='text-sm text-gray-500'>
-                                  Completed{" "}
-                                  {new Date(
-                                    test.completedAt
-                                  ).toLocaleDateString()}
-                                </p>
-                              </div>
-                            </div>
-                            <div className='text-right'>
-                              <div className='text-2xl font-bold text-gray-800'>
-                                {test.score}%
-                              </div>
-                              <div className='text-sm text-gray-500'>
-                                {test.timeSpent} min
-                              </div>
-                            </div>
-                          </div>
-                        </FadeInUp>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            )}
-
-            {/* Create Test (Admin Only) */}
-            {active === "Create Test" && profile.role === "admin" && (
-              <motion.div
-                key='create-test'
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className='space-y-6'>
-                <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg'>
-                  <h2 className='text-2xl font-bold text-gray-800 mb-6'>
-                    Create New Test
-                  </h2>
-                  <TestCreationForm
-                    onTestCreated={() => setActive("Test")}
+            {active === "Test" && (
+              <CareerAssessmentTest 
+                onTestCompleted={() => {
+                  // Handle test completion
+                }}
                     setNotifications={setNotifications}
                   />
-                </div>
-              </motion.div>
             )}
 
-            {/* Active Test View */}
-            {active === "Test" && isTestActive && currentTest && (
-              <motion.div
-                key='active-test'
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className='space-y-6'>
-                {/* Test Header */}
-                <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg'>
-                  <div className='flex items-center justify-between mb-4'>
-                    <div>
-                      <h2 className='text-2xl font-bold text-gray-800'>
-                        {currentTest.title}
-                      </h2>
-                      <p className='text-gray-600'>{currentTest.description}</p>
-                    </div>
-                    <div className='text-right'>
-                      <div className='text-3xl font-bold text-red-600'>
-                        {formatTime(timeRemaining)}
-                      </div>
-                      <div className='text-sm text-gray-500'>
-                        Time Remaining
-                      </div>
-                    </div>
-                  </div>
-                  <div className='w-full bg-gray-200 rounded-full h-2'>
-                    <div
-                      className='bg-red-500 h-2 rounded-full transition-all duration-1000'
-                      style={{
-                        width: `${((currentTest.timeLimit * 60 - timeRemaining) / (currentTest.timeLimit * 60)) * 100}%`,
-                      }}></div>
-                  </div>
-                </div>
 
-                {/* Test Questions */}
-                <div className='space-y-6'>
-                  {currentTest.questions?.map((question, qIndex) => (
-                    <FadeInUp key={question.id} delay={qIndex * 0.1}>
-                      <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg'>
-                        <h3 className='text-lg font-semibold text-gray-800 mb-4'>
-                          Question {qIndex + 1}: {question.question}
-                        </h3>
-                        <div className='space-y-3'>
-                          {question.options?.map((option, oIndex) => (
-                            <label
-                              key={option.id}
-                              className='flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:bg-gray-50 cursor-pointer transition-all duration-200'>
-                              <input
-                                type='radio'
-                                name={`question-${question.id}`}
-                                value={option.id}
-                                checked={testAnswers[question.id] === option.id}
-                                onChange={() =>
-                                  saveAnswer(question.id, option.id)
-                                }
-                                className='text-[#10B981] focus:ring-[#10B981]'
-                              />
-                              <span className='text-gray-800'>
-                                {option.text}
-                              </span>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-                    </FadeInUp>
-                  ))}
-                </div>
 
-                {/* Test Actions */}
-                <div className='flex justify-between items-center'>
-                  <button
-                    onClick={() => {
-                      setIsTestActive(false);
-                      setCurrentTest(null);
-                      setTestAnswers({});
-                      setTimeRemaining(0);
-                    }}
-                    className='px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors'>
-                    Cancel Test
-                  </button>
-                  <button
-                    onClick={submitTest}
-                    className='px-6 py-3 bg-gradient-to-r from-[#10B981] to-[#34D399] text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300'>
-                    Submit Test
-                  </button>
-                </div>
-              </motion.div>
-            )}
 
             {active === "Frai AI" && (
               <motion.div
@@ -4203,202 +4332,71 @@ export default function DashboardPage() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
                 className='space-y-6 max-w-4xl mx-auto'>
-                {/* Header */}
-                <div className='text-center mb-8'>
-                  <div className='w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4'>
-                    <Bot className='w-10 h-10 text-white' />
+                
+                {/* Coming Soon Design */}
+                <div className='text-center'>
+                  <FadeInUp delay={0.1}>
+                    <div className='relative mb-8'>
+                      {/* Animated Background */}
+                      <div className='absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl blur-3xl'></div>
+                      
+                      {/* Main Icon */}
+                      <div className='relative w-32 h-32 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl'>
+                        <Bot className='w-16 h-16 text-white' />
+                        
+                        {/* Animated Ring */}
+                        <div className='absolute inset-0 border-4 border-blue-300/30 rounded-full animate-ping'></div>
+                        <div className='absolute inset-0 border-4 border-purple-300/30 rounded-full animate-pulse'></div>
                   </div>
-                  <h2 className='text-3xl font-bold text-gray-800 mb-2'>
-                    Frai AI Assistant
+                    </div>
+                  </FadeInUp>
+
+                  <FadeInUp delay={0.2}>
+                    <h2 className='text-4xl md:text-5xl font-bold text-gray-800 mb-4'>
+                      Frai AI
                   </h2>
-                  <p className='text-gray-600'>
-                    Your intelligent coding companion powered by AI
-                  </p>
-                </div>
+                    <p className='text-xl text-gray-600 mb-8 max-w-2xl mx-auto'>
+                      Your intelligent coding companion is coming soon
+                    </p>
+                  </FadeInUp>
 
-                {/* Chat Interface */}
-                <div className='bg-white/80 backdrop-blur-xl rounded-2xl border border-white/30 shadow-lg overflow-hidden'>
-                  {/* Messages Area */}
-                  <div className='h-96 p-6 overflow-y-auto bg-gradient-to-b from-gray-50/50 to-white/50'>
-                    {aiMessages.length === 0 ? (
-                      <div className='flex flex-col items-center justify-center h-full text-center'>
-                        <div className='w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mb-4'>
-                          <Bot className='w-8 h-8 text-blue-600' />
+                  <FadeInUp delay={0.3}>
+                    <div className='bg-white/80 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-white/30 shadow-2xl max-w-2xl mx-auto'>
+                      <div className='flex items-center justify-center gap-3 mb-6'>
+                        <div className='w-3 h-3 bg-yellow-500 rounded-full animate-pulse'></div>
+                        <span className='text-lg font-semibold text-yellow-700'>
+                          Coming Soon
+                        </span>
+                        <div className='w-3 h-3 bg-yellow-500 rounded-full animate-pulse'></div>
                         </div>
-                        <h3 className='text-lg font-semibold text-gray-800 mb-2'>
-                          Welcome to Frai AI!
-                        </h3>
-                        <p className='text-gray-600 mb-4 max-w-md'>
-                          I'm your AI assistant ready to help with coding
-                          questions, project ideas, and technical guidance.
-                        </p>
-                        <div className='grid grid-cols-1 md:grid-cols-2 gap-3 max-w-lg'>
-                          <div className='p-3 bg-white rounded-lg border border-gray-200 text-sm'>
-                            <div className='font-medium text-gray-800 mb-1'>
-                              💡 Ask me about:
+                      
+                      <p className='text-gray-700 text-lg leading-relaxed mb-8'>
+                        We're working hard to bring you an amazing AI-powered coding assistant. 
+                        Get ready for intelligent code suggestions, debugging help, and much more!
+                      </p>
+
+                      {/* Progress Bar */}
+                      <div className='mb-8'>
+                        <div className='flex justify-between items-center mb-2'>
+                          <span className='text-sm font-medium text-gray-600'>Development Progress</span>
+                          <span className='text-sm font-medium text-gray-600'>75%</span>
                             </div>
-                            <div className='text-gray-600'>
-                              Code reviews, debugging, best practices
+                        <div className='w-full bg-gray-200 rounded-full h-3'>
+                          <div 
+                            className='bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-1000 ease-out'
+                            style={{ width: '75%' }}
+                          ></div>
                             </div>
-                          </div>
-                          <div className='p-3 bg-white rounded-lg border border-gray-200 text-sm'>
-                            <div className='font-medium text-gray-800 mb-1'>
-                              🚀 Get help with:
-                            </div>
-                            <div className='text-gray-600'>
-                              Project planning, architecture, tools
-                            </div>
-                          </div>
-                          <div className='p-3 bg-white rounded-lg border border-gray-200 text-sm'>
-                            <div className='font-medium text-gray-800 mb-1'>
-                              📚 Learn about:
-                            </div>
-                            <div className='text-gray-600'>
-                              New technologies, frameworks, APIs
-                            </div>
-                          </div>
-                          <div className='p-3 bg-white rounded-lg border border-gray-200 text-sm'>
-                            <div className='font-medium text-gray-800 mb-1'>
-                              ⚡ Quick tasks:
-                            </div>
-                            <div className='text-gray-600'>
-                              Code generation, optimization tips
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className='space-y-4'>
-                        {aiMessages.map((message, index) => (
-                          <div
-                            key={index}
-                            className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
-                            <div
-                              className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
-                                message.sender === "user"
-                                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
-                                  : "bg-white border border-gray-200 text-gray-800"
-                              }`}>
-                              {message.text}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
 
-                  {/* Input Area */}
-                  <div className='p-4 bg-white border-t border-gray-200'>
-                    <div className='flex items-center gap-3'>
-                      <div className='flex-1 relative'>
-                        <input
-                          type='text'
-                          value={aiMessage}
-                          onChange={(e) => setAiMessage(e.target.value)}
-                          placeholder='Ask Frai AI anything about coding...'
-                          className='w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300'
-                          onKeyPress={(e) => {
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                              // Coming soon functionality
-                              if (aiMessage.trim()) {
-                                setAiMessages((prev) => [
-                                  ...prev,
-                                  { sender: "user", text: aiMessage },
-                                ]);
-                                setAiMessage("");
-                                // Simulate AI response
-                                setTimeout(() => {
-                                  setAiMessages((prev) => [
-                                    ...prev,
-                                    {
-                                      sender: "ai",
-                                      text: "🚧 Coming Soon! Frai AI is currently under development. Stay tuned for amazing AI-powered coding assistance!",
-                                    },
-                                  ]);
-                                }, 1000);
-                              }
-                            }
-                          }}
-                        />
-                      </div>
-                      <button
-                        onClick={() => {
-                          // Coming soon functionality
-                          if (aiMessage.trim()) {
-                            setAiMessages((prev) => [
-                              ...prev,
-                              { sender: "user", text: aiMessage },
-                            ]);
-                            setAiMessage("");
-                            // Simulate AI response
-                            setTimeout(() => {
-                              setAiMessages((prev) => [
-                                ...prev,
-                                {
-                                  sender: "ai",
-                                  text: "🚧 Coming Soon! Frai AI is currently under development. Stay tuned for amazing AI-powered coding assistance!",
-                                },
-                              ]);
-                            }, 1000);
-                          }
-                        }}
-                        className='px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2'>
-                        <Bot size={16} />
-                        Send
+                      {/* Notify Me Button */}
+                      <button className='w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 px-8 rounded-2xl font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105'>
+                        🔔 Notify Me When Ready
                       </button>
                     </div>
+                  </FadeInUp>
 
-                    {/* Coming Soon Badge */}
-                    <div className='mt-3 text-center'>
-                      <span className='inline-flex items-center gap-2 px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full'>
-                        <span className='w-2 h-2 bg-yellow-500 rounded-full animate-pulse'></span>
-                        Coming Soon - AI Features Under Development
-                      </span>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Feature Preview Cards */}
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mt-8'>
-                  <div className='bg-white/80 backdrop-blur-xl rounded-xl p-6 border border-white/30 shadow-lg'>
-                    <div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4'>
-                      <Bot className='w-6 h-6 text-blue-600' />
-                    </div>
-                    <h3 className='text-lg font-semibold text-gray-800 mb-2'>
-                      Code Assistant
-                    </h3>
-                    <p className='text-gray-600 text-sm'>
-                      Get intelligent code suggestions, debugging help, and
-                      optimization tips.
-                    </p>
-                  </div>
-
-                  <div className='bg-white/80 backdrop-blur-xl rounded-xl p-6 border border-white/30 shadow-lg'>
-                    <div className='w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4'>
-                      <FileText className='w-6 h-6 text-purple-600' />
-                    </div>
-                    <h3 className='text-lg font-semibold text-gray-800 mb-2'>
-                      Project Planning
-                    </h3>
-                    <p className='text-gray-600 text-sm'>
-                      AI-powered project structure recommendations and
-                      architecture guidance.
-                    </p>
-                  </div>
-
-                  <div className='bg-white/80 backdrop-blur-xl rounded-xl p-6 border border-white/30 shadow-lg'>
-                    <div className='w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4'>
-                      <Users className='w-6 h-6 text-green-600' />
-                    </div>
-                    <h3 className='text-lg font-semibold text-gray-800 mb-2'>
-                      Learning Path
-                    </h3>
-                    <p className='text-gray-600 text-sm'>
-                      Personalized learning recommendations based on your skills
-                      and goals.
-                    </p>
-                  </div>
                 </div>
               </motion.div>
             )}

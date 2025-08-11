@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { sendWaitlistNotification } from '@/lib/telegram';
 
 export async function POST(req) {
   try {
@@ -20,9 +21,20 @@ export async function POST(req) {
       });
     }
 
-    await prisma.waitlist.create({
+    const newWaitlistUser = await prisma.waitlist.create({
       data: { email },
     });
+    
+    // Telegram botga xabar yuborish
+    try {
+      await sendWaitlistNotification({
+        email: email,
+        createdAt: newWaitlistUser.createdAt
+      });
+    } catch (telegramError) {
+      console.error("❌ Telegram xabar yuborishda xatolik:", telegramError);
+      // Telegram xatosi waitlist jarayonini to'xtatmasin
+    }
 
     return new Response(JSON.stringify({ message: "Email qo‘shildi" }), {
       status: 200,

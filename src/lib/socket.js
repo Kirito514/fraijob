@@ -111,7 +111,17 @@ class ChatManager {
       this.pollingInterval = null;
     }
 
-    console.log("Chat manager disconnected");
+    // Clear all registered callbacks to avoid memory leaks/duplicated handlers
+    this.callbacks = {
+      newMessage: [],
+      messageUpdated: [],
+      messageDeleted: [],
+      userTyping: [],
+      userStoppedTyping: [],
+      error: [],
+    };
+
+    console.log("Chat manager disconnected and callbacks cleared");
   }
 
   startPolling() {
@@ -119,6 +129,7 @@ class ChatManager {
       clearInterval(this.pollingInterval);
     }
 
+    // Lower polling frequency to reduce CPU when animations heavy
     this.pollingInterval = setInterval(async () => {
       if (!this.isConnected) return;
 
@@ -136,7 +147,7 @@ class ChatManager {
       } catch (error) {
         console.error("Polling error:", error);
       }
-    }, 2000);
+    }, 5000);
   }
 
   async sendMessage(message) {
@@ -255,26 +266,54 @@ class ChatManager {
   // Event listeners
   onNewMessage(callback) {
     this.callbacks.newMessage.push(callback);
+    return () => {
+      this.callbacks.newMessage = this.callbacks.newMessage.filter(
+        (cb) => cb !== callback
+      );
+    };
   }
 
   onMessageUpdated(callback) {
     this.callbacks.messageUpdated.push(callback);
+    return () => {
+      this.callbacks.messageUpdated = this.callbacks.messageUpdated.filter(
+        (cb) => cb !== callback
+      );
+    };
   }
 
   onMessageDeleted(callback) {
     this.callbacks.messageDeleted.push(callback);
+    return () => {
+      this.callbacks.messageDeleted = this.callbacks.messageDeleted.filter(
+        (cb) => cb !== callback
+      );
+    };
   }
 
   onUserTyping(callback) {
     this.callbacks.userTyping.push(callback);
+    return () => {
+      this.callbacks.userTyping = this.callbacks.userTyping.filter(
+        (cb) => cb !== callback
+      );
+    };
   }
 
   onUserStoppedTyping(callback) {
     this.callbacks.userStoppedTyping.push(callback);
+    return () => {
+      this.callbacks.userStoppedTyping = this.callbacks.userStoppedTyping.filter(
+        (cb) => cb !== callback
+      );
+    };
   }
 
   onError(callback) {
     this.callbacks.error.push(callback);
+    return () => {
+      this.callbacks.error = this.callbacks.error.filter((cb) => cb !== callback);
+    };
   }
 }
 
