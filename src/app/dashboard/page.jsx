@@ -989,102 +989,102 @@ const CareerAssessmentTest = ({ onTestCompleted, setNotifications }) => {
   // Test Overview Screen
   if (!testStarted) {
     return (
-      <div className='space-y-6 max-w-4xl mx-auto'>
-        <div className='text-center mb-8'>
-          <div className='w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6'>
-            <FileText className='w-10 h-10 text-white' />
+      <div className='space-y-4 max-w-4xl mx-auto p-4 md:p-6'>
+        <div className='text-center mb-6'>
+          <div className='w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4'>
+            <FileText className='w-8 h-8 text-white' />
           </div>
-          <h2 className='text-3xl font-bold text-gray-800 mb-4'>
+          <h2 className='text-2xl md:text-3xl font-bold text-gray-800 mb-3'>
             🎯 Career Assessment Test
           </h2>
-          <p className='text-gray-600 mb-8'>
+          <p className='text-gray-600 mb-6 text-sm md:text-base'>
             Discover which IT career path best matches your personality and
             interests
           </p>
         </div>
 
         {/* Test Information */}
-        <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-8 border border-white/30 shadow-lg'>
-          <h3 className='text-xl font-semibold text-gray-800 mb-6'>
+        <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-white/30 shadow-lg'>
+          <h3 className='text-lg md:text-xl font-semibold text-gray-800 mb-4'>
             Test Information
           </h3>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-8'>
-            <div className='space-y-4'>
-              <div className='flex items-center gap-3'>
-                <div className='w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center'>
-                  <span className='text-blue-600 font-semibold'>📝</span>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-6'>
+            <div className='space-y-3'>
+              <div className='flex items-center gap-2.5'>
+                <div className='w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center'>
+                  <span className='text-blue-600 font-semibold text-sm'>📝</span>
                 </div>
                 <div>
-                  <h4 className='font-semibold text-gray-800'>
+                  <h4 className='font-semibold text-gray-800 text-sm'>
                     Total Questions
                   </h4>
-                  <p className='text-gray-600'>30 questions</p>
+                  <p className='text-gray-600 text-xs'>30 questions</p>
                 </div>
               </div>
 
-              <div className='flex items-center gap-3'>
-                <div className='w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center'>
-                  <span className='text-green-600 font-semibold'>⏱️</span>
+              <div className='flex items-center gap-2.5'>
+                <div className='w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center'>
+                  <span className='text-green-600 font-semibold text-sm'>⏱️</span>
                 </div>
                 <div>
-                  <h4 className='font-semibold text-gray-800'>
+                  <h4 className='font-semibold text-gray-800 text-sm'>
                     Estimated Time
                   </h4>
-                  <p className='text-gray-600'>10-15 minutes</p>
+                  <p className='text-gray-600 text-xs'>10-15 minutes</p>
                 </div>
               </div>
 
-              <div className='flex items-center gap-3'>
-                <div className='w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center'>
-                  <span className='text-purple-600 font-semibold'>🎯</span>
+              <div className='flex items-center gap-2.5'>
+                <div className='w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center'>
+                  <span className='text-purple-600 font-semibold text-sm'>🎯</span>
                 </div>
                 <div>
-                  <h4 className='font-semibold text-gray-800'>
+                  <h4 className='font-semibold text-gray-800 text-sm'>
                     Career Categories
                   </h4>
-                  <p className='text-gray-600'>35+ IT careers</p>
+                  <p className='text-gray-600 text-xs'>35+ IT careers</p>
                 </div>
               </div>
             </div>
 
-            <div className='space-y-4'>
-              <div className='flex items-center gap-3'>
-                <div className='w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center'>
-                  <span className='text-orange-600 font-semibold'>🧠</span>
+            <div className='space-y-3'>
+              <div className='flex items-center gap-2.5'>
+                <div className='w-6 h-6 bg-orange-100 rounded-lg flex items-center justify-center'>
+                  <span className='text-orange-600 font-semibold text-sm'>🧠</span>
                 </div>
                 <div>
-                  <h4 className='font-semibold text-gray-800'>Test Sections</h4>
-                  <p className='text-gray-600'>
+                  <h4 className='font-semibold text-gray-800 text-sm'>Test Sections</h4>
+                  <p className='text-gray-600 text-xs'>
                     Personality, Motivation, Interests
                   </p>
                 </div>
               </div>
 
-              <div className='flex items-center gap-3'>
-                <div className='w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center'>
-                  <span className='text-red-600 font-semibold'>📊</span>
+              <div className='flex items-center gap-2.5'>
+                <div className='w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center'>
+                  <span className='text-red-600 font-semibold text-sm'>📊</span>
                 </div>
                 <div>
-                  <h4 className='font-semibold text-gray-800'>Results</h4>
-                  <p className='text-gray-600'>Top 10 career matches</p>
+                  <h4 className='font-semibold text-gray-800 text-sm'>Results</h4>
+                  <p className='text-gray-600 text-xs'>Top 10 career matches</p>
                 </div>
               </div>
 
-              <div className='flex items-center gap-3'>
-                <div className='w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center'>
-                  <span className='text-indigo-600 font-semibold'>🔄</span>
+              <div className='flex items-center gap-2.5'>
+                <div className='w-6 h-6 bg-indigo-100 rounded-lg flex items-center justify-center'>
+                  <span className='text-indigo-600 font-semibold text-sm'>🔄</span>
                 </div>
                 <div>
-                  <h4 className='font-semibold text-gray-800'>Retake</h4>
-                  <p className='text-gray-600'>Unlimited attempts</p>
+                  <h4 className='font-semibold text-gray-800 text-sm'>Retake</h4>
+                  <p className='text-gray-600 text-xs'>Unlimited attempts</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Test Instructions */}
-          <div className='bg-blue-50 rounded-xl p-6 mb-8'>
+          <div className='bg-blue-50/80 rounded-xl p-4 mb-6'>
             <h4 className='font-semibold text-blue-800 mb-3'>
               📋 Instructions:
             </h4>
@@ -1103,7 +1103,7 @@ const CareerAssessmentTest = ({ onTestCompleted, setNotifications }) => {
           <div className='text-center'>
             <button
               onClick={startTest}
-              className='bg-gradient-to-r from-blue-500 to-purple-600 text-white px-12 py-4 rounded-2xl font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105'>
+              className='bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold text-base hover:shadow-lg transition-all duration-300 transform hover:scale-105'>
               🚀 Start Career Assessment
             </button>
           </div>
@@ -1114,27 +1114,27 @@ const CareerAssessmentTest = ({ onTestCompleted, setNotifications }) => {
 
   if (showResults) {
     return (
-      <div className='space-y-6'>
+      <div className='space-y-4 max-w-4xl mx-auto p-4 md:p-6'>
         <div className='text-center'>
-          <h2 className='text-3xl font-bold text-gray-800 mb-4'>
+          <h2 className='text-2xl md:text-3xl font-bold text-gray-800 mb-3'>
             🎯 Your Career Results
           </h2>
-          <p className='text-gray-600 mb-8'>
+          <p className='text-gray-600 mb-6 text-sm md:text-base'>
             Based on your answers, here are the careers that best match your
             personality and interests:
           </p>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           {careerResults.map(([career, score], index) => (
             <div
               key={career}
-              className='bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg'>
-              <div className='flex items-center justify-between mb-4'>
-                <h3 className='text-lg font-semibold text-gray-800'>
+              className='bg-white/80 backdrop-blur-xl rounded-xl p-4 border border-white/30 shadow-lg'>
+              <div className='flex items-center justify-between mb-3'>
+                <h3 className='text-base font-semibold text-gray-800'>
                   {career}
                 </h3>
-                <span className='text-sm font-medium text-green-600'>
+                <span className='text-xs font-medium text-green-600'>
                   Score: {score}
                 </span>
               </div>
@@ -1150,7 +1150,7 @@ const CareerAssessmentTest = ({ onTestCompleted, setNotifications }) => {
         <div className='text-center'>
           <button
             onClick={resetTest}
-            className='bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-2xl font-semibold hover:shadow-xl transition-all duration-300'>
+            className='bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 text-sm'>
             🔄 Take Test Again
           </button>
         </div>
@@ -1163,52 +1163,52 @@ const CareerAssessmentTest = ({ onTestCompleted, setNotifications }) => {
     ((currentQuestion + 1) / CAREER_ASSESSMENT_QUESTIONS.length) * 100;
 
   return (
-    <div className='space-y-6 max-w-4xl mx-auto'>
-      <div className='text-center mb-8'>
-        <h2 className='text-3xl font-bold text-gray-800 mb-4'>
+    <div className='space-y-4 max-w-4xl mx-auto p-4 md:p-6'>
+      <div className='text-center mb-6'>
+        <h2 className='text-2xl md:text-3xl font-bold text-gray-800 mb-3'>
           🎯 Career Assessment Test
         </h2>
-        <p className='text-gray-600 mb-6'>
+        <p className='text-gray-600 mb-4 text-sm md:text-base'>
           Discover which IT career path best matches your personality and
           interests
         </p>
 
         {/* Progress Bar */}
-        <div className='w-full bg-gray-200 rounded-full h-3 mb-4'>
+        <div className='w-full bg-gray-200 rounded-full h-2.5 mb-3'>
           <div
-            className='bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500'
+            className='bg-gradient-to-r from-blue-500 to-purple-600 h-2.5 rounded-full transition-all duration-500'
             style={{ width: `${progress}%` }}></div>
         </div>
-        <p className='text-sm text-gray-600'>
+        <p className='text-xs text-gray-600'>
           Question {currentQuestion + 1} of {CAREER_ASSESSMENT_QUESTIONS.length}
         </p>
       </div>
 
-      <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-8 border border-white/30 shadow-lg'>
-        <h3 className='text-xl font-semibold text-gray-800 mb-6'>
+      <div className='bg-white/80 backdrop-blur-xl rounded-xl p-4 md:p-6 border border-white/30 shadow-lg'>
+        <h3 className='text-lg md:text-xl font-semibold text-gray-800 mb-4'>
           {question.question}
         </h3>
 
-        <div className='space-y-4'>
+        <div className='space-y-3'>
           {question.options.map((option, index) => (
             <button
               key={index}
               onClick={() => handleAnswer(question.id, index)}
-              className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-300 ${
+              className={`w-full text-left p-3 rounded-lg border-2 transition-all duration-300 ${
                 answers[question.id] === index
                   ? "border-blue-500 bg-blue-50 text-blue-800"
                   : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
               }`}>
-              <span className='font-medium'>{option.text}</span>
+              <span className='font-medium text-sm'>{option.text}</span>
             </button>
           ))}
         </div>
 
-        <div className='flex justify-between items-center mt-8'>
+        <div className='flex justify-between items-center mt-6'>
           <button
             onClick={() => setCurrentQuestion((prev) => Math.max(0, prev - 1))}
             disabled={currentQuestion === 0}
-            className='px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'>
+            className='px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm'>
             ← Previous
           </button>
 
@@ -1219,14 +1219,14 @@ const CareerAssessmentTest = ({ onTestCompleted, setNotifications }) => {
                 Object.keys(answers).length <
                   CAREER_ASSESSMENT_QUESTIONS.length || isSubmitting
               }
-              className='px-8 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'>
+              className='px-6 py-2.5 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm'>
               {isSubmitting ? "Calculating..." : "🎯 Get Results"}
             </button>
           ) : (
             <button
               onClick={() => setCurrentQuestion((prev) => prev + 1)}
               disabled={!answers[question.id]}
-              className='px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'>
+              className='px-4 py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm'>
               Next →
             </button>
           )}
@@ -1266,6 +1266,7 @@ export default function DashboardPage() {
   const [deletingMessages, setDeletingMessages] = useState(new Set());
   const [typingUsers, setTypingUsers] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const typingTimeoutRef = useRef(null);
   const messagesEndRef = useRef(null);
 
@@ -4218,49 +4219,50 @@ export default function DashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                className='space-y-6'>
-                {/* Clean Header Section */}
-                <div className='bg-white rounded-2xl p-6 md:p-8 border border-gray-200 shadow-sm'>
-                  <div className='flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6'>
+                className='space-y-4 max-w-5xl mx-auto p-4 md:p-6'>
+                
+                {/* Compact Header Section */}
+                <div className='bg-white/90 backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-white/40 shadow-lg'>
+                  <div className='flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4'>
                     <div className='flex-1'>
-                      <div className='flex items-center gap-3 mb-4'>
-                        <div className='w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center border border-gray-200'>
-                          <Briefcase className='w-6 h-6 text-gray-700' />
+                      <div className='flex items-center gap-3 mb-3'>
+                        <div className='w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center border border-white/40 shadow-md'>
+                          <Briefcase className='w-5 h-5 text-white' />
                         </div>
                         <div>
-                          <h1 className='text-2xl md:text-3xl font-bold text-gray-900'>
+                          <h1 className='text-xl md:text-2xl font-bold text-gray-800'>
                             Job Opportunities
                           </h1>
-                          <p className='text-gray-600 font-medium'>
+                          <p className='text-gray-600 text-sm md:text-base'>
                             Discover your next career move
                           </p>
                         </div>
                       </div>
-                      <div className='flex flex-wrap items-center gap-3 mt-4'>
-                        <div className='flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200'>
-                          <div className='w-2 h-2 bg-green-500 rounded-full'></div>
-                          <span className='text-sm font-medium text-gray-700'>
+                      <div className='flex flex-wrap items-center gap-2 mt-3'>
+                        <div className='flex items-center gap-2 bg-emerald-50/80 px-2.5 py-1.5 rounded-lg border border-emerald-200/50'>
+                          <div className='w-1.5 h-1.5 bg-emerald-500 rounded-full'></div>
+                          <span className='text-xs md:text-sm font-medium text-emerald-700'>
                             {jobs.length} Active Jobs
                           </span>
                         </div>
-                        <div className='flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200'>
-                          <div className='w-2 h-2 bg-blue-500 rounded-full'></div>
-                          <span className='text-sm font-medium text-gray-700'>
+                        <div className='flex items-center gap-2 bg-blue-50/80 px-2.5 py-1.5 rounded-lg border border-blue-200/50'>
+                          <div className='w-1.5 h-1.5 bg-blue-500 rounded-full'></div>
+                          <span className='text-xs md:text-sm font-medium text-blue-700'>
                             {jobApplications.length} Applications
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className='flex gap-3'>
+                    <div className='flex gap-2'>
                       <button
                         onClick={() => setShowApplications(!showApplications)}
-                        className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 ${
+                        className={`px-4 py-2.5 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 text-sm ${
                           showApplications
-                            ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300"
+                            ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md"
+                            : "bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 border border-gray-200/50"
                         }`}>
-                        <Briefcase className='w-5 h-5' />
+                        <Briefcase className='w-4 h-4' />
                         <span className='hidden sm:inline'>
                           {showApplications ? "Browse Jobs" : "My Applications"}
                         </span>
@@ -4274,11 +4276,11 @@ export default function DashboardPage() {
 
                 {showApplications ? (
                   // Enhanced Job Applications View
-                  <div className='space-y-6'>
+                  <div className='space-y-4'>
                     <div className='flex items-center justify-between'>
-                      <h2 className='text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-3'>
-                        <div className='w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center'>
-                          <span className='text-white font-bold text-sm'>
+                      <h2 className='text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2'>
+                        <div className='w-6 h-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center'>
+                          <span className='text-white font-bold text-xs'>
                             {jobApplications.length}
                           </span>
                         </div>
@@ -4287,20 +4289,20 @@ export default function DashboardPage() {
                     </div>
 
                     {jobApplications.length === 0 ? (
-                      <div className='text-center py-16 bg-gray-50 rounded-2xl border border-gray-200'>
-                        <div className='w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6'>
-                          <Briefcase className='w-10 h-10 text-gray-600' />
+                      <div className='text-center py-8 md:py-12 bg-gray-50/80 rounded-xl border border-gray-200/50'>
+                        <div className='w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4'>
+                          <Briefcase className='w-8 h-8 text-gray-600' />
                         </div>
-                        <h3 className='text-xl font-bold text-gray-800 mb-2'>
+                        <h3 className='text-lg font-bold text-gray-800 mb-2'>
                           No Applications Yet
                         </h3>
-                        <p className='text-gray-600 mb-4 max-w-md mx-auto'>
+                        <p className='text-gray-600 mb-4 max-w-sm mx-auto text-sm'>
                           Start applying for jobs to track your applications and
                           progress here
                         </p>
                         <button
                           onClick={() => setShowApplications(false)}
-                          className='bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors duration-200'>
+                          className='bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-sm'>
                           Browse Available Jobs
                         </button>
                       </div>
@@ -4498,12 +4500,12 @@ export default function DashboardPage() {
                         </div>
                       </div>
                     ) : (
-                      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         {jobs.map((job, index) => (
                           <FadeInUp key={job.id} delay={index * 0.1}>
-                            <div className='group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:border-gray-300 overflow-hidden'>
+                            <div className='group bg-white/90 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-300 hover:border-gray-300 overflow-hidden'>
                               {/* Job Type Badge */}
-                              <div className='px-4 py-3 border-b border-gray-100 bg-gray-50'>
+                              <div className='px-3 py-2.5 border-b border-gray-100/50 bg-gray-50/80'>
                                 <div className='flex items-center justify-between'>
                                   <span
                                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -4528,17 +4530,17 @@ export default function DashboardPage() {
                                 </div>
                               </div>
 
-                              <div className='p-4'>
-                                <div className='space-y-3'>
+                              <div className='p-3'>
+                                <div className='space-y-2.5'>
                                   {/* Job Title & Company */}
                                   <div>
-                                    <h3 className='text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1'>
+                                    <h3 className='text-base font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1'>
                                       {job.title}
                                     </h3>
                                     <div className='flex items-center gap-2'>
-                                      <div className='w-6 h-6 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0'>
+                                      <div className='w-5 h-5 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0'>
                                         <svg
-                                          className='w-3 h-3 text-gray-600'
+                                          className='w-2.5 h-2.5 text-gray-600'
                                           fill='none'
                                           stroke='currentColor'
                                           viewBox='0 0 24 24'>
@@ -4550,17 +4552,17 @@ export default function DashboardPage() {
                                           />
                                         </svg>
                                       </div>
-                                      <span className='text-gray-700 font-medium text-sm'>
+                                      <span className='text-gray-700 font-medium text-xs'>
                                         {job.company}
                                       </span>
                                     </div>
                                   </div>
 
                                   {/* Job Details */}
-                                  <div className='grid grid-cols-2 gap-3'>
-                                    <div className='flex items-center gap-2 text-sm'>
+                                  <div className='grid grid-cols-2 gap-2'>
+                                    <div className='flex items-center gap-1.5 text-xs'>
                                       <svg
-                                        className='w-4 h-4 text-gray-400'
+                                        className='w-3.5 h-3.5 text-gray-400'
                                         fill='none'
                                         stroke='currentColor'
                                         viewBox='0 0 24 24'>
@@ -4576,9 +4578,9 @@ export default function DashboardPage() {
                                       </span>
                                     </div>
 
-                                    <div className='flex items-center gap-2 text-sm'>
+                                    <div className='flex items-center gap-1.5 text-xs'>
                                       <svg
-                                        className='w-4 h-4 text-gray-400'
+                                        className='w-3.5 h-3.5 text-gray-400'
                                         fill='none'
                                         stroke='currentColor'
                                         viewBox='0 0 24 24'>
@@ -4734,49 +4736,50 @@ export default function DashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                className='space-y-6'>
-                {/* Clean Freelance Projects Header */}
-                <div className='bg-white rounded-2xl p-6 md:p-8 border border-gray-200 shadow-sm'>
-                  <div className='flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6'>
+                className='space-y-4 max-w-5xl mx-auto p-4 md:p-6'>
+                
+                {/* Compact Freelance Projects Header */}
+                <div className='bg-white/90 backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-white/40 shadow-lg'>
+                  <div className='flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4'>
                     <div className='flex-1'>
-                      <div className='flex items-center gap-3 mb-4'>
-                        <div className='w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center border border-gray-200'>
-                          <Users className='w-6 h-6 text-gray-700' />
+                      <div className='flex items-center gap-3 mb-3'>
+                        <div className='w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center border border-white/40 shadow-md'>
+                          <Users className='w-5 h-5 text-white' />
                         </div>
                         <div>
-                          <h1 className='text-2xl md:text-3xl font-bold text-gray-900'>
+                          <h1 className='text-xl md:text-2xl font-bold text-gray-800'>
                             Freelance Projects
                           </h1>
-                          <p className='text-gray-600 font-medium'>
+                          <p className='text-gray-600 text-sm md:text-base'>
                             Find your next freelance opportunity
                           </p>
                         </div>
                       </div>
-                      <div className='flex flex-wrap items-center gap-3 mt-4'>
-                        <div className='flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200'>
-                          <div className='w-2 h-2 bg-green-500 rounded-full'></div>
-                          <span className='text-sm font-medium text-gray-700'>
+                      <div className='flex flex-wrap items-center gap-2 mt-3'>
+                        <div className='flex items-center gap-2 bg-emerald-50/80 px-2.5 py-1.5 rounded-lg border border-emerald-200/50'>
+                          <div className='w-1.5 h-1.5 bg-emerald-500 rounded-full'></div>
+                          <span className='text-xs md:text-sm font-medium text-emerald-700'>
                             {projects.length} Active Projects
                           </span>
                         </div>
-                        <div className='flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200'>
-                          <div className='w-2 h-2 bg-blue-500 rounded-full'></div>
-                          <span className='text-sm font-medium text-gray-700'>
+                        <div className='flex items-center gap-2 bg-blue-50/80 px-2.5 py-1.5 rounded-lg border border-blue-200/50'>
+                          <div className='w-1.5 h-1.5 bg-blue-500 rounded-full'></div>
+                          <span className='text-xs md:text-sm font-medium text-blue-700'>
                             {projectProposals.length} My Proposals
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className='flex gap-3'>
+                    <div className='flex gap-2'>
                       <button
                         onClick={() => setShowProposals(!showProposals)}
-                        className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 ${
+                        className={`px-4 py-2.5 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 text-sm ${
                           showProposals
-                            ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300"
+                            ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md"
+                            : "bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 border border-gray-200/50"
                         }`}>
-                        <Users className='w-5 h-5' />
+                        <Users className='w-4 h-4' />
                         <span className='hidden sm:inline'>
                           {showProposals ? "Browse Projects" : "My Proposals"}
                         </span>
@@ -4790,11 +4793,11 @@ export default function DashboardPage() {
 
                 {showProposals ? (
                   // Project Proposals View
-                  <div className='space-y-6'>
+                  <div className='space-y-4'>
                     <div className='flex items-center justify-between'>
-                      <h2 className='text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-3'>
-                        <div className='w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center'>
-                          <span className='text-white font-bold text-sm'>
+                      <h2 className='text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2'>
+                        <div className='w-6 h-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center'>
+                          <span className='text-white font-bold text-xs'>
                             {projectProposals.length}
                           </span>
                         </div>
@@ -4803,33 +4806,33 @@ export default function DashboardPage() {
                     </div>
 
                     {projectProposals.length === 0 ? (
-                      <div className='text-center py-16 bg-gray-50 rounded-2xl border border-gray-200'>
-                        <div className='w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6'>
-                          <Users className='w-10 h-10 text-gray-600' />
+                      <div className='text-center py-8 md:py-12 bg-gray-50/80 rounded-xl border border-gray-200/50'>
+                        <div className='w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4'>
+                          <Users className='w-8 h-8 text-gray-600' />
                         </div>
-                        <h3 className='text-xl font-bold text-gray-800 mb-2'>
+                        <h3 className='text-lg font-bold text-gray-800 mb-2'>
                           No Proposals Submitted Yet
                         </h3>
-                        <p className='text-gray-600 mb-4 max-w-md mx-auto'>
+                        <p className='text-gray-600 mb-4 max-w-sm mx-auto text-sm'>
                           Start submitting proposals to projects to track your
                           applications and progress here
                         </p>
                         <button
                           onClick={() => setShowProposals(false)}
-                          className='bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors duration-200'>
+                          className='bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-sm'>
                           Browse Available Projects
                         </button>
                       </div>
                     ) : (
-                      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         {projectProposals.map((proposal, index) => (
                           <FadeInUp key={proposal.id} delay={index * 0.1}>
-                            <div className='group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:border-gray-300 overflow-hidden'>
+                            <div className='group bg-white/90 backdrop-blur-sm rounded-xl border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-300 hover:border-gray-300 overflow-hidden'>
                               {/* Status Badge */}
-                              <div className='px-4 py-3 border-b border-gray-100 bg-gray-50'>
+                              <div className='px-3 py-2.5 border-b border-gray-100/50 bg-gray-50/80'>
                                 <div className='flex items-center justify-between'>
                                   <span
-                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                                       proposal.status === "pending"
                                         ? "bg-yellow-100 text-yellow-800"
                                         : proposal.status === "accepted"
@@ -4849,17 +4852,17 @@ export default function DashboardPage() {
                                 </div>
                               </div>
 
-                              <div className='p-4'>
-                                <div className='space-y-3'>
+                              <div className='p-3'>
+                                <div className='space-y-2.5'>
                                   {/* Project Title & Client */}
                                   <div>
-                                    <h3 className='text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1'>
+                                    <h3 className='text-base font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1'>
                                       {proposal.project.title}
                                     </h3>
                                     <div className='flex items-center gap-2'>
-                                      <div className='w-6 h-6 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0'>
+                                      <div className='w-5 h-5 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0'>
                                         <svg
-                                          className='w-3 h-3 text-gray-600'
+                                          className='w-2.5 h-2.5 text-gray-600'
                                           fill='none'
                                           stroke='currentColor'
                                           viewBox='0 0 24 24'>
@@ -4871,7 +4874,7 @@ export default function DashboardPage() {
                                           />
                                         </svg>
                                       </div>
-                                      <span className='text-gray-700 font-medium text-sm'>
+                                      <span className='text-gray-700 font-medium text-xs'>
                                         {proposal.project.client.name ||
                                           proposal.project.client.email}
                                       </span>
@@ -4879,10 +4882,10 @@ export default function DashboardPage() {
                                   </div>
 
                                   {/* Proposal Details */}
-                                  <div className='grid grid-cols-2 gap-3'>
-                                    <div className='flex items-center gap-2 text-sm'>
+                                  <div className='grid grid-cols-2 gap-2'>
+                                    <div className='flex items-center gap-1.5 text-xs'>
                                       <svg
-                                        className='w-4 h-4 text-gray-400'
+                                        className='w-3.5 h-3.5 text-gray-400'
                                         fill='none'
                                         stroke='currentColor'
                                         viewBox='0 0 24 24'>
@@ -4898,9 +4901,9 @@ export default function DashboardPage() {
                                       </span>
                                     </div>
 
-                                    <div className='flex items-center gap-2 text-sm'>
+                                    <div className='flex items-center gap-1.5 text-xs'>
                                       <svg
-                                        className='w-4 h-4 text-gray-400'
+                                        className='w-3.5 h-3.5 text-gray-400'
                                         fill='none'
                                         stroke='currentColor'
                                         viewBox='0 0 24 24'>
@@ -4918,9 +4921,9 @@ export default function DashboardPage() {
                                   </div>
 
                                   {/* Project Category */}
-                                  <div className='flex items-center gap-2 text-sm'>
+                                  <div className='flex items-center gap-1.5 text-xs'>
                                     <svg
-                                      className='w-4 h-4 text-gray-400'
+                                      className='w-3.5 h-3.5 text-gray-400'
                                       fill='none'
                                       stroke='currentColor'
                                       viewBox='0 0 24 24'>
@@ -4945,11 +4948,11 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   // Available Projects View
-                  <div className='space-y-6'>
+                  <div className='space-y-4'>
                     <div className='flex items-center justify-between'>
-                      <h2 className='text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-3'>
-                        <div className='w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center'>
-                          <span className='text-white font-bold text-sm'>
+                      <h2 className='text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2'>
+                        <div className='w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center'>
+                          <span className='text-white font-bold text-xs'>
                             {projects.length}
                           </span>
                         </div>
@@ -4958,38 +4961,38 @@ export default function DashboardPage() {
                     </div>
 
                     {loadingProjects ? (
-                      <div className='flex items-center justify-center py-20'>
+                      <div className='flex items-center justify-center py-12'>
                         <div className='text-center'>
-                          <div className='animate-spin w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full mx-auto mb-4'></div>
-                          <p className='text-gray-600 font-medium'>
+                          <div className='animate-spin w-10 h-10 border-4 border-gray-400 border-t-transparent rounded-full mx-auto mb-3'></div>
+                          <p className='text-gray-600 font-medium text-sm'>
                             Loading projects...
                           </p>
                         </div>
                       </div>
                     ) : projects.length === 0 ? (
-                      <div className='text-center py-16 bg-gray-50 rounded-2xl border border-gray-200'>
-                        <div className='w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6'>
-                          <Users className='w-10 h-10 text-gray-600' />
+                      <div className='text-center py-8 md:py-12 bg-gray-50/80 rounded-xl border border-gray-200/50'>
+                        <div className='w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4'>
+                          <Users className='w-8 h-8 text-gray-600' />
                         </div>
-                        <h3 className='text-xl font-bold text-gray-800 mb-2'>
+                        <h3 className='text-lg font-bold text-gray-800 mb-2'>
                           No Projects Available Right Now
                         </h3>
-                        <p className='text-gray-600 mb-4 max-w-md mx-auto'>
+                        <p className='text-gray-600 mb-4 max-w-sm mx-auto text-sm'>
                           Don't worry! New freelance projects are added
                           regularly. Check back soon for exciting opportunities.
                         </p>
-                        <div className='flex items-center justify-center gap-2 text-sm text-gray-500'>
-                          <div className='w-2 h-2 bg-gray-400 rounded-full'></div>
+                        <div className='flex items-center justify-center gap-2 text-xs text-gray-500'>
+                          <div className='w-1.5 h-1.5 bg-gray-400 rounded-full'></div>
                           <span>We'll notify you when new projects arrive</span>
                         </div>
                       </div>
                     ) : (
-                      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         {projects.map((project, index) => (
                           <FadeInUp key={project.id} delay={index * 0.1}>
-                            <div className='group bg-white border border-gray-200 rounded-xl shadow-sm hover:border-blue-400 hover:shadow-md transition-all duration-200 overflow-hidden'>
+                            <div className='group bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-xl shadow-sm hover:border-blue-400 hover:shadow-md transition-all duration-200 overflow-hidden'>
                               {/* Card Header */}
-                              <div className='flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50'>
+                              <div className='flex items-center justify-between px-3 py-2.5 border-b border-gray-100/50 bg-gray-50/80'>
                                 <span className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200'>
                                   {project.category}
                                 </span>
@@ -5010,15 +5013,15 @@ export default function DashboardPage() {
                                 </span>
                               </div>
                               {/* Card Body */}
-                              <div className='p-4 space-y-3'>
+                              <div className='p-3 space-y-2.5'>
                                 {/* Title & Client */}
                                 <div>
-                                  <h3 className='text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1'>
+                                  <h3 className='text-base font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1'>
                                     {project.title}
                                   </h3>
                                   <div className='flex items-center gap-2 mb-2'>
                                     <svg
-                                      className='w-4 h-4 text-gray-400'
+                                      className='w-3.5 h-3.5 text-gray-400'
                                       fill='none'
                                       stroke='currentColor'
                                       viewBox='0 0 24 24'>
@@ -5029,7 +5032,7 @@ export default function DashboardPage() {
                                         d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
                                       />
                                     </svg>
-                                    <span className='text-gray-700 text-sm'>
+                                    <span className='text-gray-700 text-xs'>
                                       {project.client.name ||
                                         project.client.email}
                                     </span>
@@ -5142,74 +5145,75 @@ export default function DashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                className='space-y-6 max-w-4xl mx-auto'>
-                {/* Coming Soon Design */}
-                <div className='text-center'>
+                className='space-y-4 max-w-3xl mx-auto p-4 md:p-6'>
+                
+                {/* Compact Header */}
+                <div className='text-center mb-6'>
                   <FadeInUp delay={0.1}>
-                    <div className='relative mb-8'>
-                      {/* Animated Background */}
-                      <div className='absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl blur-3xl'></div>
+                    <div className='relative mb-4'>
+                      {/* Smaller Animated Background */}
+                      <div className='absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-2xl blur-2xl'></div>
 
-                      {/* Main Icon */}
-                      <div className='relative w-32 h-32 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl'>
-                        <Bot className='w-16 h-16 text-white' />
+                      {/* Smaller Main Icon */}
+                      <div className='relative w-20 h-20 md:w-24 md:h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl'>
+                        <Bot className='w-10 h-10 md:w-12 md:h-12 text-white' />
 
-                        {/* Animated Ring */}
-                        <div className='absolute inset-0 border-4 border-blue-300/30 rounded-full animate-ping'></div>
-                        <div className='absolute inset-0 border-4 border-purple-300/30 rounded-full animate-pulse'></div>
+                        {/* Smaller Animated Rings */}
+                        <div className='absolute inset-0 border-2 border-blue-300/30 rounded-full animate-ping'></div>
+                        <div className='absolute inset-0 border-2 border-purple-300/30 rounded-full animate-pulse'></div>
                       </div>
                     </div>
                   </FadeInUp>
 
                   <FadeInUp delay={0.2}>
-                    <h2 className='text-4xl md:text-5xl font-bold text-gray-800 mb-4'>
+                    <h2 className='text-2xl md:text-3xl font-bold text-gray-800 mb-2'>
                       Frai AI
                     </h2>
-                    <p className='text-xl text-gray-600 mb-8 max-w-2xl mx-auto'>
+                    <p className='text-base md:text-lg text-gray-600 mb-4 max-w-xl mx-auto'>
                       Your intelligent coding companion is coming soon
                     </p>
                   </FadeInUp>
-
-                  <FadeInUp delay={0.3}>
-                    <div className='bg-white/80 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-white/30 shadow-2xl max-w-2xl mx-auto'>
-                      <div className='flex items-center justify-center gap-3 mb-6'>
-                        <div className='w-3 h-3 bg-yellow-500 rounded-full animate-pulse'></div>
-                        <span className='text-lg font-semibold text-yellow-700'>
-                          Coming Soon
-                        </span>
-                        <div className='w-3 h-3 bg-yellow-500 rounded-full animate-pulse'></div>
-                      </div>
-
-                      <p className='text-gray-700 text-lg leading-relaxed mb-8'>
-                        We're working hard to bring you an amazing AI-powered
-                        coding assistant. Get ready for intelligent code
-                        suggestions, debugging help, and much more!
-                      </p>
-
-                      {/* Progress Bar */}
-                      <div className='mb-8'>
-                        <div className='flex justify-between items-center mb-2'>
-                          <span className='text-sm font-medium text-gray-600'>
-                            Development Progress
-                          </span>
-                          <span className='text-sm font-medium text-gray-600'>
-                            75%
-                          </span>
-                        </div>
-                        <div className='w-full bg-gray-200 rounded-full h-3'>
-                          <div
-                            className='bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-1000 ease-out'
-                            style={{ width: "75%" }}></div>
-                        </div>
-                      </div>
-
-                      {/* Notify Me Button */}
-                      <button className='w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 px-8 rounded-2xl font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105'>
-                        🔔 Notify Me When Ready
-                      </button>
-                    </div>
-                  </FadeInUp>
                 </div>
+
+                <FadeInUp delay={0.3}>
+                  <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-white/30 shadow-xl max-w-lg mx-auto'>
+                    <div className='flex items-center justify-center gap-2 mb-4'>
+                      <div className='w-2 h-2 bg-yellow-500 rounded-full animate-pulse'></div>
+                      <span className='text-sm font-semibold text-yellow-700'>
+                        Coming Soon
+                      </span>
+                      <div className='w-2 h-2 bg-yellow-500 rounded-full animate-pulse'></div>
+                    </div>
+
+                    <p className='text-gray-700 text-sm md:text-base leading-relaxed mb-4 text-center'>
+                      We're working hard to bring you an amazing AI-powered
+                      coding assistant. Get ready for intelligent code
+                      suggestions, debugging help, and much more!
+                    </p>
+
+                    {/* Compact Progress Bar */}
+                    <div className='mb-4'>
+                      <div className='flex justify-between items-center mb-1'>
+                        <span className='text-xs font-medium text-gray-600'>
+                          Progress
+                        </span>
+                        <span className='text-xs font-medium text-gray-600'>
+                          75%
+                        </span>
+                      </div>
+                      <div className='w-full bg-gray-200 rounded-full h-2'>
+                        <div
+                          className='bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-1000 ease-out'
+                          style={{ width: "75%" }}></div>
+                      </div>
+                    </div>
+
+                    {/* Smaller Notify Button */}
+                    <button className='w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2.5 px-6 rounded-xl font-medium text-sm hover:shadow-lg transition-all duration-300 transform hover:scale-105'>
+                      🔔 Notify Me When Ready
+                    </button>
+                  </div>
+                </FadeInUp>
               </motion.div>
             )}
 
@@ -5342,6 +5346,16 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <div className='flex items-center gap-1'>
+                        {/* Scroll to bottom button - only show when there are many messages */}
+                        {chatMessages.length > 15 && (
+                          <button 
+                            onClick={scrollToBottom}
+                            className='p-2 rounded-xl hover:bg-gray-100/80 transition-all duration-300 group bg-emerald-50 hover:bg-emerald-100'
+                            title="Scroll to bottom"
+                          >
+                            <ChevronDown className='w-4 h-4 text-emerald-600 group-hover:text-emerald-800' />
+                          </button>
+                        )}
                         <button className='p-2 rounded-xl hover:bg-gray-100/80 transition-all duration-300 group'>
                           <Search className='w-4 h-4 text-gray-600 group-hover:text-gray-800' />
                         </button>
@@ -5353,8 +5367,25 @@ export default function DashboardPage() {
 
                     {/* Chat Messages */}
                     <div
-                      className='flex-1 overflow-y-auto overflow-x-hidden p-3 space-y-2 max-h-full'
-                      style={{ scrollBehavior: "smooth", WebkitOverflowScrolling: "touch", height: "100%", position: "relative" }}>
+                      className='flex-1 overflow-y-auto overflow-x-hidden p-3 space-y-2 max-h-full relative'
+                      style={{ scrollBehavior: "smooth", WebkitOverflowScrolling: "touch", height: "100%", position: "relative" }}
+                      onScroll={(e) => {
+                        const { scrollTop, scrollHeight, clientHeight } = e.target;
+                        const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+                        setShowScrollButton(!isNearBottom);
+                      }}>
+                      
+                      {/* Floating scroll to bottom button */}
+                      {showScrollButton && (
+                        <button
+                          onClick={scrollToBottom}
+                          className='absolute bottom-4 right-4 z-10 p-3 md:p-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 opacity-80 hover:opacity-100 touch-manipulation'
+                          title="Scroll to bottom"
+                        >
+                          <ChevronDown className='w-4 h-4' />
+                        </button>
+                      )}
+
                       {chatMessages.length === 0 ? (
                         <div className='text-center py-12'>
                           <div className='w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-md'>
@@ -5444,21 +5475,21 @@ export default function DashboardPage() {
                                   {/* Reply indicator */}
                                   {msg.replyTo && (
                                     <div
-                                      className={`mb-2 p-2 rounded-xl border-l-3 ${
+                                      className={`mb-2 p-1.5 md:p-2 rounded-lg md:rounded-xl border-l-2 md:border-l-3 ${
                                         msg.userId === user?.id
                                           ? "bg-white/20 border-white/50"
                                           : "bg-gray-50/80 border-gray-300"
                                       }`}>
-                                      <div className='flex items-center gap-1.5 mb-0.5'>
+                                      <div className='flex items-center gap-1 md:gap-1.5 mb-1 md:mb-0.5'>
                                         <Reply
-                                          className={`w-3 h-3 ${
+                                          className={`w-2.5 h-2.5 md:w-3 md:h-3 ${
                                             msg.userId === user?.id
                                               ? "text-white/70"
                                               : "text-gray-500"
                                           }`}
                                         />
                                         <span
-                                          className={`text-[10px] font-semibold ${
+                                          className={`text-[9px] md:text-[10px] font-semibold ${
                                             msg.userId === user?.id
                                               ? "text-white/70"
                                               : "text-gray-500"
@@ -5467,14 +5498,19 @@ export default function DashboardPage() {
                                           {msg.replyTo.user?.name || "Unknown"}
                                         </span>
                                       </div>
-                                      <p
-                                        className={`text-[10px] truncate ${
-                                          msg.userId === user?.id
-                                            ? "text-white/60"
-                                            : "text-gray-400"
-                                        }`}>
-                                        {msg.replyTo.message}
-                                      </p>
+                                      <div className='max-w-full'>
+                                        <p
+                                          className={`text-[9px] md:text-[10px] line-clamp-2 leading-tight ${
+                                            msg.userId === user?.id
+                                              ? "text-white/60"
+                                              : "text-gray-400"
+                                          }`}>
+                                          {msg.replyTo.message.length > 80 
+                                            ? `${msg.replyTo.message.substring(0, 80)}...` 
+                                            : msg.replyTo.message
+                                          }
+                                        </p>
+                                      </div>
                                     </div>
                                   )}
 
@@ -5599,12 +5635,12 @@ export default function DashboardPage() {
                     <div className='border-t border-gray-100/50 flex-shrink-0'>
                       {/* Reply Preview */}
                       {replyingTo && (
-                        <div className='px-6 pt-4 pb-2'>
-                          <div className='bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-4 border-l-4 border-emerald-500'>
-                            <div className='flex items-center justify-between mb-2'>
-                              <div className='flex items-center gap-2'>
-                                <Reply className='w-4 h-4 text-emerald-600' />
-                                <span className='text-sm font-semibold text-gray-700'>
+                        <div className='px-3 md:px-6 pt-2 md:pt-4 pb-2'>
+                          <div className='bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl md:rounded-2xl p-2.5 md:p-4 border-l-4 border-emerald-500'>
+                            <div className='flex items-center justify-between mb-1.5 md:mb-2'>
+                              <div className='flex items-center gap-1.5 md:gap-2'>
+                                <Reply className='w-3.5 h-3.5 md:w-4 md:h-4 text-emerald-600' />
+                                <span className='text-xs md:text-sm font-semibold text-gray-700'>
                                   Replying to{" "}
                                   {replyingTo.user?.name || replyingTo.userName}
                                 </span>
@@ -5612,45 +5648,55 @@ export default function DashboardPage() {
                               <button
                                 onClick={handleCancelReply}
                                 className='text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100'>
-                                <X className='w-4 h-4' />
+                                <X className='w-3.5 h-3.5 md:w-4 md:h-4' />
                               </button>
                             </div>
-                            <p className='text-sm text-gray-600 truncate'>
-                              {replyingTo.message}
-                            </p>
+                            <div className='max-w-full'>
+                              <p className='text-xs md:text-sm text-gray-600 line-clamp-2 leading-tight'>
+                                {replyingTo.message.length > 100 
+                                  ? `${replyingTo.message.substring(0, 100)}...` 
+                                  : replyingTo.message
+                                }
+                              </p>
+                            </div>
                           </div>
                         </div>
                       )}
 
                       {/* Edit Preview */}
                       {editingMessage && (
-                        <div className='px-6 pt-4 pb-2'>
-                          <div className='bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border-l-4 border-blue-500'>
-                            <div className='flex items-center justify-between mb-2'>
-                              <div className='flex items-center gap-2'>
-                                <Edit className='w-4 h-4 text-blue-600' />
-                                <span className='text-sm font-semibold text-gray-700'>
+                        <div className='px-3 md:px-6 pt-2 md:pt-4 pb-2'>
+                          <div className='bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl md:rounded-2xl p-2.5 md:p-4 border-l-4 border-blue-500'>
+                            <div className='flex items-center justify-between mb-1.5 md:mb-2'>
+                              <div className='flex items-center gap-1.5 md:gap-2'>
+                                <Edit className='w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600' />
+                                <span className='text-xs md:text-sm font-semibold text-gray-700'>
                                   Editing message
                                 </span>
                               </div>
                               <button
                                 onClick={handleCancelEdit}
                                 className='text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100'>
-                                <X className='w-4 h-4' />
+                                <X className='w-3.5 h-3.5 md:w-4 md:h-4' />
                               </button>
                             </div>
-                            <p className='text-sm text-gray-600 truncate'>
-                              {editMessageText}
-                            </p>
+                            <div className='max-w-full'>
+                              <p className='text-xs md:text-sm text-gray-600 line-clamp-2 leading-tight'>
+                                {editMessageText.length > 100 
+                                  ? `${editMessageText.substring(0, 100)}...` 
+                                  : editMessageText
+                                }
+                              </p>
+                            </div>
                           </div>
                         </div>
                       )}
 
-                      <div className='p-6 bg-white/90 backdrop-blur-sm flex-shrink-0 min-h-[80px]'>
+                      <div className='p-3 md:p-4 bg-white/90 backdrop-blur-sm flex-shrink-0'>
                         <form
                           onSubmit={handleSendMessage}
-                          className='flex items-center gap-4'>
-                          <div className='flex-1 relative min-h-[40px]'>
+                          className='flex items-center gap-2 md:gap-3 max-w-full'>
+                          <div className='flex-1 relative'>
                             <input
                               type='text'
                               value={
@@ -5663,12 +5709,12 @@ export default function DashboardPage() {
                               }
                               placeholder={
                                 editingMessage
-                                  ? "Edit your message..."
+                                  ? "Edit message..."
                                   : replyingTo
                                     ? `Reply to ${replyingTo.user?.name || replyingTo.userName}...`
                                     : "Type a message..."
                               }
-                              className='w-full px-6 py-4 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 bg-white/80 placeholder-gray-400'
+                              className='w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-200 rounded-lg md:rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 bg-white/80 placeholder-gray-400'
                               disabled={sendingMessage}
                               onKeyPress={
                                 editingMessage
@@ -5702,11 +5748,11 @@ export default function DashboardPage() {
                                 ? !editMessageText.trim()
                                 : !newMessage.trim() || sendingMessage
                             }
-                            className='p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:from-emerald-600 hover:to-teal-700'>
+                            className='bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:from-emerald-600 hover:to-teal-700 w-[44px] md:w-[48px] h-[40px] md:h-[44px] flex items-center justify-center flex-shrink-0'>
                             {editingMessage ? (
                               <span className='text-sm font-medium'>Save</span>
                             ) : (
-                              <Send className='w-5 h-5' />
+                              <Send className='w-4 h-4' />
                             )}
                           </button>
                         </form>
@@ -5716,32 +5762,32 @@ export default function DashboardPage() {
 
                   {/* Right Sidebar - Group Info */}
                   <div className='hidden xl:flex w-96 bg-white/90 backdrop-blur-xl rounded-3xl border border-white/40 shadow-xl flex-col h-full'>
-                    <div className='p-6 border-b border-gray-100/50'>
-                      <h3 className='text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2'>
+                    <div className='p-4 md:p-6 border-b border-gray-100/50'>
+                      <h3 className='text-lg md:text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-1 md:mb-2'>
                         Group Information
                       </h3>
-                      <p className='text-sm text-gray-600'>
+                      <p className='text-xs md:text-sm text-gray-600'>
                         Community details and guidelines
                       </p>
                     </div>
 
                     {/* Group Info */}
-                    <div className='flex-1 p-6'>
-                      <div className='space-y-8'>
+                    <div className='flex-1 p-4 md:p-6'>
+                      <div className='space-y-4 md:space-y-6'>
                         {/* General Info */}
                         <div>
-                          <h4 className='font-bold text-gray-800 mb-4 text-lg'>
+                          <h4 className='font-bold text-gray-800 mb-2 md:mb-3 text-base md:text-lg'>
                             About General
                           </h4>
-                          <div className='bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100'>
-                            <p className='text-sm text-gray-700 leading-relaxed mb-4'>
+                          <div className='bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl md:rounded-2xl p-3 md:p-4 border border-emerald-100'>
+                            <p className='text-xs md:text-sm text-gray-700 leading-relaxed mb-2 md:mb-3'>
                               Welcome to our community! This is a space for all
                               professionals to connect, share knowledge, and
                               collaborate on projects. Feel free to introduce
                               yourself and start meaningful conversations.
                             </p>
-                            <div className='flex items-center gap-2 text-sm text-emerald-600 font-medium'>
-                              <div className='w-2 h-2 bg-emerald-500 rounded-full'></div>
+                            <div className='flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-emerald-600 font-medium'>
+                              <div className='w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full'></div>
                               <span>Open to all members</span>
                             </div>
                           </div>
@@ -5749,23 +5795,23 @@ export default function DashboardPage() {
 
                         {/* Stats */}
                         <div>
-                          <h4 className='font-bold text-gray-800 mb-4 text-lg'>
+                          <h4 className='font-bold text-gray-800 mb-2 md:mb-3 text-base md:text-lg'>
                             Community Stats
                           </h4>
-                          <div className='grid grid-cols-2 gap-4'>
-                            <div className='bg-white rounded-2xl p-4 border border-gray-100 shadow-sm'>
-                              <div className='text-2xl font-bold text-emerald-600 mb-1'>
+                          <div className='grid grid-cols-2 gap-2 md:gap-3'>
+                            <div className='bg-white rounded-xl md:rounded-2xl p-2.5 md:p-3 border border-gray-100 shadow-sm'>
+                              <div className='text-lg md:text-xl font-bold text-emerald-600 mb-0.5 md:mb-1'>
                                 {userCount}
                               </div>
-                              <div className='text-sm text-gray-600'>
+                              <div className='text-xs md:text-sm text-gray-600'>
                                 Total Members
                               </div>
                             </div>
-                            <div className='bg-white rounded-2xl p-4 border border-gray-100 shadow-sm'>
-                              <div className='text-2xl font-bold text-blue-600 mb-1'>
+                            <div className='bg-white rounded-xl md:rounded-2xl p-2.5 md:p-3 border border-gray-100 shadow-sm'>
+                              <div className='text-lg md:text-xl font-bold text-blue-600 mb-0.5 md:mb-1'>
                                 {chatMessages.length}
                               </div>
-                              <div className='text-sm text-gray-600'>
+                              <div className='text-xs md:text-sm text-gray-600'>
                                 Messages
                               </div>
                             </div>
@@ -5785,116 +5831,229 @@ export default function DashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                className='space-y-6'>
-                <h2 className='text-2xl font-bold text-gray-800'>
-                  Profile Settings
-                </h2>
+                className='space-y-4 max-w-5xl mx-auto p-4 md:p-6'>
+                
+                {/* Header Section */}
+                <div className='text-center mb-6'>
+                  <div className='w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg'>
+                    <Settings className='w-7 h-7 text-white' />
+                  </div>
+                  <h2 className='text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2'>
+                    Profile Settings
+                  </h2>
+                  <p className='text-gray-600 text-sm md:text-base'>
+                    Manage your account settings and preferences
+                  </p>
+                </div>
 
                 <FadeInUp>
-                  <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg'>
-                    <form onSubmit={handleProfileSave} className='space-y-6'>
-                      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                        <div>
-                          <label className='block text-sm font-medium text-gray-700 mb-2'>
-                            Full Name
-                          </label>
-                          <input
-                            type='text'
-                            name='name'
-                            value={profile.name}
-                            onChange={handleChange}
-                            className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition-all duration-300'
-                          />
-                        </div>
-                        <div>
-                          <label className='block text-sm font-medium text-gray-700 mb-2'>
-                            Email
-                          </label>
-                          <input
-                            type='email'
-                            value={profile.email}
-                            disabled
-                            className='w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-500'
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>
-                          Bio
-                        </label>
-                        <textarea
-                          name='bio'
-                          value={profile.bio}
-                          onChange={handleChange}
-                          rows={4}
-                          className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition-all duration-300'
-                        />
-                      </div>
-
-                      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                        <div>
-                          <label className='block text-sm font-medium text-gray-700 mb-2'>
-                            GitHub
-                          </label>
-                          <input
-                            type='url'
-                            name='github'
-                            value={profile.github}
-                            onChange={handleChange}
-                            className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition-all duration-300'
-                          />
-                        </div>
-                        <div>
-                          <label className='block text-sm font-medium text-gray-700 mb-2'>
-                            Telegram
-                          </label>
-                          <input
-                            type='text'
-                            name='telegram'
-                            value={profile.telegram}
-                            onChange={handleChange}
-                            className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition-all duration-300'
-                          />
+                  <div className='max-w-4xl mx-auto'>
+                    <div className='bg-white/90 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl overflow-hidden'>
+                      
+                      {/* Profile Picture Section */}
+                      <div className='bg-gradient-to-r from-emerald-50 to-teal-50 p-4 md:p-6 border-b border-emerald-100/50'>
+                        <div className='flex flex-col md:flex-row items-center gap-4'>
+                          <div className='relative'>
+                            <div className='w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center text-white font-bold text-xl md:text-2xl shadow-lg'>
+                              {profile.name ? profile.name[0]?.toUpperCase() : 'U'}
+                            </div>
+                            <button className='absolute -bottom-1.5 -right-1.5 w-6 h-6 bg-white rounded-full border-2 border-emerald-500 flex items-center justify-center shadow-lg hover:bg-emerald-50 transition-all duration-300'>
+                              <Edit className='w-3 h-3 text-emerald-600' />
+                            </button>
+                          </div>
+                          <div className='text-center md:text-left'>
+                            <h3 className='text-lg md:text-xl font-bold text-gray-800 mb-1.5'>
+                              {profile.name || 'Your Name'}
+                            </h3>
+                            <p className='text-gray-600 text-sm'>
+                              {profile.email}
+                            </p>
+                            <div className='flex items-center gap-2 mt-2'>
+                              <div className='w-1.5 h-1.5 bg-emerald-500 rounded-full'></div>
+                              <span className='text-xs text-emerald-600 font-medium'>Active</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      <div className='flex items-center justify-between'>
-                        <div>
-                          <label className='block text-sm font-medium text-gray-700 mb-2'>
-                            Language
-                          </label>
-                          <select
-                            name='lang'
-                            value={profile.lang}
-                            onChange={handleChange}
-                            className='px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition-all duration-300'>
-                            {LANGS.map((lang) => (
-                              <option key={lang.value} value={lang.value}>
-                                {lang.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <button
-                          type='submit'
-                          disabled={loading}
-                          className='bg-gradient-to-r from-[#10B981] to-[#34D399] text-white px-8 py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-300 disabled:opacity-50'>
-                          {loading ? "Saving..." : "Save Changes"}
-                        </button>
-                      </div>
+                      {/* Form Section */}
+                      <div className='p-4 md:p-6'>
+                        <form onSubmit={handleProfileSave} className='space-y-4'>
+                          
+                          {/* Personal Information */}
+                          <div className='space-y-3'>
+                            <h4 className='text-base font-semibold text-gray-800 flex items-center gap-2'>
+                              <User className='w-4 h-4 text-emerald-600' />
+                              Personal Information
+                            </h4>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                              <div className='space-y-1.5'>
+                                <label className='block text-sm font-medium text-gray-700'>
+                                  Full Name
+                                </label>
+                                <input
+                                  type='text'
+                                  name='name'
+                                  value={profile.name}
+                                  onChange={handleChange}
+                                  className='w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 bg-white/80'
+                                  placeholder='Enter your full name'
+                                />
+                              </div>
+                              <div className='space-y-1.5'>
+                                <label className='block text-sm font-medium text-gray-700'>
+                                  Email
+                                </label>
+                                <input
+                                  type='email'
+                                  value={profile.email}
+                                  disabled
+                                  className='w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50/80 text-gray-500 cursor-not-allowed'
+                                />
+                              </div>
+                            </div>
+                          </div>
 
-                      {success && (
-                        <div className='p-4 bg-green-100 text-green-700 rounded-xl'>
-                          {success}
-                        </div>
-                      )}
-                      {error && (
-                        <div className='p-4 bg-red-100 text-red-700 rounded-xl'>
-                          {error}
-                        </div>
-                      )}
-                    </form>
+                          {/* Bio Section */}
+                          <div className='space-y-1.5'>
+                            <label className='block text-sm font-medium text-gray-700'>
+                              Bio
+                            </label>
+                            <textarea
+                              name='bio'
+                              value={profile.bio}
+                              onChange={handleChange}
+                              rows={3}
+                              className='w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 bg-white/80 resize-none'
+                              placeholder='Tell us about yourself...'
+                            />
+                          </div>
+
+                          {/* Social Links */}
+                          <div className='space-y-3'>
+                            <h4 className='text-base font-semibold text-gray-800 flex items-center gap-2'>
+                              <div className='w-4 h-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center'>
+                                <span className='text-white text-xs font-bold'>S</span>
+                              </div>
+                              Social Links
+                            </h4>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                              <div className='space-y-1.5'>
+                                <label className='block text-sm font-medium text-gray-700 flex items-center gap-2'>
+                                  <div className='w-3.5 h-3.5 bg-gray-800 rounded'></div>
+                                  GitHub
+                                </label>
+                                <input
+                                  type='url'
+                                  name='github'
+                                  value={profile.github}
+                                  onChange={handleChange}
+                                  className='w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 bg-white/80'
+                                  placeholder='https://github.com/username'
+                                />
+                              </div>
+                              <div className='space-y-1.5'>
+                                <label className='block text-sm font-medium text-gray-700 flex items-center gap-2'>
+                                  <div className='w-3.5 h-3.5 bg-blue-500 text-white text-xs font-bold rounded flex items-center justify-center'>T</div>
+                                  Telegram
+                                </label>
+                                <input
+                                  type='text'
+                                  name='telegram'
+                                  value={profile.telegram}
+                                  onChange={handleChange}
+                                  className='w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 bg-white/80'
+                                  placeholder='@username or phone number'
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Preferences */}
+                          <div className='space-y-3'>
+                            <h4 className='text-base font-semibold text-gray-800 flex items-center gap-2'>
+                              <div className='w-4 h-4 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center'>
+                                <span className='text-white text-xs font-bold'>P</span>
+                              </div>
+                              Preferences
+                            </h4>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                              <div className='space-y-1.5'>
+                                <label className='block text-sm font-medium text-gray-700'>
+                                  Language
+                                </label>
+                                <select
+                                  name='lang'
+                                  value={profile.lang}
+                                  onChange={handleChange}
+                                  className='w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 bg-white/80'>
+                                  {LANGS.map((lang) => (
+                                    <option key={lang.value} value={lang.value}>
+                                      {lang.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div className='space-y-1.5'>
+                                <label className='block text-sm font-medium text-gray-700'>
+                                  Theme
+                                </label>
+                                <select className='w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 bg-white/80'>
+                                  <option value='light'>Light</option>
+                                  <option value='dark'>Dark</option>
+                                  <option value='auto'>Auto</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className='flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-gray-100'>
+                            <button
+                              type='submit'
+                              disabled={loading}
+                              className='w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-6 py-2.5 rounded-lg font-medium hover:shadow-lg hover:from-emerald-600 hover:to-teal-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm'>
+                              {loading ? (
+                                <>
+                                  <div className='w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
+                                  Saving...
+                                </>
+                              ) : (
+                                <>
+                                  <div className='w-3.5 h-3.5 text-white'>✓</div>
+                                  Save Changes
+                                </>
+                              )}
+                            </button>
+                            <button
+                              type='button'
+                              className='w-full sm:w-auto px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-all duration-300 text-sm'>
+                              Cancel
+                            </button>
+                          </div>
+
+                          {/* Status Messages */}
+                          {success && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className='p-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg flex items-center gap-2'>
+                              <div className='w-4 h-4 text-green-600'>✓</div>
+                              <span className='text-green-700 font-medium text-sm'>{success}</span>
+                            </motion.div>
+                          )}
+                          {error && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className='p-3 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-lg flex items-center gap-2'>
+                              <div className='w-4 h-4 text-red-600'>✗</div>
+                              <span className='text-red-700 font-medium text-sm'>{error}</span>
+                            </motion.div>
+                          )}
+                        </form>
+                      </div>
+                    </div>
                   </div>
                 </FadeInUp>
               </motion.div>
