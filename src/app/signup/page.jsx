@@ -83,16 +83,11 @@ export default function SignupPage() {
   };
 
   const handleGoogleSignup = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
+    // Google signup temporarily disabled
+    setNotification({
+      type: "error",
+      message: "⚠️ Google orqali ro'yxatdan o'tish vaqtincha o'chirilgan",
     });
-
-    if (error) {
-      console.error("Google signup error:", error.message);
-    }
   };
 
   /* ----------------------- Toast auto‑dismiss ------------------------ */
@@ -445,9 +440,10 @@ export default function SignupPage() {
                     <button
                       type='button'
                       onClick={handleGoogleSignup}
-                      className='w-full border border-gray-300 text-gray-700 py-4 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-3'>
+                      disabled
+                      className='w-full border border-gray-200 text-gray-400 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 cursor-not-allowed opacity-50'>
                       <FcGoogle className='w-5 h-5' />
-                      <span>Sign up with Google</span>
+                      <span>Google orqali ro'yxatdan o'tish (o'chirilgan)</span>
                     </button>
                   </FadeInUp>
 

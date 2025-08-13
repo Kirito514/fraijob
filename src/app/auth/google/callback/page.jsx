@@ -6,90 +6,22 @@ import { useRouter } from 'next/navigation'
 function GoogleAuthCallbackContent() {
   const router = useRouter()
   const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const handleGoogleCallback = async () => {
-      try {
-        // URL'dan code parametrini olamiz
-        const urlParams = new URLSearchParams(window.location.search)
-        const code = urlParams.get('code')
-        
-        if (!code) {
-          setError('Authorization code topilmadi')
-          setLoading(false)
-          return
-        }
-
-        // Google OAuth token olish
-        const tokenResponse = await fetch('/api/auth/google/token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ code }),
-        })
-
-        if (!tokenResponse.ok) {
-          throw new Error('Token olishda xatolik')
-        }
-
-        const tokenData = await tokenResponse.json()
-        
-        // Foydalanuvchi ma'lumotlarini olish
-        const userResponse = await fetch('/api/auth/google/user', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ access_token: tokenData.access_token }),
-        })
-
-        if (!userResponse.ok) {
-          throw new Error('Foydalanuvchi ma\'lumotlarini olishda xatolik')
-        }
-
-        const userData = await userResponse.json()
-        
-        // Backend'ga yuborish va JWT cookie o'rnatish
-        const loginResponse = await fetch('/api/login-oauth', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: userData.email,
-            name: userData.name,
-            image: userData.picture,
-            uid: userData.id,
-          }),
-        })
-
-        if (!loginResponse.ok) {
-          throw new Error('Login qilishda xatolik')
-        }
-
-        // Dashboard'ga yo'naltirish
-        router.push('/dashboard')
-        
-      } catch (err) {
-        console.error('Google OAuth callback error:', err)
-        setError(err.message)
-        setLoading(false)
-      }
-    }
-
-    handleGoogleCallback()
-  }, [router])
+    // Google OAuth temporarily disabled
+    setError('Google orqali kirish vaqtincha o\'chirilgan')
+  }, [])
 
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
-          <p className="text-red-500 text-lg mb-4">Xatolik: {error}</p>
+          <p className="text-red-500 text-lg mb-4">⚠️ {error}</p>
+          <p className="text-gray-600 text-sm mb-6">Iltimos, oddiy email va parol orqali kirish qiling</p>
           <button 
             onClick={() => router.push('/login')}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
           >
             Login sahifasiga qaytish
           </button>

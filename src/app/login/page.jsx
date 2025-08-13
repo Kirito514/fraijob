@@ -91,19 +91,11 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = async () => {
-    setIsGoogleLoading(true);
-    
-    // Google OAuth URL yaratish
-    const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
-    googleAuthUrl.searchParams.append('client_id', process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
-    googleAuthUrl.searchParams.append('redirect_uri', `${window.location.origin}/auth/google/callback`);
-    googleAuthUrl.searchParams.append('response_type', 'code');
-    googleAuthUrl.searchParams.append('scope', 'email profile');
-    googleAuthUrl.searchParams.append('access_type', 'offline');
-    googleAuthUrl.searchParams.append('prompt', 'consent');
-    
-    // Google OAuth sahifasiga yo'naltirish
-    window.location.href = googleAuthUrl.toString();
+    // Google login temporarily disabled
+    setNotification({
+      type: "error",
+      message: "⚠️ Google orqali kirish vaqtincha o'chirilgan",
+    });
   };
 
   useEffect(() => {
@@ -411,19 +403,10 @@ export default function LoginPage() {
                     <button
                       type='button'
                       onClick={handleGoogleLogin}
-                      disabled={isGoogleLoading}
-                      className='w-full border border-gray-300 text-gray-700 py-4 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-3'>
-                      {isGoogleLoading ? (
-                        <>
-                          <Loader2 className='animate-spin w-5 h-5' />
-                          <span>Signing in with Google...</span>
-                        </>
-                      ) : (
-                        <>
-                          <FcGoogle className='w-5 h-5' />
-                          <span>Sign in with Google</span>
-                        </>
-                      )}
+                      disabled
+                      className='w-full border border-gray-200 text-gray-400 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 cursor-not-allowed opacity-50'>
+                      <FcGoogle className='w-5 h-5' />
+                      <span>Google orqali kirish (o'chirilgan)</span>
                     </button>
                   </FadeInUp>
                 </form>
