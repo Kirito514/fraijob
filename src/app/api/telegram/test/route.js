@@ -23,7 +23,7 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { action } = body;
+    const { action, message } = body;
     
     if (action === 'getChatId') {
       const chatId = await getChatId();
@@ -35,13 +35,24 @@ export async function POST(request) {
       });
     }
     
+    // Send feedback message
+    if (message) {
+      const { sendMessage } = await import('@/lib/telegram');
+      await sendMessage(message);
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Feedback muvaffaqiyatli yuborildi!' 
+      });
+    }
+    
     return NextResponse.json({ 
       success: false, 
-      error: 'Noto\'g\'ri action' 
+      error: 'Xabar matni kerak' 
     }, { status: 400 });
     
   } catch (error) {
-    console.error('❌ Chat ID olishda xatolik:', error);
+    console.error('❌ Feedback yuborishda xatolik:', error);
     
     return NextResponse.json({ 
       success: false, 

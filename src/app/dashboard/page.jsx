@@ -32,8 +32,10 @@ import {
   Menu,
   Home,
   Send,
+  MessageSquare,
 } from "lucide-react";
 import Image from "next/image";
+import FeedbackForm from "@/components/FeedbackForm";
 
 // Animation components
 const FadeInUp = ({ children, delay = 0, duration = 0.5 }) => (
@@ -1306,49 +1308,16 @@ export default function DashboardPage() {
   const [aiMessages, setAiMessages] = useState([]);
 
   // Notifications state
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: "success",
-      message: "Profile updated successfully!",
-      time: "2m ago",
-    },
-    {
-      id: 2,
-      type: "info",
-      message: "New job opportunity: Frontend Developer at TechCorp",
-      time: "1h ago",
-    },
-    {
-      id: 3,
-      type: "warning",
-      message: "Test deadline approaching: React Advanced",
-      time: "3h ago",
-    },
-  ]);
-  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
 
-  // Clean up old notifications (keep only last 10)
-  useEffect(() => {
-    if (notifications.length > 10) {
-      setNotifications((prev) => prev.slice(-10));
-    }
-  }, [notifications]);
+  // Feedback state
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [showBanner, setShowBanner] = useState(true);
 
-  // Click outside to close notifications
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        showNotifications &&
-        !event.target.closest(".notifications-dropdown")
-      ) {
-        setShowNotifications(false);
-      }
-    };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showNotifications]);
+
+
+
 
   // Foydalanuvchi va profilni JWT cookie orqali olish
   useEffect(() => {
@@ -1404,28 +1373,8 @@ export default function DashboardPage() {
 
       if (response.ok) {
         setSuccess("Profile updated!");
-        // Add notification
-        setNotifications((prev) => [
-          ...prev,
-          {
-            id: Date.now(),
-            type: "success",
-            message: "Profile updated successfully!",
-            time: "Just now",
-          },
-        ]);
       } else {
         setError("Error updating profile");
-        // Add error notification
-        setNotifications((prev) => [
-          ...prev,
-          {
-            id: Date.now(),
-            type: "warning",
-            message: "Failed to update profile. Please try again.",
-            time: "Just now",
-          },
-        ]);
       }
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -1642,16 +1591,7 @@ export default function DashboardPage() {
         setShowEditModal(false);
         setEditingPortfolio({});
 
-        // Add notification
-        setNotifications((prev) => [
-          ...prev,
-          {
-            id: Date.now(),
-            type: "success",
-            message: "Portfolio updated successfully!",
-            time: "Just now",
-          },
-        ]);
+
       }
     } catch (error) {
       console.error("Error updating portfolio:", error);
@@ -2109,6 +2049,41 @@ export default function DashboardPage() {
 
   return (
     <div className='flex flex-col md:flex-row min-h-screen h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-emerald-50/50'>
+      {/* Notification Banner */}
+      {showBanner && (
+        <motion.div
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -50, opacity: 0 }}
+          className="fixed top-0 left-0 right-0 z-50 bg-blue-600 text-white shadow-md"
+        >
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 py-1.5 sm:py-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <MessageSquare className="w-4 h-4 flex-shrink-0" />
+                <span className="text-sm font-medium hidden sm:inline">🚀 Platforma test rejimida! Yanada yaxshilash uchun feedback qoldiring</span>
+                <span className="text-sm font-medium sm:hidden">🚀 Test rejimida! Feedback bering</span>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <button
+                  onClick={() => setShowFeedbackForm(true)}
+                  className="px-2 sm:px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-xs font-medium transition-colors"
+                >
+                  <span className="hidden sm:inline">Feedback</span>
+                  <span className="sm:hidden">💬</span>
+                </button>
+                <button
+                  onClick={() => setShowBanner(false)}
+                  className="p-1 hover:bg-white/20 rounded transition-colors"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Desktop Sidebar */}
       <motion.aside
         initial={{ x: -100, opacity: 0 }}
@@ -2304,9 +2279,9 @@ export default function DashboardPage() {
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className='bg-white/80 backdrop-blur-xl border-b border-white/30 p-4 md:p-6 shadow-sm'>
+          className={`bg-white/80 backdrop-blur-xl border-b border-white/30 p-4 md:p-6 shadow-sm ${showBanner ? 'mt-10 sm:mt-12' : ''}`}>
           <div className='flex items-center justify-between'>
-            <div className='flex items-center gap-4'>
+            <div className='flex items-center gap-2 sm:gap-4'>
               {/* Desktop Sidebar Toggle */}
               <button
                 onClick={() => setSidebarOpen((v) => !v)}
@@ -2322,17 +2297,17 @@ export default function DashboardPage() {
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className='md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200'
+                className='md:hidden p-1.5 rounded-lg hover:bg-gray-100 transition-colors duration-200'
                 aria-label='Toggle mobile menu'>
-                <Menu size={20} />
+                <Menu size={18} />
               </button>
 
-              <h1 className='text-xl md:text-2xl font-bold text-gray-800'>
+              <h1 className='text-lg sm:text-xl md:text-2xl font-bold text-gray-800 truncate'>
                 {active}
               </h1>
             </div>
 
-            <div className='flex items-center gap-2 md:gap-4'>
+            <div className='flex items-center gap-1 sm:gap-2 md:gap-4'>
               <div className='relative hidden sm:block'>
                 <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4' />
                 <input
@@ -2341,62 +2316,16 @@ export default function DashboardPage() {
                   className='pl-10 pr-4 py-2 bg-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:bg-white transition-all duration-300 w-48 md:w-64'
                 />
               </div>
-              <div className='relative notifications-dropdown'>
-                <button
-                  onClick={() => setShowNotifications(!showNotifications)}
-                  className='p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200 relative'>
-                  <Bell size={18} />
+              <div className='relative'>
+                <button className='p-1.5 sm:p-2 rounded-lg sm:rounded-xl hover:bg-gray-100 transition-colors duration-200 relative'>
+                  <Bell size={16} className="sm:w-4 sm:h-4" />
                   {notifications.length > 0 && (
-                    <span className='absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full'></span>
+                    <span className='absolute -top-1 -right-1 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-red-500 rounded-full'></span>
                   )}
                 </button>
-
-                {/* Notifications Dropdown */}
-                {showNotifications && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className='absolute right-0 top-full mt-2 w-72 bg-white rounded-lg shadow-md border border-gray-200 z-50'>
-                    <div className='p-3 border-b border-gray-100'>
-                      <h3 className='font-semibold text-gray-800 text-sm'>
-                        Notifications
-                      </h3>
-                    </div>
-                    <div className='max-h-56 overflow-y-auto'>
-                      {notifications.map((notification) => (
-                        <div
-                          key={notification.id}
-                          className='p-3 border-b border-gray-100 hover:bg-gray-50'>
-                          <div className='flex items-start gap-3'>
-                            <div
-                              className={`w-2 h-2 rounded-full mt-2 ${
-                                notification.type === "success"
-                                  ? "bg-green-500"
-                                  : notification.type === "warning"
-                                    ? "bg-yellow-500"
-                                    : "bg-blue-500"
-                              }`}></div>
-                            <div className='flex-1'>
-                              <p className='text-xs text-gray-800'>
-                                {notification.message}
-                              </p>
-                              <p className='text-xs text-gray-500 mt-0.5'>
-                                {notification.time}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className='p-3 border-t border-gray-100'>
-                      <button className='text-sm text-[#10B981] hover:text-[#0ea672] font-medium'>
-                        View all notifications
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
               </div>
+
+
             </div>
           </div>
         </motion.header>
@@ -6217,6 +6146,21 @@ export default function DashboardPage() {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Feedback Form */}
+      <FeedbackForm
+        isOpen={showFeedbackForm}
+        onClose={() => setShowFeedbackForm(false)}
+        onSubmit={(type, message) => {
+          if (type === "success") {
+            setSuccess(message);
+          } else {
+            setError(message);
+          }
+        }}
+      />
+
+
 
     </div>
   );

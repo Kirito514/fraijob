@@ -337,3 +337,25 @@ export async function getChatId() {
     throw error;
   }
 }
+
+// Xabar yuborish uchun umumiy funksiya
+export async function sendMessage(message) {
+  try {
+    const telegramBot = initTelegramBot();
+    
+    if (!telegramBot || !TELEGRAM_CHAT_ID) {
+      throw new Error('Telegram bot yoki chat ID sozlanmagan');
+    }
+
+    await telegramBot.sendMessage(TELEGRAM_CHAT_ID, message, {
+      parse_mode: 'Markdown'
+    });
+    
+    console.log('✅ Xabar yuborildi');
+    return true;
+    
+  } catch (error) {
+    console.error('❌ Xabar yuborishda xatolik:', error);
+    throw error;
+  }
+}

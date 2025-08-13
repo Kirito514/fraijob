@@ -6,12 +6,19 @@ const prisma = new PrismaClient();
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { category, text, userId, userName, userEmail, timestamp } = body;
+    const { rating, type, message, timestamp } = body;
 
-    // Validate required fields
-    if (!category || !text || !userId) {
+    // Validation
+    if (!rating || !type || !message) {
       return NextResponse.json(
-        { error: "Barcha maydonlar to'ldirilishi shart" },
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    if (rating < 1 || rating > 5) {
+      return NextResponse.json(
+        { error: "Rating must be between 1 and 5" },
         { status: 400 }
       );
     }
@@ -19,46 +26,39 @@ export async function POST(request) {
     // Save feedback to database
     const feedback = await prisma.feedback.create({
       data: {
-        category,
-        text,
-        userId,
-        userName,
-        userEmail,
+        rating: parseInt(rating),
+        type,
+        message,
         timestamp: new Date(timestamp),
-        status: 'pending' // pending, reviewed, implemented
+        userAgent: request.headers.get("user-agent") || "",
+        ipAddress: request.headers.get("x-forwarded-for") || 
+                   request.headers.get("x-real-ip") || 
+                   "unknown",
       },
     });
 
-    // Send to Telegram bot
-    try {
-      const telegramMessage = `
-🚀 **Yangi Feedback!**
-
-👤 **Foydalanuvchi**: ${userName}
-📧 **Email**: ${userEmail}
-🏷️ **Kategoriya**: ${getCategoryName(category)}
-📝 **Matn**: ${text}
-⏰ **Vaqt**: ${new Date(timestamp).toLocaleString('uz-UZ')}
-
-#feedback #fraijob #platforma
-      `;
-
-      await sendToTelegramBot(telegramMessage);
-    } catch (telegramError) {
-      console.error("Telegram error:", telegramError);
-      // Don't fail the request if Telegram fails
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "Feedback muvaffaqiyatli saqlandi",
-      feedback
+    // Log feedback for monitoring
+    console.log("New feedback received:", {
+      id: feedback.id,
+      rating,
+      type,
+      message: message.substring(0, 100) + "...",
+      timestamp,
     });
 
-  } catch (error) {
-    console.error("Feedback API error:", error);
     return NextResponse.json(
-      { error: "Server xatosi" },
+      { 
+        success: true, 
+        message: "Feedback submitted successfully",
+        feedbackId: feedback.id 
+      },
+      { status: 201 }
+    );
+
+  } catch (error) {
+    console.error("Error saving feedback:", error);
+    return NextResponse.json(
+      { error: "Failed to save feedback" },
       { status: 500 }
     );
   }
@@ -66,76 +66,40 @@ export async function POST(request) {
 
 export async function GET(request) {
   try {
+    // Get feedback statistics (for admin panel)
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-    const category = searchParams.get('category');
-    const status = searchParams.get('status');
+    const isAdmin = searchParams.get("admin");
 
-    let where = {};
-    
-    if (userId) where.userId = userId;
-    if (category) where.category = category;
-    if (status) where.status = status;
+    if (isAdmin === "true") {
+      const feedbacks = await prisma.feedback.findMany({
+        orderBy: { timestamp: "desc" },
+        take: 50, // Limit to last 50 feedbacks
+      });
 
-    const feedbacks = await prisma.feedback.findMany({
-      where,
-      orderBy: { timestamp: 'desc' },
-      take: 50
-    });
+      const stats = await prisma.feedback.groupBy({
+        by: ["type", "rating"],
+        _count: true,
+      });
 
-    return NextResponse.json({ feedbacks });
+      return NextResponse.json({
+        feedbacks,
+        stats,
+        total: await prisma.feedback.count(),
+      });
+    }
+
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
 
   } catch (error) {
-    console.error("Get feedback error:", error);
+    console.error("Error fetching feedback:", error);
     return NextResponse.json(
-      { error: "Server xatosi" },
+      { error: "Failed to fetch feedback" },
       { status: 500 }
     );
   }
-}
-
-// Helper function to get category name in Uzbek
-function getCategoryName(category) {
-  const categories = {
-    'ui_ux': 'UI/UX Dizayn',
-    'functionality': 'Funksionallik',
-    'performance': 'Tezlik va ishlash',
-    'mobile': 'Mobil versiya',
-    'features': 'Yangi xususiyatlar',
-    'other': 'Boshqa'
-  };
-  return categories[category] || category;
-}
-
-// Send message to Telegram bot
-async function sendToTelegramBot(message) {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-
-  if (!botToken || !chatId) {
-    console.error("Telegram bot token yoki chat ID topilmadi");
-    return;
-  }
-
-  const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-  
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: message,
-      parse_mode: 'Markdown'
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Telegram API error: ${response.status}`);
-  }
-
-  return response.json();
 }
 
 

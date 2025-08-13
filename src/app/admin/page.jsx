@@ -41,6 +41,13 @@ export default async function AdminPage() {
       color: 'from-purple-500 to-purple-600'
     },
     {
+      title: 'Feedback',
+      description: 'Foydalanuvchilar feedbacklarini ko\'rish',
+      icon: '💬',
+      href: '/admin/feedback',
+      color: 'from-orange-500 to-orange-600'
+    },
+    {
       title: 'Kutish ro\'yxati',
       description: 'Kutish ro\'yxatidagi foydalanuvchilar',
       icon: '📝',
