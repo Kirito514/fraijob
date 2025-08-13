@@ -2412,233 +2412,294 @@ export default function DashboardPage() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
                 className='space-y-6'>
-                {/* Welcome Message */}
+                {/* Hero */}
                 <FadeInUp delay={0.1}>
-                  <div className='bg-gradient-to-r from-[#10B981] to-[#34D399] rounded-xl p-4 text-white shadow-md'>
-                    <div className='flex items-center justify-between'>
+                  <div className='relative overflow-hidden rounded-2xl p-6 md:p-7 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-xl'>
+                    <div className='absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl'></div>
+                    <div className='absolute -bottom-12 -left-12 w-56 h-56 bg-white/10 rounded-full blur-3xl'></div>
+                    <div className='relative flex items-start justify-between gap-6'>
                       <div>
-                        <h2 className='text-xl font-bold mb-1'>
-                          Welcome back, {profile.name || "User"}! 👋
-                        </h2>
-                        <p className='text-green-100'>
-                          Ready to take your career to the next level?
-                        </p>
-                      </div>
-                      <div className='text-right'>
-                        <div className='text-2xl font-bold'>
-                          {new Date().toLocaleDateString("en-US", {
-                            weekday: "long",
-                          })}
+                        <div className='flex items-center gap-3'>
+                          <div className='w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center font-semibold'>
+                            {profile.name ? profile.name[0].toUpperCase() : "U"}
+                          </div>
+                          <div>
+                            <h2 className='text-xl md:text-2xl font-semibold'>
+                              Welcome back, {profile.name || "User"}! 👋
+                            </h2>
+                            <p className='text-white/80 text-sm'>Let’s boost your career journey today.</p>
+                          </div>
                         </div>
-                        <div className='text-green-100'>
-                          {new Date().toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
+                        <div className='mt-4 flex flex-wrap items-center gap-2'>
+                          <button onClick={() => setActive("Portfolio")} className='px-3 py-1.5 rounded-lg bg-white text-emerald-700 text-xs md:text-sm font-medium hover:bg-white/90 transition'>Complete profile</button>
+                          <button onClick={() => setActive("Jobs")} className='px-3 py-1.5 rounded-lg border border-white/40 text-white text-xs md:text-sm font-medium hover:bg-white/10 transition'>Find jobs</button>
+                        </div>
+                      </div>
+                      <div className='text-right hidden sm:block'>
+                        <div className='text-sm font-medium'>
+                          {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+                        </div>
+                        <div className='text-xs text-white/80'>
+                          {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                         </div>
                       </div>
                     </div>
                   </div>
                 </FadeInUp>
 
-                {/* Quick Actions Widget */}
-                <FadeInUp delay={0.3}>
-                  <div className='bg-white/80 backdrop-blur-xl rounded-xl p-4 border border-white/30 shadow-md'>
-                    <h3 className='text-base font-semibold text-gray-800 mb-3 flex items-center gap-2'>
-                      <span className='w-2 h-2 bg-green-500 rounded-full animate-pulse'></span>
-                      Quick Actions
-                    </h3>
-                    <div className='grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3'>
-                      <button
-                        onClick={() => setActive("Portfolio")}
-                        className='p-2 md:p-3 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs md:text-sm font-medium hover:shadow-md transition-all duration-300 flex flex-col items-center gap-1 md:gap-1.5'>
-                        <FolderOpen className='w-4 h-4 md:w-5 md:h-5' />
-                        <span className='text-xs md:text-sm'>
-                          Update Portfolio
-                        </span>
-                      </button>
-                      <button
-                        onClick={() => setActive("Jobs")}
-                        className='p-3 md:p-4 rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white text-xs md:text-sm font-medium hover:shadow-lg transition-all duration-300 flex flex-col items-center gap-1 md:gap-2'>
-                        <Briefcase className='w-4 h-4 md:w-5 md:h-5' />
-                        <span className='text-xs md:text-sm'>Find Jobs</span>
-                      </button>
-                      <button
-                        onClick={() => setActive("Freelance")}
-                        className='p-3 md:p-4 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 text-white text-xs md:text-sm font-medium hover:shadow-lg transition-all duration-300 flex flex-col items-center gap-1 md:gap-2'>
-                        <Users className='w-4 h-4 md:w-5 md:h-5' />
-                        <span className='text-xs md:text-sm'>
-                          Browse Projects
-                        </span>
-                      </button>
-                      <button
-                        onClick={() => setActive("Test")}
-                        className='p-3 md:p-4 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs md:text-sm font-medium hover:shadow-lg transition-all duration-300 flex flex-col items-center gap-1 md:gap-2'>
-                        <FileText className='w-4 h-4 md:w-5 md:h-5' />
-                        <span className='text-xs md:text-sm'>Take Test</span>
-                      </button>
-                    </div>
+                {/* Main layout */}
+                <div className='grid grid-cols-1 lg:grid-cols-3 gap-4'>
+                  {/* Left: KPIs, Activity, Quick actions */}
+                  <div className='lg:col-span-2 space-y-4'>
+                    {/* KPI tiles */}
+                    <FadeInUp delay={0.2}>
+                      <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
+                        <div className='rounded-xl bg-white/90 backdrop-blur border border-white/40 shadow-sm p-4 relative overflow-hidden'>
+                          <div className='absolute right-0 top-0 w-16 h-16 bg-emerald-100 rounded-bl-[100%]'></div>
+                          <div className='flex items-center justify-between relative'>
+                            <span className='text-sm text-gray-600'>Applications</span>
+                            <span className='inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700'>
+                              <Briefcase className='h-4 w-4' />
+                            </span>
+                          </div>
+                          <div className='mt-2 text-2xl font-semibold text-gray-900'>2</div>
+                          <div className='mt-2 flex items-end gap-1 h-8'>
+                            <span className='w-1.5 bg-emerald-200 rounded' style={{ height: '40%' }}></span>
+                            <span className='w-1.5 bg-emerald-300 rounded' style={{ height: '60%' }}></span>
+                            <span className='w-1.5 bg-emerald-400 rounded' style={{ height: '80%' }}></span>
+                            <span className='w-1.5 bg-emerald-300 rounded' style={{ height: '55%' }}></span>
+                            <span className='w-1.5 bg-emerald-500 rounded' style={{ height: '100%' }}></span>
+                          </div>
+                        </div>
+
+                        <div className='rounded-xl bg-white/90 backdrop-blur border border-white/40 shadow-sm p-4 relative overflow-hidden'>
+                          <div className='absolute right-0 top-0 w-16 h-16 bg-blue-100 rounded-bl-[100%]'></div>
+                          <div className='flex items-center justify-between relative'>
+                            <span className='text-sm text-gray-600'>Messages</span>
+                            <span className='inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-700'>
+                              <MessagesSquare className='h-4 w-4' />
+                            </span>
+                          </div>
+                          <div className='mt-2 text-2xl font-semibold text-gray-900'>{Array.isArray(chatMessages) ? chatMessages.length : 0}</div>
+                          <div className='mt-2 flex items-end gap-1 h-8'>
+                            <span className='w-1.5 bg-blue-200 rounded' style={{ height: '35%' }}></span>
+                            <span className='w-1.5 bg-blue-300 rounded' style={{ height: '70%' }}></span>
+                            <span className='w-1.5 bg-blue-400 rounded' style={{ height: '50%' }}></span>
+                            <span className='w-1.5 bg-blue-300 rounded' style={{ height: '65%' }}></span>
+                            <span className='w-1.5 bg-blue-500 rounded' style={{ height: '90%' }}></span>
+                          </div>
+                        </div>
+
+                        <div className='rounded-xl bg-white/90 backdrop-blur border border-white/40 shadow-sm p-4 relative overflow-hidden'>
+                          <div className='absolute right-0 top-0 w-16 h-16 bg-amber-100 rounded-bl-[100%]'></div>
+                          <div className='flex items-center justify-between relative'>
+                            <span className='text-sm text-gray-600'>Profile Views</span>
+                            <span className='inline-flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-700'>
+                              <Eye className='h-4 w-4' />
+                            </span>
+                          </div>
+                          <div className='mt-2 text-2xl font-semibold text-gray-900'>—</div>
+                          <div className='mt-2 flex items-end gap-1 h-8'>
+                            <span className='w-1.5 bg-amber-200 rounded' style={{ height: '50%' }}></span>
+                            <span className='w-1.5 bg-amber-300 rounded' style={{ height: '45%' }}></span>
+                            <span className='w-1.5 bg-amber-400 rounded' style={{ height: '75%' }}></span>
+                            <span className='w-1.5 bg-amber-300 rounded' style={{ height: '55%' }}></span>
+                            <span className='w-1.5 bg-amber-500 rounded' style={{ height: '85%' }}></span>
+                          </div>
+                        </div>
+
+                        <div className='rounded-xl bg-white/90 backdrop-blur border border-white/40 shadow-sm p-4 relative overflow-hidden'>
+                          <div className='absolute right-0 top-0 w-16 h-16 bg-purple-100 rounded-bl-[100%]'></div>
+                          <div className='flex items-center justify-between relative'>
+                            <span className='text-sm text-gray-600'>Saved Jobs</span>
+                            <span className='inline-flex h-8 w-8 items-center justify-center rounded-lg bg-purple-50 text-purple-700'>
+                              <FolderOpen className='h-4 w-4' />
+                            </span>
+                          </div>
+                          <div className='mt-2 text-2xl font-semibold text-gray-900'>0</div>
+                          <div className='mt-2 flex items-end gap-1 h-8'>
+                            <span className='w-1.5 bg-purple-200 rounded' style={{ height: '30%' }}></span>
+                            <span className='w-1.5 bg-purple-300 rounded' style={{ height: '55%' }}></span>
+                            <span className='w-1.5 bg-purple-400 rounded' style={{ height: '40%' }}></span>
+                            <span className='w-1.5 bg-purple-300 rounded' style={{ height: '65%' }}></span>
+                            <span className='w-1.5 bg-purple-500 rounded' style={{ height: '70%' }}></span>
+                          </div>
+                        </div>
+                      </div>
+                    </FadeInUp>
+
+                    {/* Application pipeline */}
+                    <FadeInUp delay={0.28}>
+                      <div className='rounded-2xl bg-white/90 backdrop-blur-xl p-6 border border-gray-200 shadow-sm'>
+                        <h3 className='text-lg font-semibold text-gray-900 mb-4'>Application pipeline</h3>
+                        <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
+                          <div className='rounded-xl border border-gray-200 p-4'>
+                            <div className='text-2xl font-semibold text-gray-900'>2</div>
+                            <div className='text-xs text-gray-500'>Applied</div>
+                            <div className='mt-3 h-1.5 w-full rounded-full bg-gray-200'>
+                              <div className='h-1.5 rounded-full bg-emerald-500' style={{ width: '40%' }}></div>
+                            </div>
+                          </div>
+                          <div className='rounded-xl border border-gray-200 p-4'>
+                            <div className='text-2xl font-semibold text-gray-900'>1</div>
+                            <div className='text-xs text-gray-500'>Interview</div>
+                            <div className='mt-3 h-1.5 w-full rounded-full bg-gray-200'>
+                              <div className='h-1.5 rounded-full bg-blue-500' style={{ width: '20%' }}></div>
+                            </div>
+                          </div>
+                          <div className='rounded-xl border border-gray-200 p-4'>
+                            <div className='text-2xl font-semibold text-gray-900'>0</div>
+                            <div className='text-xs text-gray-500'>Offers</div>
+                            <div className='mt-3 h-1.5 w-full rounded-full bg-gray-200'>
+                              <div className='h-1.5 rounded-full bg-indigo-500' style={{ width: '0%' }}></div>
+                            </div>
+                          </div>
+                          <div className='rounded-xl border border-gray-200 p-4'>
+                            <div className='text-2xl font-semibold text-gray-900'>0</div>
+                            <div className='text-xs text-gray-500'>Rejected</div>
+                            <div className='mt-3 h-1.5 w-full rounded-full bg-gray-200'>
+                              <div className='h-1.5 rounded-full bg-rose-500' style={{ width: '0%' }}></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </FadeInUp>
+
+                    {/* Job suggestions */}
+                    <FadeInUp delay={0.32}>
+                      <div className='rounded-2xl bg-white/90 backdrop-blur-xl p-6 border border-gray-200 shadow-sm'>
+                        <div className='flex items-center justify-between mb-4'>
+                          <h3 className='text-lg font-semibold text-gray-900'>Job suggestions</h3>
+                          <button onClick={() => setActive('Jobs')} className='text-sm text-emerald-600 hover:text-emerald-700'>See all</button>
+                        </div>
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                          <div className='rounded-xl border border-gray-200 p-4 hover:bg-gray-50 transition'>
+                            <div className='flex items-start justify-between'>
+                              <div>
+                                <div className='text-sm font-medium text-gray-900'>Frontend Developer</div>
+                                <div className='text-xs text-gray-500'>TechCorp • Remote • Full-time</div>
+                              </div>
+                              <span className='text-xs px-2 py-0.5 rounded-lg bg-gray-100 text-gray-700'>$2.5k–4k</span>
+                            </div>
+                            <div className='mt-3 flex flex-wrap gap-2'>
+                              <span className='text-[11px] px-2 py-1 rounded-md bg-emerald-50 text-emerald-700'>React</span>
+                              <span className='text-[11px] px-2 py-1 rounded-md bg-blue-50 text-blue-700'>TypeScript</span>
+                              <span className='text-[11px] px-2 py-1 rounded-md bg-purple-50 text-purple-700'>Tailwind</span>
+                            </div>
+                            <div className='mt-3'>
+                              <button onClick={() => setActive('Jobs')} className='text-xs px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-100 transition'>View</button>
+                            </div>
+                          </div>
+                          <div className='rounded-xl border border-gray-200 p-4 hover:bg-gray-50 transition'>
+                            <div className='flex items-start justify-between'>
+                              <div>
+                                <div className='text-sm font-medium text-gray-900'>React Native Engineer</div>
+                                <div className='text-xs text-gray-500'>Appify • Hybrid • Contract</div>
+                              </div>
+                              <span className='text-xs px-2 py-0.5 rounded-lg bg-gray-100 text-gray-700'>$3k–5k</span>
+                            </div>
+                            <div className='mt-3 flex flex-wrap gap-2'>
+                              <span className='text-[11px] px-2 py-1 rounded-md bg-indigo-50 text-indigo-700'>React Native</span>
+                              <span className='text-[11px] px-2 py-1 rounded-md bg-pink-50 text-pink-700'>Expo</span>
+                              <span className='text-[11px] px-2 py-1 rounded-md bg-amber-50 text-amber-700'>REST</span>
+                            </div>
+                            <div className='mt-3'>
+                              <button onClick={() => setActive('Jobs')} className='text-xs px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-100 transition'>View</button>
+                            </div>
+                          </div>
+                          <div className='rounded-xl border border-gray-200 p-4 hover:bg-gray-50 transition'>
+                            <div className='flex items-start justify-between'>
+                              <div>
+                                <div className='text-sm font-medium text-gray-900'>UI Engineer</div>
+                                <div className='text-xs text-gray-500'>Designly • Remote • Part-time</div>
+                              </div>
+                              <span className='text-xs px-2 py-0.5 rounded-lg bg-gray-100 text-gray-700'>$1.5k–3k</span>
+                            </div>
+                            <div className='mt-3 flex flex-wrap gap-2'>
+                              <span className='text-[11px] px-2 py-1 rounded-md bg-purple-50 text-purple-700'>Figma</span>
+                              <span className='text-[11px] px-2 py-1 rounded-md bg-blue-50 text-blue-700'>UI</span>
+                              <span className='text-[11px] px-2 py-1 rounded-md bg-emerald-50 text-emerald-700'>Accessibility</span>
+                            </div>
+                            <div className='mt-3'>
+                              <button onClick={() => setActive('Jobs')} className='text-xs px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-100 transition'>View</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </FadeInUp>
+
+                    {/* Upcoming interviews */}
+                    <FadeInUp delay={0.36}>
+                      <div className='rounded-2xl bg-white/90 backdrop-blur-xl p-6 border border-gray-200 shadow-sm'>
+                        <div className='flex items-center justify-between mb-4'>
+                          <h3 className='text-lg font-semibold text-gray-900'>Upcoming interviews</h3>
+                          <button className='text-sm text-emerald-600 hover:text-emerald-700'>Add</button>
+                        </div>
+                        <div className='space-y-3'>
+                          <div className='flex items-start justify-between rounded-xl border border-gray-200 p-4 hover:bg-gray-50 transition'>
+                            <div className='flex items-start gap-3'>
+                              <div className='w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center text-blue-700 font-medium'>13</div>
+                              <div>
+                                <div className='text-sm font-medium text-gray-900'>Frontend Interview • TechCorp</div>
+                                <div className='text-xs text-gray-500'>Wed, 10:30 • Google Meet</div>
+                              </div>
+                            </div>
+                            <button className='text-xs px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-100 transition'>View</button>
+                          </div>
+                          <div className='flex items-start justify-between rounded-xl border border-gray-200 p-4 hover:bg-gray-50 transition'>
+                            <div className='flex items-start gap-3'>
+                              <div className='w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center text-purple-700 font-medium'>15</div>
+                              <div>
+                                <div className='text-sm font-medium text-gray-900'>Tech Screen • Appify</div>
+                                <div className='text-xs text-gray-500'>Fri, 14:00 • Zoom</div>
+                              </div>
+                            </div>
+                            <button className='text-xs px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-100 transition'>View</button>
+                          </div>
+                        </div>
+                      </div>
+                    </FadeInUp>
                   </div>
-                </FadeInUp>
 
-                {/* Progress Tracker */}
-                <FadeInUp delay={0.4}>
-                  <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg'>
-                    <h3 className='text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2'>
-                      <TrendingUp className='w-5 h-5 text-green-500' />
-                      Your Progress
-                    </h3>
-                    <div className='space-y-4'>
-                      {/* Profile Completion */}
-                      <div>
-                        <div className='flex justify-between items-center mb-2'>
-                          <span className='text-sm font-medium text-gray-700'>
-                            Profile Completion
-                          </span>
-                          <span className='text-sm text-gray-500'>85%</span>
+                  {/* Right: Progress + Recommendations */}
+                  <div className='space-y-4'>
+                    {/* Next steps checklist with progress ring */}
+                    <FadeInUp delay={0.25}>
+                      <div className='rounded-2xl bg-white/90 backdrop-blur-xl p-6 border border-gray-200 shadow-sm'>
+                        <div className='flex items-center justify-between mb-3'>
+                          <h3 className='text-base font-semibold text-gray-900'>Next steps</h3>
+                          <span className='text-xs px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100'>85% complete</span>
                         </div>
-                        <div className='w-full bg-gray-200 rounded-full h-2'>
-                          <div
-                            className='bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full'
-                            style={{ width: "85%" }}></div>
+                        <div className='flex items-start gap-4'>
+                          <div className='relative w-24 h-24 flex-shrink-0'>
+                            <div className='absolute inset-0 rounded-full' style={{ background: 'conic-gradient(#10B981 0% 85%, #e5e7eb 85% 100%)' }}></div>
+                            <div className='absolute inset-2 rounded-full bg-white/90 backdrop-blur flex items-center justify-center border border-gray-200'>
+                              <span className='text-lg font-semibold text-gray-900'>85%</span>
+                            </div>
+                          </div>
+                          <div className='flex-1 space-y-2'>
+                            <label className='flex items-center gap-2 text-sm text-gray-800'>
+                              <input type='checkbox' defaultChecked className='rounded text-emerald-600' /> Add 5+ skills
+                            </label>
+                            <label className='flex items-center gap-2 text-sm text-gray-800'>
+                              <input type='checkbox' defaultChecked={false} className='rounded text-emerald-600' /> Upload 2 portfolio items
+                            </label>
+                            <label className='flex items-center gap-2 text-sm text-gray-800'>
+                              <input type='checkbox' defaultChecked className='rounded text-emerald-600' /> Set desired salary range
+                            </label>
+                            <div className='pt-2'>
+                              <button onClick={() => setActive('Portfolio')} className='text-xs px-3 py-1.5 rounded-lg border border-gray-300 hover:bg-gray-100 transition'>Continue</button>
+                            </div>
+                          </div>
                         </div>
                       </div>
+                    </FadeInUp>
 
-                      {/* Skills Progress */}
-                      <div>
-                        <div className='flex justify-between items-center mb-2'>
-                          <span className='text-sm font-medium text-gray-700'>
-                            Skills Assessment
-                          </span>
-                          <span className='text-sm text-gray-500'>
-                            3/5 completed
-                          </span>
-                        </div>
-                        <div className='w-full bg-gray-200 rounded-full h-2'>
-                          <div
-                            className='bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full'
-                            style={{ width: "60%" }}></div>
-                        </div>
-                      </div>
-
-                      {/* Monthly Goal */}
-                      <div>
-                        <div className='flex justify-between items-center mb-2'>
-                          <span className='text-sm font-medium text-gray-700'>
-                            Monthly Goal (Job Applications)
-                          </span>
-                          <span className='text-sm text-gray-500'>2/10</span>
-                        </div>
-                        <div className='w-full bg-gray-200 rounded-full h-2'>
-                          <div
-                            className='bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full'
-                            style={{ width: "20%" }}></div>
-                        </div>
-                      </div>
-                    </div>
+                    {/* Recommendations - removed as requested */}
                   </div>
-                </FadeInUp>
+                </div>
 
-                {/* Recent Activity Feed */}
-                <FadeInUp delay={0.5}>
-                  <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg'>
-                    <h3 className='text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2'>
-                      <Clock className='w-5 h-5 text-blue-500' />
-                      Recent Activity
-                    </h3>
-                    <div className='space-y-3'>
-                      <div className='flex items-center gap-3 p-3 rounded-xl bg-green-50 border border-green-200'>
-                        <div className='w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center'>
-                          <Briefcase size={16} className='text-green-600' />
-                        </div>
-                        <div className='flex-1'>
-                          <div className='text-sm font-medium text-gray-800'>
-                            Applied to Frontend Developer position
-                          </div>
-                          <div className='text-xs text-gray-500'>
-                            2 hours ago at TechCorp
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className='flex items-center gap-3 p-3 rounded-xl bg-purple-50 border border-purple-200'>
-                        <div className='w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center'>
-                          <Users size={16} className='text-purple-600' />
-                        </div>
-                        <div className='flex-1'>
-                          <div className='text-sm font-medium text-gray-800'>
-                            Submitted proposal for React Native App
-                          </div>
-                          <div className='text-xs text-gray-500'>
-                            1 day ago • $2000-3500
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className='flex items-center gap-3 p-3 rounded-xl bg-blue-50 border border-blue-200'>
-                        <div className='w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center'>
-                          <FileText size={16} className='text-blue-600' />
-                        </div>
-                        <div className='flex-1'>
-                          <div className='text-sm font-medium text-gray-800'>
-                            Completed JavaScript Assessment
-                          </div>
-                          <div className='text-xs text-gray-500'>
-                            3 days ago • Score: 85%
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </FadeInUp>
-
-                {/* Skill Recommendations */}
-                <FadeInUp delay={0.6}>
-                  <div className='bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg'>
-                    <h3 className='text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2'>
-                      <Bot className='w-5 h-5 text-indigo-500' />
-                      Recommended for You
-                    </h3>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                      <div className='p-4 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200'>
-                        <div className='flex items-center gap-3 mb-2'>
-                          <div className='w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center'>
-                            <TrendingUp size={16} className='text-indigo-600' />
-                          </div>
-                          <span className='font-medium text-gray-800'>
-                            Learn React Native
-                          </span>
-                        </div>
-                        <p className='text-sm text-gray-600 mb-3'>
-                          Based on your JavaScript skills, React Native is
-                          trending in your area
-                        </p>
-                        <button className='text-xs bg-indigo-500 text-white px-3 py-1 rounded-lg hover:bg-indigo-600 transition-colors'>
-                          Start Learning
-                        </button>
-                      </div>
-
-                      <div className='p-4 rounded-xl bg-gradient-to-r from-green-50 to-teal-50 border border-green-200'>
-                        <div className='flex items-center gap-3 mb-2'>
-                          <div className='w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center'>
-                            <Award size={16} className='text-green-600' />
-                          </div>
-                          <span className='font-medium text-gray-800'>
-                            UI/UX Design
-                          </span>
-                        </div>
-                        <p className='text-sm text-gray-600 mb-3'>
-                          High demand skill that complements your development
-                          background
-                        </p>
-                        <button className='text-xs bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 transition-colors'>
-                          Explore
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </FadeInUp>
+                {/* Removed duplicate sections as requested */}
               </motion.div>
             )}
 
@@ -6157,36 +6218,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      <div className='fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200 p-2 md:hidden z-40'>
-        <div className='flex items-center justify-around'>
-          {menuItems.slice(0, 5).map(({ label, icon: Icon, adminOnly }) => {
-            if (adminOnly && profile.role?.toLowerCase() !== "admin") {
-              return null;
-            }
-
-            return (
-              <button
-                key={label}
-                onClick={() => {
-                  if (label === "Admin Panel") {
-                    window.open("/admin/users", "_blank");
-                  } else {
-                    setActive(label);
-                  }
-                }}
-                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-300 ${
-                  active === label
-                    ? "text-[#10B981]"
-                    : "text-gray-600 hover:text-[#10B981]"
-                }`}>
-                <Icon className='w-5 h-5' />
-                <span className='text-xs font-medium'>{label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }
